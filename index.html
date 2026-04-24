@@ -11,6 +11,9 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif;background:var(--bg-page);min-height:100vh;color:var(--text-dark);padding-bottom:80px;max-width:480px;margin:0 auto}
 .page{display:none;min-height:100vh;background:var(--bg-page);padding-bottom:80px}
 .page.active{display:block}
+/* 登录页面完全独立 */
+#page-login{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);padding-bottom:0}
+#page-login.active{display:flex}
 .login-page{display:flex;min-height:100vh;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);flex-direction:column;align-items:center;padding:20px}
 .login-header-bg{width:100%;height:160px;background:linear-gradient(135deg,#3377FF,#00D2FF);border-radius:0 0 40px 40px;position:absolute;top:0;left:50%;transform:translateX(-50%);width:480px;max-width:100vw}
 .login-content{width:100%;max-width:360px;padding:0 20px;margin-top:120px;position:relative;z-index:10}
@@ -689,13 +692,14 @@ function renderUserList() {
     const container = document.getElementById('user-list-container');
     if (!container) return;
     const colors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#FF9A63,#E87A4E)', 'linear-gradient(135deg,#43E97B,#38F9D7)'];
+    const currentUserId = data.currentUser;
     container.innerHTML = data.users.length === 0 
         ? '<div style="padding:12px;text-align:center;color:var(--text-light);">暂无用户，请创建新账号</div>'
         : data.users.map((u, i) => `
-            <div class="user-select-item" onclick="quickLogin('${u.id}')">
+            <div class="user-select-item" onclick="quickLogin('${u.id}')" style="${u.id === currentUserId ? 'background:#e8f4ff;border:1px solid #3377ff;' : ''}">
                 <div class="item-avatar" style="background:${colors[i%3]};color:white;">${u.name.charAt(0)}</div>
                 <div class="item-info">
-                    <div class="item-name">${u.name}</div>
+                    <div class="item-name">${u.name} ${u.id === currentUserId ? '(当前)' : ''}</div>
                     <div class="item-grade">${gradeNames[u.grade]} · Lv.${u.difficulty}</div>
                 </div>
             </div>
@@ -811,6 +815,11 @@ function showPage(pageId) {
     const bottomNav = document.querySelector('.bottom-nav');
     if (bottomNav) {
         bottomNav.style.display = pageId === 'login' ? 'none' : 'flex';
+    }
+    // 登录页面特殊处理：隐藏首页内容
+    const homePage = document.getElementById('page-home');
+    if (homePage) {
+        homePage.style.display = pageId === 'login' ? 'none' : '';
     }
 }
 
@@ -2522,11 +2531,16 @@ function closeGame() {
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户 V49 加载完成');
+    console.log('认知训练门户 V58 加载完成');
+    // 始终先显示登录页面
+    showPage('login');
+    initLoginPage();
     const data = loadData();
+    // 如果有用户，自动登录
     if (data.currentUser && data.users.find(u=>u.id===data.currentUser)) {
-        updateUI(); syncTodayStats(); showPage('home');
-    } else { initLoginPage(); }
+        setTimeout(() => {
+            updateUI(); syncTodayStats(); showPage('home');
+        }, 100);
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.user-select-wrapper')) { document.getElementById('user-select-dropdown').classList.remove('show'); }
         if (!e.target.closest('.user-menu-wrapper')) { document.getElementById('user-dropdown').classList.remove('show'); }
@@ -2534,9 +2548,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initLoginPage() {
+    showPage('login');
     const data = loadData();
     renderUserList();
-    if (data.users.length === 0) { showCreateUserModal(); }
+    // 如果有用户，默认选中第一个用户
+    if (data.users.length > 0) {
+        const firstUser = data.users[0];
+        document.getElementById('selected-user-display').innerHTML = `<span>${firstUser.name.charAt(0)}</span> ${firstUser.name}`;
+        document.querySelector('.user-select-btn').dataset.userId = firstUser.id;
+        document.getElementById('login-difficulty').value = firstUser.difficulty || 1;
+        document.getElementById('login-form-section').style.display = 'block';
+    } else {
+        document.getElementById('login-form-section').style.display = 'none';
+        showCreateUserModal();
+    }
 }
 
 // ====== 播客音频播放 ======
