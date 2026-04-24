@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V77</title>
+<title>认知训练 V78</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -388,6 +388,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                         <div class="user-dropdown-item" onclick="showUserSwitchModal()"><span>👥</span><span>切换用户</span></div>
                         <div class="user-dropdown-item" onclick="showCreateUserModal()"><span>➕</span><span>创建新账号</span></div>
                         <div class="user-dropdown-item" onclick="openSettingsPanel()"><span>⚙️</span><span>设置</span></div>
+                        <div class="user-dropdown-item" onclick="clearCurrentUserData()"><span>🗑️</span><span>清除数据</span></div>
                         <div class="user-dropdown-item danger" onclick="logoutAndReturn()"><span>🚪</span><span>退出登录</span></div>
                     </div>
                 </div>
@@ -794,62 +795,77 @@ function showCreateUserModal() { document.getElementById('create-user-modal').cl
 function closeCreateUserModal() { document.getElementById('create-user-modal').classList.remove('show'); document.getElementById('create-name').value = ''; }
 
 function createNewUser() {
-    const nameEl = document.getElementById('create-name');
-    const gradeEl = document.getElementById('create-grade');
-    const diffEl = document.getElementById('create-difficulty');
-    if (!nameEl || !gradeEl || !diffEl) {
-        showToast('页面加载错误，请刷新重试');
+    var nameEl = document.getElementById('create-name');
+    var gradeEl = document.getElementById('create-grade');
+    var diffEl = document.getElementById('create-difficulty');
+    
+    var name = nameEl ? nameEl.value.trim() : '';
+    var grade = gradeEl ? parseInt(gradeEl.value) : 7;
+    var difficulty = diffEl ? parseInt(diffEl.value) : 1;
+    
+    if (!name) {
+        showToast('请输入名字');
         return;
     }
-    const name = nameEl.value.trim();
-    const grade = parseInt(gradeEl.value) || 7;
-    const difficulty = parseInt(diffEl.value) || 1;
-    if (!name) { showToast('请输入名字'); return; }
-    const data = loadData();
-    if (data.users.find(u => u.name === name)) { showToast('名字已存在'); return; }
-    const user = {
+    
+    var data = loadData();
+    
+    // 检查名字是否重复
+    if (data.users.some(function(u) { return u.name === name; })) {
+        showToast('名字已存在，请换一个');
+        return;
+    }
+    
+    var newUser = {
         id: 'user_' + Date.now(),
         name: name,
         grade: grade,
         difficulty: difficulty,
-        score: 0,
-        lastLogin: Date.now(),
-        createdAt: Date.now(),
-        abilities: { attention: 65, memory: 60, logic: 70, creativity: 55, problem: 65, strategy: 60 },
-        knowledge: { math: 30, chinese: 30, english: 30, physics: 30, chemistry: 30 },
-        studyDays: {},
-        calendarData: {},
-        planTasks: {},
-        gameScores: {},
-        uploads: { method: [], thinking: [], video: [] },
-        userVideos: [],
-        chatHistory: {},
-        thinkingScores: { logic: 0, creative: 0, critical: 0, system: 0 },
-        practiceRecords: [],
+        points: 1000,
+        createdAt: new Date().toISOString(),
+        stats: {
+            totalQuestions: 0,
+            correctAnswers: 0,
+            totalMinutes: 0,
+            streakDays: 0,
+            lastActiveDate: null
+        },
+        weeklyProgress: {},
         wrongNotes: [],
-        aiChatCount: 0,
-        todayStats: { date: new Date().toDateString(), questions: 0, correct: 0, minutes: 0 },
-        topicResults: {},
-        wrongNoteIds: [],
-        uploadedImages: []
+        completedTopics: []
     };
-    data.users.push(user);
-    data.currentUser = user.id;
+    
+    data.users.push(newUser);
+    data.currentUser = newUser.id;
     saveData(data);
+    
     closeCreateUserModal();
-    // 先切换页面，再更新UI
-    showPage('home');
-    setTimeout(() => {
-        updateUI();
-        syncTodayStats();
-        showToast('账号创建成功！');
-    }, 50);
-}
-
-function confirmClearAllData() {
-    if(confirm('确定要清除所有数据吗？这将删除所有用户和学习记录！')) {
-        clearAllData();
-    }
+    
+    // 同步所有模块数据
+    updateUI();
+    syncTodayStats();
+    renderUserList();
+    
+    // 更新所有相关显示
+    var headerAvatar = document.getElementById('header-avatar');
+    if (headerAvatar) headerAvatar.textContent = name.charAt(0);
+    
+    var greetingName = document.getElementById('greeting-name');
+    if (greetingName) greetingName.textContent = name;
+    
+    var dropdownName = document.getElementById('dropdown-name');
+    if (dropdownName) dropdownName.textContent = name;
+    
+    var dropdownInfo = document.getElementById('dropdown-info');
+    if (dropdownInfo) dropdownInfo.textContent = gradeNames[grade] + ' · Lv.' + difficulty;
+    
+    var difficultyText = document.getElementById('difficulty-text');
+    if (difficultyText) difficultyText.textContent = 'Lv.' + difficulty;
+    
+    showToast('创建成功: ' + name);
+    
+    // 清空表单
+    if (nameEl) nameEl.value = '';
 }
 function clearAllData() {
     if (!confirm('⚠️ 确定要清除所有数据吗？')) return;
@@ -989,6 +1005,40 @@ function switchToUser(userId) {
     syncTodayStats();
     showToast('已切换到: ' + user.name);
 }
+
+
+function clearCurrentUserData() {
+    if (!confirm('确定要清除当前用户的所有数据吗？')) return;
+    
+    var data = loadData();
+    var user = data.users.find(function(u) { return u.id === data.currentUser; });
+    
+    if (!user) {
+        showToast('用户不存在');
+        return;
+    }
+    
+    // 重置用户数据
+    user.points = 0;
+    user.stats = {
+        totalQuestions: 0,
+        correctAnswers: 0,
+        totalMinutes: 0,
+        streakDays: 0,
+        lastActiveDate: null
+    };
+    user.wrongNotes = [];
+    user.completedTopics = [];
+    user.weeklyProgress = {};
+    
+    saveData(data);
+    updateUI();
+    syncTodayStats();
+    closeUserMenu();
+    showToast('已清除 ' + user.name + ' 的数据');
+}
+
+
 
 
 
