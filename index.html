@@ -533,9 +533,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 const STORAGE_KEY = 'cognitive_training_v44';
+const OLD_KEYS = ['cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
+function migrateData() {
+    for (const key of OLD_KEYS) {
+        const old = localStorage.getItem(key);
+        if (old const STORAGE_KEY = 'cognitive_training_v44';const STORAGE_KEY = 'cognitive_training_v44'; !localStorage.getItem(STORAGE_KEY)) {
+            localStorage.setItem(STORAGE_KEY, old);
+            console.log('数据已迁移:', key, '->', STORAGE_KEY);
+        }
+    }
+}
 
 // ====== 数据存储 ======
 function loadData() {
+    migrateData();
     try {
         const data = localStorage.getItem(STORAGE_KEY);
         if (data) return JSON.parse(data);
