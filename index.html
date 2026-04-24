@@ -2315,25 +2315,29 @@ let gameScore = 0, gameType = '', gameLevel = 1, gameTimer = null, gameStartTime
 
 function startGame(type) {
     gameType = type; gameScore = 0; gameLevel = 1;
-    // 显示全屏游戏区域
-    const gameFullscreen = document.getElementById('game-fullscreen-container');
-    if (gameFullscreen) {
-        gameFullscreen.style.display = 'flex';
-        document.getElementById('game-area').style.display = 'block';
-    } else {
-        document.getElementById('game-area').style.display = 'block';
-    }
-    document.getElementById('game-score').textContent = '0';
-    switch(type) {
-        case 'schulte': startSchulte(); break;
-        case 'visual': startVisual(); break;
-        case 'digit': startDigit(); break;
-        case 'pattern': startPattern(); break;
-        case 'tap': startTap(); break;
-        case 'color': startColor(); break;
-        case 'diff': startDiff(); break;
-        case 'reason': startReason(); break;
-    }
+    // 先打开game-play模块来渲染游戏容器
+    openFullscreenPage('game-play');
+    // 延迟启动游戏，等待DOM渲染完成
+    setTimeout(() => {
+        const gameFullscreen = document.getElementById('game-fullscreen-container');
+        if (gameFullscreen) {
+            gameFullscreen.style.display = 'flex';
+            const gameArea = document.getElementById('game-area');
+            if (gameArea) gameArea.style.display = 'block';
+        }
+        const gameScoreEl = document.getElementById('game-score');
+        if (gameScoreEl) gameScoreEl.textContent = '0';
+        switch(type) {
+            case 'schulte': startSchulte(); break;
+            case 'visual': startVisual(); break;
+            case 'digit': startDigit(); break;
+            case 'pattern': startPattern(); break;
+            case 'tap': startTap(); break;
+            case 'color': startColor(); break;
+            case 'diff': startDiff(); break;
+            case 'reason': startReason(); break;
+        }
+    }, 100);
 }
 
 function startSchulte() {
@@ -2510,9 +2514,10 @@ function endGame() {
 function resetGame() { startGame(gameType); }
 function closeGame() { 
     if (gameTimer) clearInterval(gameTimer); 
-    document.getElementById('game-area').style.display = 'none';
-    const gameFullscreen = document.getElementById('game-fullscreen-container');
-    if (gameFullscreen) gameFullscreen.style.display = 'none';
+    // 关闭全屏容器并返回games模块
+    closeFullscreenPage();
+    // 重新打开games模块显示游戏列表
+    setTimeout(() => openFullscreenPage('games'), 50);
 }
 
 // ====== 初始化 ======
