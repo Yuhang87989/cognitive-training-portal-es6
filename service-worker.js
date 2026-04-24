@@ -1,5 +1,5 @@
 // Service Worker for 认知训练门户 PWA
-const CACHE_NAME = 'cognitive-training-v1.0.0';
+const CACHE_NAME = 'cognitive-training-v1.0.57';
 const OFFLINE_URL = '/training_portal_final.html';
 
 // 需要缓存的资源
