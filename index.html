@@ -2932,6 +2932,7 @@ function updatePodcastListState(courseId) { document.querySelectorAll('.podcast-
 // ====== 统一媒体播放器代码 ======
 // ====== 统一媒体播放器核心代码 ======
 var mediaPlayer = {
+    savedPositions: {},
     isPlaying: false,
     currentMedia: null,
     currentIndex: -1,
