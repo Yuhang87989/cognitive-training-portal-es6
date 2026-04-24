@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>测试登录</title>
+<style>
+body { font-family: sans-serif; padding: 20px; background: #f5f6fa; }
+.login-box { background: white; padding: 30px; border-radius: 16px; max-width: 400px; margin: 50px auto; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+h1 { color: #3377FF; margin-bottom: 20px; }
+input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
+button { width: 100%; padding: 14px; background: linear-gradient(135deg, #3377FF, #FF9A63); border: none; border-radius: 10px; color: white; font-size: 16px; cursor: pointer; }
+button:hover { opacity: 0.9; }
+.result { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; display: none; }
+</style>
+</head>
+<body>
+<div class="login-box">
+    <h1>🧠 认知训练 - 测试</h1>
+    <input type="text" id="name" placeholder="输入你的名字">
+    <button onclick="login()">开始训练</button>
+    <div id="result" class="result">
+        <strong>登录成功！</strong><br>
+        欢迎，<span id="welcome-name"></span>
+    </div>
+</div>
+<script>
+function login() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) {
+        alert('请输入名字');
+        return;
+    }
+    localStorage.setItem('test_user', JSON.stringify({name: name, time: new Date().toISOString()}));
+    document.getElementById('welcome-name').textContent = name;
+    document.getElementById('result').style.display = 'block';
+}
+
+// 检查是否已登录
+window.onload = function() {
+    const user = localStorage.getItem('test_user');
+    if (user) {
+        const data = JSON.parse(user);
+        document.getElementById('welcome-name').textContent = data.name;
+        document.getElementById('result').style.display = 'block';
+    }
+};
+</script>
+</body>
+</html>

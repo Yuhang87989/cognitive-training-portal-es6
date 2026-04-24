@@ -537,7 +537,7 @@ const OLD_KEYS = ['cognitive_training_v43', 'cognitive_training_v42', 'cognitive
 function migrateData() {
     for (const key of OLD_KEYS) {
         const old = localStorage.getItem(key);
-        if (old const STORAGE_KEY = 'cognitive_training_v44';const STORAGE_KEY = 'cognitive_training_v44'; !localStorage.getItem(STORAGE_KEY)) {
+        if (old && !localStorage.getItem(STORAGE_KEY)) {
             localStorage.setItem(STORAGE_KEY, old);
             console.log('数据已迁移:', key, '->', STORAGE_KEY);
         }
