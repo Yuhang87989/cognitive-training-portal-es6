@@ -4,16 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V79</title>
+<title>认知训练</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
 body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif;background:var(--bg-page);min-height:100vh;color:var(--text-dark);padding-bottom:80px;max-width:480px;margin:0 auto}
 .page{display:none;min-height:100vh;background:var(--bg-page);padding-bottom:80px}
 .page.active{display:block}
-/* 登录页面完全独立 */
-#page-login{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);padding-bottom:0}
-#page-login.active{display:flex}
 .login-page{display:flex;min-height:100vh;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);flex-direction:column;align-items:center;padding:20px}
 .login-header-bg{width:100%;height:160px;background:linear-gradient(135deg,#3377FF,#00D2FF);border-radius:0 0 40px 40px;position:absolute;top:0;left:50%;transform:translateX(-50%);width:480px;max-width:100vw}
 .login-content{width:100%;max-width:360px;padding:0 20px;margin-top:120px;position:relative;z-index:10}
@@ -30,7 +27,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .user-select-item{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid #f0f0f0}
 .user-select-item:hover{background:#f5f7ff}
 .user-select-item .item-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
-.user-select-item .item-info{flex:1}
 .user-select-item .item-name{font-size:14px;font-weight:600}
 .user-select-item .item-grade{font-size:11px;color:var(--text-light)}
 .input-group{margin-bottom:16px}
@@ -41,7 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .login-btn-primary{background:linear-gradient(135deg,#3377FF,#FF9A63);color:white;box-shadow:0 4px 15px rgba(51,119,255,0.3)}
 .login-btn-secondary{background:#f0f0f0;color:var(--text-dark);margin-top:10px}
 .login-btn-outline{background:white;border:2px solid var(--blue);color:var(--blue);margin-top:10px}
-.create-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
+.create-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
 .create-modal.show{display:flex}
 .create-modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:85vh;overflow-y:auto}
 .create-modal-title{font-size:18px;font-weight:bold;text-align:center;margin-bottom:20px}
@@ -182,7 +178,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .video-info{flex:1}
 .video-title{font-size:14px;font-weight:600;margin-bottom:4px}
 .video-meta{font-size:11px;color:var(--text-light)}
-.video-player-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;flex-direction:column}
+.video-player-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1000;display:none;flex-direction:column}
 .video-player-modal.show{display:flex}
 .vp-header{display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,0.8)}
 .vp-back{color:white;font-size:20px;cursor:pointer;padding:8px}
@@ -194,9 +190,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .vp-progress-bar{height:100%;background:white;border-radius:3px}
 .vp-btn{background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:10px}
 .vp-time{color:white;font-size:13px}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}
-.modal-overlay.show{display:flex !important;animation:fadeIn 0.2s;z-index:9999}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.show{display:flex}
 .modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:18px;font-weight:bold;text-align:center;margin-bottom:20px}
 .modal-close{width:100%;padding:14px;background:var(--gradient-blue);border:none;border-radius:12px;color:white;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
@@ -265,17 +260,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .media-views{font-size:11px;color:var(--text-light);margin-top:2px}
 .media-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;background:rgba(102,126,234,0.1);color:var(--blue)}
 .media-badge.video{background:rgba(255,107,107,0.1);color:#FF6B6B}
-
-.audio-player-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:2000;display:none;flex-direction:column;}
-.audio-player-modal.show{display:flex}
-.mini-player{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:white;border-radius:16px;padding:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);display:flex;align-items:center;z-index:100;}
-
 </style>
 </head>
 <body>
 
 <!-- 登录页 -->
-<div id="page-login" class="page login-page" style="display:none !important;">
+<div id="page-login" class="page login-page active">
     <div class="login-header-bg"></div>
     <div class="login-content">
         <div class="login-logo-area">
@@ -370,7 +360,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 
 <!-- 首页 -->
-<div id="page-home" class="page active" style="display:block;">
+<div id="page-home" class="page">
     <div class="home-header">
         <div class="header-top">
             <div class="app-logo">🧠</div>
@@ -386,9 +376,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                             <div class="user-dropdown-info" id="dropdown-info">初一 · Lv.1</div>
                         </div>
                         <div class="user-dropdown-item" onclick="showUserSwitchModal()"><span>👥</span><span>切换用户</span></div>
-                        <div class="user-dropdown-item" onclick="showCreateUserModal()"><span>➕</span><span>创建新账号</span></div>
                         <div class="user-dropdown-item" onclick="openSettingsPanel()"><span>⚙️</span><span>设置</span></div>
-                        <div class="user-dropdown-item" onclick="clearCurrentUserData()"><span>🗑️</span><span>清除数据</span></div>
                         <div class="user-dropdown-item danger" onclick="logoutAndReturn()"><span>🚪</span><span>退出登录</span></div>
                     </div>
                 </div>
@@ -651,54 +639,23 @@ function playVideoFromList(id) {
 }
 
 function migrateData() {
-    const currentData = localStorage.getItem(STORAGE_KEY);
-    // 如果已有有效数据，跳过迁移
-    if (currentData) {
-        try {
-            const parsed = JSON.parse(currentData);
-            if (parsed && Array.isArray(parsed.users)) return;
-        } catch(e) {}
-    }
-    // 尝试从旧key迁移
     for (const key of OLD_KEYS) {
-        try {
-            const old = localStorage.getItem(key);
-            if (old) {
-                const parsed = JSON.parse(old);
-                if (parsed && Array.isArray(parsed.users)) {
-                    localStorage.setItem(STORAGE_KEY, old);
-                    console.log('数据已迁移:', key, '->', STORAGE_KEY);
-                    return;
-                }
-            }
-        } catch(e) {}
+        const old = localStorage.getItem(key);
+        if (old && !localStorage.getItem(STORAGE_KEY)) {
+            localStorage.setItem(STORAGE_KEY, old);
+            console.log('数据已迁移:', key, '->', STORAGE_KEY);
+        }
     }
 }
 
 // ====== 数据存储 ======
 function loadData() {
+    migrateData();
     try {
-        // 尝试迁移旧数据
-        migrateData();
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { users: [], currentUser: null };
-        const data = JSON.parse(raw);
-        // 验证数据格式
-        if (!data || typeof data !== 'object') {
-            console.log('数据格式错误，重置');
-            return { users: [], currentUser: null };
-        }
-        if (!Array.isArray(data.users)) data.users = [];
-        if (!data.currentUser && data.users.length > 0) {
-            data.currentUser = data.users[0].id;
-        }
-        return data;
-    } catch(e) {
-        console.log('数据加载错误，重置:', e.message);
-        // 清除损坏的数据
-        try { localStorage.removeItem(STORAGE_KEY); } catch(e2) {}
-        return { users: [], currentUser: null };
-    }
+        const data = localStorage.getItem(STORAGE_KEY);
+        if (data) return JSON.parse(data);
+    } catch(e) {}
+    return { users: [], currentUser: null };
 }
 
 function saveData(data) {
@@ -721,6 +678,187 @@ function syncUserData(user) {
 
 const gradeNames = {5:'五年级',6:'六年级',7:'初一',8:'初二',9:'初三'};
 
+// ====== 用户管理 ======
+function toggleUserSelect() {
+    document.getElementById('user-select-dropdown').classList.toggle('show');
+    document.querySelector('.user-select-btn').classList.toggle('active');
+}
+
+function renderUserList() {
+    const data = loadData();
+    const container = document.getElementById('user-list-container');
+    if (!container) return;
+    const colors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#FF9A63,#E87A4E)', 'linear-gradient(135deg,#43E97B,#38F9D7)'];
+    container.innerHTML = data.users.length === 0 
+        ? '<div style="padding:12px;text-align:center;color:var(--text-light);">暂无用户，请创建新账号</div>'
+        : data.users.map((u, i) => `
+            <div class="user-select-item" onclick="quickLogin('${u.id}')">
+                <div class="item-avatar" style="background:${colors[i%3]};color:white;">${u.name.charAt(0)}</div>
+                <div class="item-info">
+                    <div class="item-name">${u.name}</div>
+                    <div class="item-grade">${gradeNames[u.grade]} · Lv.${u.difficulty}</div>
+                </div>
+            </div>
+        `).join('');
+}
+
+function quickLogin(userId) {
+    const data = loadData();
+    const user = data.users.find(u => u.id === userId);
+    if (!user) return;
+    data.currentUser = userId;
+    saveData(data);
+    document.getElementById('selected-user-display').innerHTML = `<span>${user.name.charAt(0)}</span> ${user.name}`;
+    document.getElementById('login-form-section').style.display = 'block';
+    document.getElementById('login-difficulty').value = user.difficulty || 1;
+    document.querySelector('.user-select-btn').dataset.userId = userId;
+    document.getElementById('user-select-dropdown').classList.remove('show');
+}
+
+function handleLogin() {
+    const data = loadData();
+    const btn = document.querySelector('.user-select-btn');
+    const userId = btn.dataset.userId;
+    const difficulty = parseInt(document.getElementById('login-difficulty').value);
+    if (userId) {
+        const user = data.users.find(u => u.id === userId);
+        if (user) { 
+            user.difficulty = difficulty; 
+            user.lastLogin = Date.now(); 
+            data.currentUser = userId; 
+            saveData(data); 
+        }
+    } else {
+        showToast('请先选择学习者');
+        return;
+    }
+    updateUI(); syncTodayStats(); showPage('home');
+}
+
+function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
+function closeCreateUserModal() { document.getElementById('create-user-modal').classList.remove('show'); document.getElementById('create-name').value = ''; }
+
+function createNewUser() {
+    const name = document.getElementById('create-name').value.trim();
+    const grade = parseInt(document.getElementById('create-grade').value);
+    const difficulty = parseInt(document.getElementById('create-difficulty').value);
+    if (!name) { showToast('请输入名字'); return; }
+    const data = loadData();
+    if (data.users.find(u => u.name === name)) { showToast('名字已存在'); return; }
+    const user = {
+        id: 'user_' + Date.now(), name, grade, difficulty, score: 0, lastLogin: Date.now(), createdAt: Date.now(),
+        abilities: { attention: 65, memory: 60, logic: 70, creativity: 55, problem: 65, strategy: 60 },
+        knowledge: { math: 30, chinese: 30, english: 30, physics: 30, chemistry: 30 },
+        studyDays: {}, calendarData: {}, planTasks: {}, gameScores: {},
+        uploads: { method: [], thinking: [], video: [] },
+        userVideos: [], chatHistory: {}, thinkingScores: { logic: 0, creative: 0, critical: 0, system: 0 },
+        practiceRecords: [], wrongNotes: [], aiChatCount: 0,
+        todayStats: { date: new Date().toDateString(), questions: 0, correct: 0, minutes: 0 },
+        // 母题相关
+        topicResults: {}, // {topicId: {correct, wrong, lastTime}}
+        wrongNoteIds: [], // 错题ID列表
+        uploadedImages: [] // 上传的错题图片
+    };
+    data.users.push(user); data.currentUser = user.id; saveData(data);
+    closeCreateUserModal(); updateUI(); showPage('home'); showToast('账号创建成功！');
+}
+
+function confirmClearAllData() {
+    if(confirm('确定要清除所有数据吗？这将删除所有用户和学习记录！')) {
+        clearAllData();
+    }
+}
+function clearAllData() {
+    if (!confirm('⚠️ 确定要清除所有数据吗？')) return;
+    localStorage.removeItem(STORAGE_KEY); location.reload();
+}
+
+// ====== UI更新 ======
+function updateUI() {
+    const user = getCurrentUserData();
+    if (!user) return;
+    document.getElementById('greeting-name').textContent = user.name;
+    document.getElementById('difficulty-text').textContent = 'Lv.' + user.difficulty;
+    document.getElementById('header-avatar').textContent = user.name.charAt(0);
+    document.getElementById('dropdown-name').textContent = user.name;
+    document.getElementById('dropdown-info').textContent = `${gradeNames[user.grade]} · Lv.${user.difficulty}`;
+}
+
+function syncTodayStats() {
+    const user = getCurrentUserData();
+    if (!user) return;
+    const today = new Date().toDateString();
+    let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
+    if (todayStats.date !== today) { todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; user.todayStats = todayStats; syncUserData(user); }
+    document.getElementById('today-questions').textContent = user.aiChatCount || 0;
+    document.getElementById('today-correct').textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
+    document.getElementById('today-minutes').textContent = todayStats.minutes || 0;
+    const studyDays = user.studyDays || {};
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        if (studyDays[d.toISOString().split('T')[0]]) streak++; else if (i > 0) break;
+    }
+    document.getElementById('today-streak').textContent = streak;
+}
+
+// ====== 页面切换 ======
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.classList.add('active');
+    // 登录页面隐藏底部导航
+    const bottomNav = document.querySelector('.bottom-nav');
+    if (bottomNav) {
+        bottomNav.style.display = pageId === 'login' ? 'none' : 'flex';
+    }
+}
+
+function closeFullscreenPage() { document.getElementById('fullscreen-container').classList.remove('active'); }
+function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('show'); }
+
+function showUserSwitchModal() {
+    closeUserMenu();
+    const data = loadData();
+    const container = document.getElementById('switch-user-list');
+    container.innerHTML = data.users.map(u => `
+        <div class="user-select-item" onclick="switchToUser('${u.id}')" style="${u.id === data.currentUser ? 'background:#f0f7ff;' : ''}">
+            <div class="item-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">${u.name.charAt(0)}</div>
+            <div class="item-info">
+                <div class="item-name">${u.name} ${u.id === data.currentUser ? '(当前)' : ''}</div>
+                <div class="item-grade">${gradeNames[u.grade]} · Lv.${u.difficulty}</div>
+            </div>
+        </div>
+    `).join('');
+    document.getElementById('user-switch-modal').classList.add('show');
+}
+
+function closeUserSwitchModal() { document.getElementById('user-switch-modal').classList.remove('show'); }
+function switchToUser(userId) { const data = loadData(); data.currentUser = userId; saveData(data); closeUserSwitchModal(); updateUI(); syncTodayStats(); }
+function logoutAndReturn() { closeUserMenu(); showPage('login'); initLoginPage(); }
+
+function openDifficultyModal() {
+    const user = getCurrentUserData();
+    document.querySelectorAll('.level-btn').forEach(btn => {
+        const lvl = parseInt(btn.dataset.level);
+        btn.style.borderColor = lvl === (user?.difficulty || 1) ? '#3377FF' : '#ddd';
+        btn.style.background = lvl === (user?.difficulty || 1) ? '#e8f4ff' : 'white';
+    });
+    document.getElementById('difficulty-modal').classList.add('show');
+}
+function closeDifficultyModal() { document.getElementById('difficulty-modal').classList.remove('show'); }
+function setDifficulty(level) {
+    const data = loadData();
+    const user = data.users.find(u => u.id === data.currentUser);
+    if (user) { user.difficulty = level; saveData(data); updateUI(); }
+    closeDifficultyModal();
+}
+function openSettingsPanel() { document.getElementById('settings-panel').style.display = 'flex'; }
+function closeSettingsPanel(e) { if (e && e.target !== e.currentTarget) return; document.getElementById('settings-panel').style.display = 'none'; }
+function showToast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+
+// ====== 126道母题数据 ======
+// 初一数学21道
 const topicsMath7 = [
     {id:101,title:'有理数加法',diff:2,q:'计算：(-3)+(+7)+(-5)=?',a:'-1',e:'去括号：-3+7-5=-1'},
     {id:102,title:'有理数乘法',diff:2,q:'计算：(-2)×(-3)×(+4)=?',a:'24',e:'负负得正：(-2)×(-3)=6, 6×4=24'},
@@ -745,6 +883,7 @@ const topicsMath7 = [
     {id:121,title:'绝对值方程',diff:3,q:'解方程：|x-3|=5',a:'x=8或x=-2',e:'x-3=5或x-3=-5'}
 ];
 
+// 初一英语21道
 const topicsEnglish7 = [
     {id:201,title:'一般现在时',diff:2,q:'He ____ (go) to school every day.',a:'goes',e:'第三人称单数动词加s'},
     {id:202,title:'现在进行时',diff:2,q:'Look! The children ____ (play) in the park.',a:'are playing',e:'look提示进行时，be+ing'},
@@ -769,6 +908,7 @@ const topicsEnglish7 = [
     {id:221,title:'动词短语',diff:2,q:'Please turn ____ the radio. It\'s too noisy.',a:'down/off',e:'turn down关小/off关掉'}
 ];
 
+// 初一语文21道
 const topicsChinese7 = [
     {id:301,title:'拼音拼读',diff:1,q:'"兴奋"的读音是？',a:'xīng fèn',e:'兴读xīng时表示精神旺盛'},
     {id:302,title:'字形辨析',diff:2,q:'下列词语中没有错别字的一项：A辩论 B辨论 C辩沦 D辨论',a:'A',e:'辩论的"辩"是言字旁'},
@@ -793,6 +933,9 @@ const topicsChinese7 = [
     {id:321,title:'古诗默写',diff:2,q:'默写《静夜思》全诗',a:'床前明月光，疑是地上霜。举头望明月，低头思故乡。',e:'李白名篇'}
 ];
 
+
+
+// 五年级数学21道
 const topicsMath5 = [
     {id:101,title:'小数加减法',diff:2,q:'计算：3.25+1.75=',a:'5',e:'对齐小数点相加'},
     {id:102,title:'小数乘法',diff:2,q:'计算：0.5×0.4=',a:'0.2',e:'按整数乘法计算后点小数点'},
@@ -817,6 +960,7 @@ const topicsMath5 = [
     {id:121,title:'单位换算',diff:2,q:'2.5小时=多少分钟？',a:'150分钟',e:'2.5×60=150'}
 ];
 
+// 五年级英语21道
 const topicsEnglish5 = [
     {id:201,title:'一般现在时',diff:2,q:'She ____ (have) a cat.',a:'has',e:'第三人称单数动词加s/es'},
     {id:202,title:'现在进行时',diff:2,q:'He ____ (read) a book now.',a:'is reading',e:'be+动词ing'},
@@ -841,6 +985,7 @@ const topicsEnglish5 = [
     {id:221,title:'词汇运用',diff:2,q:'Monday, Tuesday, ____ (Wednesday)',a:'Wednesday',e:'一周顺序'}
 ];
 
+// 五年级语文21道
 const topicsChinese5 = [
     {id:301,title:'拼音拼读',diff:1,q:'"骄傲"的读音是？',a:'jiāo ào',e:'骄傲是多音字'},
     {id:302,title:'字形辨析',diff:2,q:'下列词语中没有错别字的是：A决不相同 B绝不相同 C决不不相同 D绝不相同',a:'B',e:'"决"和"绝"区别'},
@@ -864,7 +1009,7 @@ const topicsChinese5 = [
     {id:320,title:'写作要素',diff:2,q:'记叙文的六要素是什么？',a:'时间、地点、人物、起因、经过、结果',e:'记叙文要素'},
     {id:321,title:'名著阅读',diff:2,q:'《西游记》中孙悟空使用的兵器叫什么？',a:'如意金箍棒',e:'东海龙宫的定海神针'}
 ];
-
+// 六年级数学21道
 const topicsMath6 = [
     {id:101,title:'分数乘法',diff:2,q:'计算：2/3×6=',a:'4',e:'分子分母约分'},
     {id:102,title:'分数除法',diff:3,q:'计算：3/4÷2=',a:'3/8',e:'除以一个数等于乘倒数'},
@@ -889,6 +1034,7 @@ const topicsMath6 = [
     {id:121,title:'统计量',diff:2,q:'一组数据2,3,3,4,5,5,5的众数是？',a:'3和5',e:'出现次数最多的数'}
 ];
 
+// 六年级英语21道
 const topicsEnglish6 = [
     {id:201,title:'一般现在时',diff:2,q:'My mother ____ (work) in a hospital.',a:'works',e:'第三人称单数动词加s'},
     {id:202,title:'现在进行时',diff:2,q:'Look! The birds ____ (fly) in the sky.',a:'are flying',e:'现在进行时be+ing'},
@@ -913,6 +1059,7 @@ const topicsEnglish6 = [
     {id:221,title:'阅读理解策略',diff:3,q:'阅读理解中，如何找主旨大意？',a:'看首段和末段',e:'阅读技巧'}
 ];
 
+// 六年级语文21道
 const topicsChinese6 = [
     {id:301,title:'拼音拼读',diff:1,q:'"水平"的读音是？',a:'shuǐ píng',e:'声调正确标注'},
     {id:302,title:'字形辨析',diff:2,q:'"戊"和"戌"的区别是？',a:'笔画不同',e:'戊wù戌xū'},
@@ -936,7 +1083,57 @@ const topicsChinese6 = [
     {id:320,title:'名著阅读',diff:2,q:'《鲁滨逊漂流记》作者是谁？',a:'笛福',e:'英国作家'},
     {id:321,title:'综合实践',diff:2,q:'开展"读书分享会"，需要准备什么？',a:'好书推荐、分享稿',e:'活动准备'}
 ];
+// 初二物理21道
+const topicsPhysics8 = [
+    {id:901,title:'机械运动',diff:2,q:'小明坐在行驶的汽车上，以下列哪个物体为参照物他是静止的？',a:'汽车座椅',e:'相对静止要求参照物与物体运动状态相同'},
+    {id:902,title:'速度计算',diff:2,q:'汽车以60km/h的速度行驶3小时，行驶了多少公里？',a:'180km',e:'路程=速度×时间'},
+    {id:903,title:'声音传播',diff:2,q:'声音在15℃空气中传播速度约为多少m/s？',a:'340m/s',e:'声音在空气中速度约为340m/s'},
+    {id:904,title:'光的反射',diff:3,q:'光线与平面镜夹角30°，反射角是多少度？',a:'30°或60°',e:'反射角等于入射角，注意光线与镜面夹角的换算'},
+    {id:905,title:'凸透镜成像',diff:3,q:'物体放在凸透镜2倍焦距处，成像特点是？',a:'倒立、等大、实像',e:'u=2f时，成倒立、等大的实像'},
+    {id:906,title:'密度计算',diff:3,q:'一块铝块质量54g，体积20cm³，密度是多少？',a:'2.7g/cm³',e:'密度=质量÷体积'},
+    {id:907,title:'力的概念',diff:2,q:'力的作用效果是什么？',a:'改变物体运动状态或使物体发生形变',e:'力可以改变运动状态或形状'},
+    {id:908,title:'重力计算',diff:2,q:'质量为10kg的物体受到的重力是多少？',a:'98N',e:'G=mg，g=9.8N/kg'},
+    {id:909,title:'二力平衡',diff:3,q:'静止在桌面上的书，受到的重力和支持力是什么关系？',a:'平衡力',e:'大小相等、方向相反、作用在同一直线上'},
+    {id:910,title:'摩擦力',diff:3,q:'用手握住瓶子，瓶子不掉，是因为什么力？',a:'静摩擦力',e:'静摩擦力与重力平衡'},
+    {id:911,title:'压强计算',diff:3,q:'重10N、底面积0.1m²的物体对水平面的压强是多少？',a:'100Pa',e:'P=F/S'},
+    {id:912,title:'液体压强',diff:3,q:'在液体内部，深度越深，压强越____',a:'大',e:'液体压强随深度增加而增大'},
+    {id:913,title:'大气压强',diff:2,q:'标准大气压约为多少Pa？',a:'1.01×10⁵Pa',e:'标准大气压约10⁵Pa'},
+    {id:914,title:'浮力计算',diff:4,q:'在水中称量弹簧测力计示数为4N的物体，物体在水中浮力为2N，物体体积是多少？(ρ水=1×10³kg/m³)',a:'2×10⁻⁴m³',e:'F浮=ρgV排'},
+    {id:915,title:'阿基米德原理',diff:3,q:'浸在液体中的物体受到的浮力等于什么？',a:'它排开的液体所受重力',e:'F浮=G排'},
+    {id:916,title:'功的计算',diff:3,q:'用50N的力将物体水平移动3m，做功多少？',a:'150J',e:'W=Fs（力与移动方向一致）'},
+    {id:917,title:'功率计算',diff:3,q:'机器在10s内做功500J，功率是多少W？',a:'50W',e:'P=W/t'},
+    {id:918,title:'动能',diff:3,q:'物体的动能与什么因素有关？',a:'质量和速度',e:'动能与质量成正比，与速度平方成正比'},
+    {id:919,title:'势能',diff:2,q:'物体的重力势能与什么因素有关？',a:'质量和高度',e:'势能与质量和高度有关'},
+    {id:920,title:'机械能守恒',diff:3,q:'在只有重力或弹力做功的物体系统中，机械能____',a:'守恒',e:'机械能守恒定律'},
+    {id:921,title:'杠杆平衡',diff:3,q:'杠杆动力臂是阻力臂的2倍，若阻力为100N，动力至少多少？',a:'50N',e:'F1×L1=F2×L2'}
+];
 
+// 初三化学21道
+const topicsChemistry9 = [
+    {id:1001,title:'化学变化',diff:2,q:'下列属于化学变化的是？',a:'燃烧',e:'燃烧有新物质生成，属于化学变化'},
+    {id:1002,title:'分子原子',diff:2,q:'分子和原子的主要区别是什么？',a:'化学变化中分子可分，原子不可分',e:'分子由原子构成'},
+    {id:1003,title:'元素符号',diff:1,q:'氧元素的符号是什么？',a:'O',e:'元素符号统一用拉丁文首字母'},
+    {id:1004,title:'化学式',diff:2,q:'水的化学式是什么？',a:'H₂O',e:'水由氢氧两种元素组成'},
+    {id:1005,title:'化合价',diff:3,q:'说出常见元素的化合价规则',a:'氢+1，氧-2，金属正价',e:'化合物中化合价代数和为零'},
+    {id:1006,title:'质量守恒',diff:3,q:'在化学反应前后，什么不变？',a:'物质总质量',e:'质量守恒定律'},
+    {id:1007,title:'化学方程式',diff:3,q:'配平：C + O₂ → CO₂',a:'C + O₂ =点燃= CO₂',e:'方程两边原子种类和数目相等'},
+    {id:1008,title:'氧气性质',diff:2,q:'氧气能使带火星的木条怎样？',a:'复燃',e:'氧气支持燃烧'},
+    {id:1009,title:'燃烧条件',diff:3,q:'燃烧需要满足哪三个条件？',a:'可燃物、氧气、温度达到着火点',e:'灭火原理：破坏任一条件'},
+    {id:1010,title:'二氧化碳',diff:2,q:'二氧化碳能使澄清石灰水怎样？',a:'变浑浊',e:'CO₂+Ca(OH)₂=CaCO₃↓+H₂O'},
+    {id:1011,title:'溶液组成',diff:2,q:'溶液由什么组成？',a:'溶剂和溶质',e:'溶液是均一稳定的混合物'},
+    {id:1012,title:'溶解度',diff:3,q:'影响固体溶解度的因素是什么？',a:'温度',e:'气体溶解度还与压强有关'},
+    {id:1013,title:'酸碱指示剂',diff:2,q:'紫色石蕊遇酸变什么色？',a:'红色',e:'石蕊遇酸变红，遇碱变蓝'},
+    {id:1014,title:'中和反应',diff:3,q:'酸和碱反应生成什么？',a:'盐和水',e:'中和反应是复分解反应'},
+    {id:1015,title:'pH值',diff:2,q:'pH<7的溶液呈什么性？',a:'酸性',e:'pH越小酸性越强'},
+    {id:1016,title:'金属活动性',diff:3,q:'金属活动性顺序中，位置越靠前，活动性越____',a:'强',e:'K Ca Na Mg Al Zn Fe...'},
+    {id:1017,title:'置换反应',diff:3,q:'Fe + CuSO₄ = ?',a:'FeSO₄ + Cu',e:'铁比铜活泼，能置换出铜'},
+    {id:1018,title:'复分解反应',diff:4,q:'复分解反应发生的条件是什么？',a:'生成沉淀、气体或水',e:'必须有沉淀、气体或水生成'},
+    {id:1019,title:'粗盐提纯',diff:3,q:'粗盐提纯的步骤是什么？',a:'溶解、过滤、蒸发、结晶',e:'除去不溶性杂质'},
+    {id:1020,title:'离子检验',diff:3,q:'如何检验CO₃²⁻离子？',a:'加稀盐酸，将气体通入澄清石灰水',e:'产生使石灰水变浑浊的气体'},
+    {id:1021,title:'化学计算',diff:4,q:'64g氧气中含有多少个氧分子？',a:'2NA或1.204×10²⁴个',e:'n=m/M, N=n×NA'}
+];
+
+// 初二数学21道
 const topicsMath8 = [
     {id:401,title:'全等三角形',diff:3,q:'AB=DE，AC=DF，BC=EF，能判定△ABC≌△DEF吗？',a:'能，SSS',e:'三边对应相等全等'},
     {id:402,title:'等腰三角形',diff:3,q:'等腰三角形一个底角为50°，顶角为？',a:'80°',e:'底角×2+顶角=180°'},
@@ -961,6 +1158,7 @@ const topicsMath8 = [
     {id:421,title:'中位线定理',diff:3,q:'三角形两边中点连线叫什么？有什么性质？',a:'中位线，平行于第三边且等于它的一半',e:'三角形中位线定理'}
 ];
 
+// 初二英语21道
 const topicsEnglish8 = [
     {id:501,title:'现在完成时',diff:3,q:'I ____ (study) English for 3 years.',a:'have studied',e:'for+时间段，现在完成时'},
     {id:502,title:'被动语态',diff:3,q:'The book ____ (write) by Lu Xun.',a:'was written',e:'过去写的，一般过去时被动'},
@@ -985,6 +1183,7 @@ const topicsEnglish8 = [
     {id:521,title:'情景交际',diff:2,q:'如何用英语说"我完全同意"？',a:"I can't agree more.",e:'同意的表达'}
 ];
 
+// 初三数学21道
 const topicsMath9 = [
     {id:701,title:'一元二次方程',diff:3,q:'解方程：x²-5x+6=0',a:'x₁=2, x₂=3',e:'因式分解：(x-2)(x-3)=0'},
     {id:702,title:'配方法',diff:3,q:'用配方法解：x²+4x-5=0',a:'x₁=1, x₂=-5',e:'配成(x+2)²=9'},
@@ -1009,6 +1208,7 @@ const topicsMath9 = [
     {id:721,title:'切线判定',diff:4,q:'如何判定一条直线是圆的切线？',a:'圆心到直线的距离等于半径',e:'切线的判定定理'}
 ];
 
+// 初二语文21道
 const topicsChinese8 = [
     {id:601,title:'文言实词',diff:3,q:'解释"学而不厌"中"厌"的意思',a:'满足',e:'厌：满足'},
     {id:602,title:'文言虚词',diff:3,q:'"而"在"人不知而不愠"中的用法是？',a:'转折，却',e:'而：表转折'},
@@ -1033,6 +1233,7 @@ const topicsChinese8 = [
     {id:621,title:'古文理解',diff:3,q:'《爱莲说》中"莲"象征什么？',a:'君子',e:'托物言志'}
 ];
 
+// 初三英语21道
 const topicsEnglish9 = [
     {id:801,title:'语法综合',diff:3,q:'By next year, I ____ (study) English for 5 years.',a:'will have studied',e:'by+将来时间，将来完成时'},
     {id:802,title:'被动语态',diff:3,q:'改写：They are building a new school.',a:'A new school is being built.',e:'现在进行时的被动'},
@@ -1057,328 +1258,864 @@ const topicsEnglish9 = [
     {id:821,title:'谚语理解',diff:3,q:'No pain, no gain是什么意思？',a:'没有付出就没有收获',e:'英语谚语'}
 ];
 
+// 合并所有母题
+const allTopics = {
+    5: { math: topicsMath5, english: topicsEnglish5, chinese: topicsChinese5 },
+    6: { math: topicsMath6, english: topicsEnglish6, chinese: topicsChinese6 },
+    7: { math: topicsMath7, english: topicsEnglish7, chinese: topicsChinese7 },
+    8: { math: topicsMath8, english: topicsEnglish8, chinese: topicsChinese8, physics: topicsPhysics8 },
+    9: { math: topicsMath9, english: topicsEnglish9, chemistry: topicsChemistry9 }
+};
 
-
-// ====== 用户管理 ======
-function toggleUserSelect() {
-    document.getElementById('user-select-dropdown').classList.toggle('show');
-    document.querySelector('.user-select-btn').classList.toggle('active');
+// 计算总题数
+function getTotalTopicCount() {
+    let count = 0;
+    for (const grade in allTopics) {
+        for (const subject in allTopics[grade]) {
+            count += allTopics[grade][subject].length;
+        }
+    }
+    return count;
 }
 
-function renderUserList() {
-    const data = loadData();
-    const container = document.getElementById('user-list-container');
-    if (!container) return;
-    const colors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#FF9A63,#E87A4E)', 'linear-gradient(135deg,#43E97B,#38F9D7)'];
-    const currentUserId = data.currentUser;
-    container.innerHTML = data.users.length === 0 
-        ? '<div style="padding:12px;text-align:center;color:var(--text-light);">暂无用户，请创建新账号</div>'
-        : data.users.map((u, i) => `
-            <div class="user-select-item" onclick="quickLogin('${u.id}')" style="${u.id === currentUserId ? 'background:#e8f4ff;border:1px solid #3377ff;' : ''}">
-                <div class="item-avatar" style="background:${colors[i%3]};color:white;">${u.name.charAt(0)}</div>
-                <div class="item-info">
-                    <div class="item-name">${u.name} ${u.id === currentUserId ? '(当前)' : ''}</div>
-                    <div class="item-grade">${gradeNames[u.grade]} · Lv.${u.difficulty}</div>
+// ====== 全屏页面内容 ======
+const pageContent = {
+    avatar: {
+        title: '🎓 AI数字分身',
+        content: `
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">👨‍🏫 选择你的专属老师</div>
+                <div class="teacher-list">
+                    <div class="teacher-item active" onclick="selectTeacher('math', this)">
+                        <div class="teacher-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">📐</div>
+                        <div class="teacher-name">赵老师</div><div class="teacher-subject">数学</div>
+                    </div>
+                    <div class="teacher-item" onclick="selectTeacher('chinese', this)">
+                        <div class="teacher-avatar" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);">📝</div>
+                        <div class="teacher-name">李老师</div><div class="teacher-subject">语文</div>
+                    </div>
+                    <div class="teacher-item" onclick="selectTeacher('english', this)">
+                        <div class="teacher-avatar" style="background:linear-gradient(135deg,#43E97B,#38F9D7);">📖</div>
+                        <div class="teacher-name">王老师</div><div class="teacher-subject">英语</div>
+                    </div>
+                    <div class="teacher-item" onclick="selectTeacher('physics', this)">
+                        <div class="teacher-avatar" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">⚡</div>
+                        <div class="teacher-name">陈老师</div><div class="teacher-subject">物理</div>
+                    </div>
+                    <div class="teacher-item" onclick="selectTeacher('chemistry', this)">
+                        <div class="teacher-avatar" style="background:linear-gradient(135deg,#fa709a,#fee140);">🧪</div>
+                        <div class="teacher-name">林老师</div><div class="teacher-subject">化学</div>
+                    </div>
                 </div>
             </div>
-        `).join('');
+            <div class="card">
+                <div style="font-size:16px;font-weight:bold;margin-bottom:16px;">💬 和老师对话</div>
+                <div class="chat-container" style="height:380px;">
+                    <div class="chat-messages" id="teacher-messages" style="flex:1;overflow-y:auto;padding:12px;">
+                        <div class="chat-msg">
+                            <div class="chat-avatar">📐</div>
+                            <div class="chat-bubble">同学你好！我是赵老师，擅长数学辅导。有什么问题可以问我哦！😊</div>
+                        </div>
+                    </div>
+                    <div class="template-btns">
+                        <button class="template-btn" onclick="insertTeacherMsg('教我解方程')">解方程</button>
+                        <button class="template-btn" onclick="insertTeacherMsg('几何证明怎么做')">几何</button>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="teacher-input" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendTeacherMsg()"/>
+                        <button class="chat-send" onclick="sendTeacherMsg()">发送</button>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    practice: {
+        title: '🎯 AI精准练',
+        content: `
+            <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="font-size:32px;">🔍</div>
+                    <div>
+                        <div style="font-size:15px;font-weight:bold;">薄弱点诊断</div>
+                        <div style="font-size:12px;opacity:0.9;margin-top:4px;">拍照上传错题，AI智能分析薄弱环节</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="upload-zone" onclick="document.getElementById('practice-upload').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">拍照或上传错题图片</div>
+                    <div class="upload-hint">AI将自动分析并给出学习建议</div>
+                </div>
+                <input type="file" id="practice-upload" accept="image/*" capture="environment" style="display:none" onchange="handlePracticePhoto(this)">
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">📁 我的错题照片</div>
+                <div id="wrong-photo-list">
+                    <div style="text-align:center;padding:20px;color:var(--text-light);">暂无上传的错题照片</div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">🎯 选择学科开始练习</div>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                    <div style="background:#f5f7ff;padding:16px;border-radius:12px;text-align:center;cursor:pointer;" onclick="openFullscreenPage('topics')">
+                        <div style="font-size:28px;margin-bottom:8px;">📐</div>
+                        <div style="font-weight:600;">数学</div>
+                    </div>
+                    <div style="background:#f5f7ff;padding:16px;border-radius:12px;text-align:center;cursor:pointer;" onclick="openFullscreenPage('topics')">
+                        <div style="font-size:28px;margin-bottom:8px;">📝</div>
+                        <div style="font-weight:600;">语文</div>
+                    </div>
+                    <div style="background:#f5f7ff;padding:16px;border-radius:12px;text-align:center;cursor:pointer;" onclick="openFullscreenPage('topics')">
+                        <div style="font-size:28px;margin-bottom:8px;">📖</div>
+                        <div style="font-weight:600;">英语</div>
+                    </div>
+                    <div style="background:#f5f7ff;padding:16px;border-radius:12px;text-align:center;cursor:pointer;" onclick="showToast('物理模块开发中')">
+                        <div style="font-size:28px;margin-bottom:8px;">⚡</div>
+                        <div style="font-weight:600;">物理</div>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    map: {
+        title: '🧠 认知地图',
+        content: `
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">🕸️ 六维能力雷达图</div>
+                <canvas id="radar-canvas" width="280" height="220" style="margin:10px auto;display:block;"></canvas>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;">
+                    <div style="text-align:center;padding:10px;background:rgba(52,119,255,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#3377FF;" id="radar-attention">65</div>
+                        <div style="font-size:10px;">注意力</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(67,233,123,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#43E97B;" id="radar-memory">60</div>
+                        <div style="font-size:10px;">记忆力</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(255,154,99,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#FF9A63;" id="radar-logic">70</div>
+                        <div style="font-size:10px;">逻辑思维</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(155,89,182,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#9B59B6;" id="radar-creativity">55</div>
+                        <div style="font-size:10px;">创造力</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(52,152,219,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#3498db;" id="radar-problem">65</div>
+                        <div style="font-size:10px;">问题解决</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(241,196,15,0.08);border-radius:10px;">
+                        <div style="font-size:18px;font-weight:bold;color:#f1c40f;" id="radar-strategy">60</div>
+                        <div style="font-size:10px;">学习策略</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">📊 知识掌握度</div>
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+                    <div style="text-align:center;padding:10px;background:rgba(52,119,255,0.1);border-radius:10px;">
+                        <div style="font-size:16px;font-weight:bold;color:#3377FF;" id="know-math">30%</div>
+                        <div style="font-size:10px;">数学</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(67,233,123,0.1);border-radius:10px;">
+                        <div style="font-size:16px;font-weight:bold;color:#43E97B;" id="know-chinese">30%</div>
+                        <div style="font-size:10px;">语文</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(255,154,99,0.1);border-radius:10px;">
+                        <div style="font-size:16px;font-weight:bold;color:#FF9A63;" id="know-english">30%</div>
+                        <div style="font-size:10px;">英语</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(155,89,182,0.1);border-radius:10px;">
+                        <div style="font-size:16px;font-weight:bold;color:#9B59B6;" id="know-physics">0%</div>
+                        <div style="font-size:10px;">物理</div>
+                    </div>
+                    <div style="text-align:center;padding:10px;background:rgba(52,152,219,0.1);border-radius:10px;">
+                        <div style="font-size:16px;font-weight:bold;color:#3498db;" id="know-chemistry">0%</div>
+                        <div style="font-size:10px;">化学</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">📅 学习日历</div>
+                <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;" id="study-calendar"></div>
+                <div style="display:flex;justify-content:center;gap:8px;margin-top:8px;font-size:10px;color:var(--text-light);">
+                    <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+                </div>
+            </div>
+        `
+    },
+    plan: {
+        title: '📅 学习计划',
+        content: `
+            <div class="card">
+                <div class="plan-calendar">
+                    <div class="calendar-header">
+                        <div style="font-weight:600;" id="plan-month">2026年4月</div>
+                    </div>
+                    <div class="calendar-grid" id="plan-calendar-grid"></div>
+                </div>
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">📋 今日任务</div>
+                <div class="plan-task"><div class="task-checkbox"></div><div class="task-text">认知训练游戏 3关</div><div class="task-time">10分钟</div></div>
+                <div class="plan-task"><div class="task-checkbox"></div><div class="task-text">母题练习 5道</div><div class="task-time">15分钟</div></div>
+                <div class="plan-task"><div class="task-checkbox"></div><div class="task-text">思维训练 1关</div><div class="task-time">5分钟</div></div>
+            </div>
+        `
+    },
+    topics: {
+        title: '📚 母题训练',
+        content: `
+            <div class="stats-bar">
+                <div class="stats-bar-item">
+                    <div class="stats-bar-value" id="topic-total">126</div>
+                    <div class="stats-bar-label">总题数</div>
+                </div>
+                <div class="stats-bar-item">
+                    <div class="stats-bar-value" id="topic-done">0</div>
+                    <div class="stats-bar-label">已完成</div>
+                </div>
+                <div class="stats-bar-item">
+                    <div class="stats-bar-value" id="topic-accuracy">0%</div>
+                    <div class="stats-bar-label">正确率</div>
+                </div>
+                <div class="stats-bar-item">
+                    <div class="stats-bar-value" id="topic-wrong">0</div>
+                    <div class="stats-bar-label">错题数</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="grade-tab">
+                    <button class="grade-tab-btn active" onclick="filterTopics(7,this)">初一</button>
+                    <button class="grade-tab-btn" onclick="filterTopics(8,this)">初二</button>
+                    <button class="grade-tab-btn" onclick="filterTopics(9,this)">初三</button>
+                </div>
+                <div class="subject-tab" id="subject-tabs">
+                    <button class="subject-tab-btn active" onclick="filterSubjects('math',this)">📐数学</button>
+                    <button class="subject-tab-btn" onclick="filterSubjects('chinese',this)">📝语文</button>
+                    <button class="subject-tab-btn" onclick="filterSubjects('english',this)">📖英语</button>
+                </div>
+            </div>
+            <div id="topics-list" style="padding:0 12px;"></div>
+            <div class="card" style="margin:12px;" onclick="showWrongNotes()">
+                <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+                    <div>
+                        <div style="font-size:14px;font-weight:600;">📝 错题本</div>
+                        <div style="font-size:12px;color:var(--text-gray);margin-top:4px;">已收录 <span id="wrong-note-count">0</span> 道错题</div>
+                    </div>
+                    <div style="color:var(--blue);font-size:20px;">→</div>
+                </div>
+            </div>
+        `
+    },
+    method: {
+        title: '💡 学霸方法',
+        content: `
+            <div class="card">
+                <div style="font-size:16px;font-weight:bold;margin-bottom:12px;">🚀 高效学习方法</div>
+                <div class="method-card" onclick="showMethodDetail('feynman')">
+                    <div class="method-title">🧠 费曼学习法</div>
+                    <div class="method-content">把学到的知识用自己的话讲给别人听，如果别人能听懂，说明你真正掌握了。</div><div style="margin-top:8px;"><button class="game-btn btn-blue" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('feynman')">🗣️ 开始练习</button></div></div>
+                <div class="method-card" onclick="showMethodDetail('pomodoro')">
+                    <div class="method-title">⏰ 番茄工作法</div>
+                    <div class="method-content">25分钟专注学习，5分钟休息，循环进行，提高效率。</div><div style="margin-top:8px;"><button class="game-btn btn-orange" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('pomodoro')">🍅 开始计时</button></div></div>
+                <div class="method-card" onclick="showMethodDetail('ebbinghaus')">
+                    <div class="method-title">🔄 艾宾浩斯记忆法</div>
+                    <div class="method-content">学习后1天、3天、7天、14天、30天分别复习，加深长期记忆。</div><div style="margin-top:8px;"><button class="game-btn btn-green" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('ebbinghaus')">🧮 记忆测试</button></div></div>
+                <div class="method-card" onclick="showMethodDetail('mindmap')">
+                    <div class="method-title">🎨 思维导图法</div>
+                    <div class="method-content">用图形和关键词将知识点连接起来，形成系统化的知识结构。</div><div style="margin-top:8px;"><button class="game-btn btn-blue" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('mindmap')">🎨 绘制练习</button></div></div>
+                <div class="method-card" onclick="showMethodDetail('cornell')">
+                    <div class="method-title">📝 康奈尔笔记法</div>
+                    <div class="method-content">将笔记分为要点、线索、总结三个区域，提高复习效率。</div><div style="margin-top:8px;"><button class="game-btn btn-orange" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('cornell')">📋 笔记练习</button></div></div>
+                <div class="method-card" onclick="showMethodDetail('sq3r')">
+                    <div class="method-title">📖 SQ3R阅读法</div>
+                    <div class="method-content">Survey泛读、Question提问、Read阅读、Recite复述、Review复习。</div><div style="margin-top:8px;"><button class="game-btn btn-green" style="padding:6px 12px;font-size:12px;" onclick="event.stopPropagation();startMethodPractice('sq3r')">📖 阅读训练</button></div></div>
+            </div>
+        `
+    },
+    thinking: {
+        title: '🧩 思维训练',
+        content: `
+            <div class="card">
+                <div style="font-size:16px;font-weight:bold;margin-bottom:12px;">选择训练类型</div>
+                <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+                    <button style="padding:20px;background:white;border-radius:12px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05);" onclick="startThinking('logic')">
+                        <div style="font-size:36px;margin-bottom:8px;">📐</div>
+                        <div style="font-weight:600;">逻辑思维</div>
+                        <div style="font-size:11px;color:var(--text-light);margin-top:4px;">推理与分析</div>
+                    </button>
+                    <button style="padding:20px;background:white;border-radius:12px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05);" onclick="startThinking('creative')">
+                        <div style="font-size:36px;margin-bottom:8px;">💡</div>
+                        <div style="font-weight:600;">创意思维</div>
+                        <div style="font-size:11px;color:var(--text-light);margin-top:4px;">发散与联想</div>
+                    </button>
+                    <button style="padding:20px;background:white;border-radius:12px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05);" onclick="startThinking('critical')">
+                        <div style="font-size:36px;margin-bottom:8px;">🔍</div>
+                        <div style="font-weight:600;">批判思维</div>
+                        <div style="font-size:11px;color:var(--text-light);margin-top:4px;">评估与判断</div>
+                    </button>
+                    <button style="padding:20px;background:white;border-radius:12px;border:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05);" onclick="startThinking('system')">
+                        <div style="font-size:36px;margin-bottom:8px;">🧠</div>
+                        <div style="font-weight:600;">系统思维</div>
+                        <div style="font-size:11px;color:var(--text-light);margin-top:4px;">整体与联系</div>
+                    </button>
+                </div>
+            </div>
+            <div id="thinking-area"></div>
+        `
+    },
+    podcast: {
+        title: '🎧 播客课堂',
+        content: `
+            <div class="card">
+                <div class="grade-tab">
+                    <button class="grade-tab-btn active" onclick="filterPodcast('study',this)">学习方法</button>
+                    <button class="grade-tab-btn" onclick="filterPodcast('science',this)">科普知识</button>
+                    <button class="grade-tab-btn" onclick="filterPodcast('story',this)">名人故事</button>
+                </div>
+            </div>
+            
+            <div id="media-list">
+                <!-- 音频课程 -->
+                <div class="media-item" data-id="audio1" onclick="playMediaCourse('audio1')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#667eea,#764ba2);">🎧<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">英语听力训练技巧</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>王老师 · 12:30</span></div><div class="media-views">2341次播放</div></div>
+                </div>
+                <div class="media-item" data-id="audio2" onclick="playMediaCourse('audio2')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);">🧠<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">费曼学习法详解</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>李老师 · 8:45</span></div><div class="media-views">4521次播放</div></div>
+                </div>
+                <div class="media-item" data-id="audio3" onclick="playMediaCourse('audio3')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#43E97B,#38F9D7);">⏰<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">时间管理秘诀</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>张老师 · 10:20</span></div><div class="media-views">3892次播放</div></div>
+                </div>
+                <div class="media-item" data-id="audio4" onclick="playMediaCourse('audio4')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">📐<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">数学思维培养</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>赵老师 · 15:00</span></div><div class="media-views">2156次播放</div></div>
+                </div>
+                <div class="media-item" data-id="audio5" onclick="playMediaCourse('audio5')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#f6d365,#fda085);">📝<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">古诗词鉴赏技巧</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>陈老师 · 11:30</span></div><div class="media-views">1876次播放</div></div>
+                </div>
+                <div class="media-item" data-id="audio6" onclick="playMediaCourse('audio6')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#fa709a,#fee140);">⚡<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">物理概念入门</div><div class="media-meta"><span class="media-badge">🎧音频</span><span>林老师 · 14:00</span></div><div class="media-views">1567次播放</div></div>
+                </div>
+                
+                <!-- 视频课程 -->
+                <div style="padding:12px 0 8px;font-size:14px;font-weight:bold;color:var(--text-dark);border-top:1px dashed var(--border-gray);margin-top:8px;">📺 视频课程</div>
+                
+                <div class="media-item" data-id="video1" onclick="playMediaCourse('video1')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#667eea,#764ba2);">🎬<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">高效学习技巧</div><div class="media-meta"><span class="media-badge video">📺视频</span><span>赵老师 · 5:30</span></div><div class="media-views">12000次播放</div></div>
+                </div>
+                <div class="media-item" data-id="video2" onclick="playMediaCourse('video2')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);">🎬<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">时间管理方法</div><div class="media-meta"><span class="media-badge video">📺视频</span><span>张老师 · 8:15</span></div><div class="media-views">8000次播放</div></div>
+                </div>
+                <div class="media-item" data-id="video3" onclick="playMediaCourse('video3')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#43E97B,#38F9D7);">📐<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">数学解题大招</div><div class="media-meta"><span class="media-badge video">📺视频</span><span>赵老师 · 12:00</span></div><div class="media-views">5600次播放</div></div>
+                </div>
+                <div class="media-item" data-id="video4" onclick="playMediaCourse('video4')">
+                    <div class="media-thumb" style="background:linear-gradient(135deg,#4facfe,#00f2fe);">🗣️<div class="media-playing-indicator">●</div></div>
+                    <div class="media-info"><div class="media-title">英语口语训练</div><div class="media-meta"><span class="media-badge video">📺视频</span><span>王老师 · 15:45</span></div><div class="media-views">4300次播放</div></div>
+                </div>
+            </div>
+            <div style="padding:12px;text-align:center;color:var(--text-light);font-size:12px;">共21个音频 + 21个视频课程</div>
+共21个音频课程</div>
+                <div class="podcast-item" onclick="playPodcast('费曼学习法详解')">
+                    <div class="podcast-thumb">🧠</div>
+                    <div class="podcast-info">
+                        <div class="podcast-title">费曼学习法详解</div>
+                        <div class="podcast-meta">李老师 · 8:45</div>
+                    </div>
+                </div>
+                <div class="podcast-item" onclick="playPodcast('时间管理秘诀')">
+                    <div class="podcast-thumb">⏰</div>
+                    <div class="podcast-info">
+                        <div class="podcast-title">时间管理秘诀</div>
+                        <div class="podcast-meta">张老师 · 10:20</div>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    video: {
+        title: '📺 视频课堂',
+        content: `
+            <div class="card" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);color:white;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="font-size:32px;">🎬</div>
+                    <div>
+                        <div style="font-size:15px;font-weight:bold;">视频学习中心</div>
+                        <div style="font-size:12px;opacity:0.9;margin-top:4px;">精选21个视频课程 + 本地上传</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="upload-zone" onclick="document.getElementById('video-upload').click()">
+                    <div class="upload-icon">📤</div>
+                    <div class="upload-text">点击上传本地视频</div>
+                    <div class="upload-hint">支持 mp4、webm、mov 格式</div>
+                </div>
+                <input type="file" id="video-upload" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
+            </div>
+            <div class="card">
+                <div style="font-size:14px;font-weight:bold;margin-bottom:12px;">📹 推荐视频</div>
+                <div class="video-item" onclick="playVideo('高效学习技巧','https://www.w3schools.com/html/mov_bbb.mp4')">
+                    <div class="video-thumb" style="background:linear-gradient(135deg,#667eea,#764ba2);">
+                        <span class="play-icon">▶</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">高效学习技巧</div>
+                        <div class="video-meta">5:30 · 播放量 1.2万</div>
+                    </div>
+                </div>
+                <div class="video-item" onclick="playVideo('时间管理方法','https://www.w3schools.com/html/movie.mp4')">
+                    <div class="video-thumb" style="background:linear-gradient(135deg:#FF9A63,#E87A4E);">
+                        <span class="play-icon">▶</span>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">时间管理方法</div>
+                        <div class="video-meta">8:15 · 播放量 8千</div>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    games: {
+        title: '🎮 训练游戏',
+        content: `
+            <div class="games-grid">
+                <div class="game-card" onclick="startGame('schulte')">
+                    <div class="game-icon-area gradient-blue-solid">🎯</div>
+                    <div class="game-name">舒尔特方格</div>
+                    <div class="game-desc">注意力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('visual')">
+                    <div class="game-icon-area gradient-orange-blue">👁️</div>
+                    <div class="game-name">视觉搜索</div>
+                    <div class="game-desc">注意力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('digit')">
+                    <div class="game-icon-area gradient-purple-pink">🔢</div>
+                    <div class="game-name">数字记忆</div>
+                    <div class="game-desc">记忆力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('pattern')">
+                    <div class="game-icon-area gradient-green">🎨</div>
+                    <div class="game-name">图形记忆</div>
+                    <div class="game-desc">记忆力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('tap')">
+                    <div class="game-icon-area gradient-cyan">⚡</div>
+                    <div class="game-name">快速点击</div>
+                    <div class="game-desc">反应力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('color')">
+                    <div class="game-icon-area gradient-yellow">🌈</div>
+                    <div class="game-name">颜色识别</div>
+                    <div class="game-desc">反应力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('diff')">
+                    <div class="game-icon-area gradient-pink">🔍</div>
+                    <div class="game-name">找不同</div>
+                    <div class="game-desc">观察力训练</div>
+                </div>
+                <div class="game-card" onclick="startGame('reason')">
+                    <div class="game-icon-area gradient-blue-solid">🧩</div>
+                    <div class="game-name">图形推理</div>
+                    <div class="game-desc">观察力训练</div>
+                </div>
+            </div>
+        `
+    },
+    'game-play': {
+        title: '🎮 游戏训练',
+        content: `
+            <div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-page);z-index:500;display:none;flex-direction:column;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:white;border-bottom:1px solid #eee;">
+                    <button onclick="closeGame()" style="background:none;border:none;font-size:20px;cursor:pointer;">← 返回</button>
+                    <div id="game-title" style="font-size:16px;font-weight:bold;">游戏</div>
+                    <div id="game-score" style="font-size:18px;font-weight:bold;color:var(--blue);">0</div>
+                </div>
+                <div id="game-area" style="flex:1;display:none;padding:16px;overflow:auto;">
+                    <div id="game-board" class="game-board size-3"></div>
+                </div>
+            </div>
+        `
+    },
+    deepseek: {
+        title: '🤖 DeepSeek AI助手',
+        content: `
+            <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <div style="font-size:32px;">🤖</div>
+                    <div>
+                        <div style="font-size:15px;font-weight:bold;">DeepSeek 智能助手</div>
+                        <div style="font-size:12px;opacity:0.9;margin-top:4px;">随时为你解答各学科问题</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" style="padding:0;">
+                <div class="chat-container" style="height:450px;">
+                    <div class="chat-messages" id="deepseek-messages" style="flex:1;overflow-y:auto;padding:12px;">
+                        <div class="chat-msg">
+                            <div class="chat-avatar">🤖</div>
+                            <div class="chat-bubble">你好！我是DeepSeek智能助手，可以回答各学科问题。有什么可以帮你的吗？😊</div>
+                        </div>
+                    </div>
+                    <div class="template-btns">
+                        <button class="template-btn" onclick="insertDeepseekMsg('帮我解答数学题')">数学</button>
+                        <button class="template-btn" onclick="insertDeepseekMsg('教我学习英语')">英语</button>
+                        <button class="template-btn" onclick="insertDeepseekMsg('物理知识点总结')">物理</button>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" id="deepseek-input" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendDeepseekMsg()"/>
+                        <button class="chat-send" onclick="startVoiceInput('deepseek-input')" title="语音输入" style="background:#667eea;">🎤</button>
+                        <button class="chat-send" onclick="sendDeepseekMsg()">发送</button>
+                    </div>
+                </div>
+            </div>
+        `
+    }
+};
+
+function openFullscreenPage(pageId) {
+    if (pageId === 'home') { closeFullscreenPage(); return; }
+    const page = pageContent[pageId];
+    if (!page) return;
+    document.getElementById('fullscreen-title').textContent = page.title;
+    document.getElementById('fullscreen-content').innerHTML = page.content;
+    document.getElementById('fullscreen-container').classList.add('active');
+    if (pageId === 'map') setTimeout(initMap, 100);
+    if (pageId === 'topics') setTimeout(() => { initTopics(); updateTopicStats(); }, 100);
+    if (pageId === 'plan') setTimeout(initPlan, 100);
 }
 
-function quickLogin(userId) {
-    const data = loadData();
-    const user = data.users.find(u => u.id === userId);
-    if (!user) return;
-    data.currentUser = userId;
-    saveData(data);
-    const displayEl = document.getElementById('selected-user-display');
-    const formEl = document.getElementById('login-form-section');
-    const diffEl = document.getElementById('login-difficulty');
-    const btn = document.querySelector('.user-select-btn');
-    const dropdown = document.getElementById('user-select-dropdown');
-    if (displayEl) displayEl.innerHTML = '<span>' + user.name.charAt(0) + '</span> ' + user.name;
-    if (formEl) formEl.style.display = 'block';
-    if (diffEl) diffEl.value = user.difficulty || 1;
-    if (btn) btn.dataset.userId = userId;
-    if (dropdown) dropdown.classList.remove('show');
-}
-
-function handleLogin() {
-    const data = loadData();
-    const btn = document.querySelector('.user-select-btn');
-    if (!btn || !btn.dataset.userId) {
-        showToast('请先选择学习者');
-        return;
-    }
-    const userId = btn.dataset.userId;
-    const diffEl = document.getElementById('login-difficulty');
-    const difficulty = diffEl ? parseInt(diffEl.value) : 1;
-    const user = data.users.find(u => u.id === userId);
-    if (user) { 
-        user.difficulty = difficulty; 
-        user.lastLogin = Date.now(); 
-        data.currentUser = userId; 
-        saveData(data); 
-        // 先切换页面，再更新UI
-        showPage('home');
-        setTimeout(() => {
-            updateUI();
-            syncTodayStats();
-        }, 50);
-    } else {
-        showToast('用户不存在，请重新选择');
+// ====== DeepSeek API ======
+async function callDeepSeek(messages, onChunk, onComplete) {
+    try {
+        const response = await fetch(DEEPSEEK_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + DEEPSEEK_API_KEY },
+            body: JSON.stringify({ model: DEEPSEEK_MODEL, messages: messages, stream: false }),
+            signal: AbortSignal.timeout(30000)
+        });
+        if (!response.ok) throw new Error('API请求失败: ' + response.status);
+        const data = await response.json();
+        const content = data.choices?.[0]?.message?.content || '';
+        if (onChunk && content) onChunk(content);
+        if (onComplete) onComplete(content);
+        const user = getCurrentUserData();
+        if (user) { user.aiChatCount = (user.aiChatCount || 0) + 1; syncUserData(user); syncTodayStats(); }
+        return content;
+    } catch (error) {
+        console.error('DeepSeek API错误:', error);
+        const errMsg = error.message.includes('Failed to fetch') ? '网络连接失败，请检查网络' : '服务暂时不可用';
+        if (onComplete) onComplete('抱歉，' + errMsg + '。您可以点击设置查看充值方法。');
+        return null;
     }
 }
 
-function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
-function closeCreateUserModal() { document.getElementById('create-user-modal').classList.remove('show'); document.getElementById('create-name').value = ''; }
-
-function createNewUser() {
-    var nameEl = document.getElementById('create-name');
-    var gradeEl = document.getElementById('create-grade');
-    var diffEl = document.getElementById('create-difficulty');
-    
-    var name = nameEl ? nameEl.value.trim() : '';
-    var grade = gradeEl ? parseInt(gradeEl.value) : 7;
-    var difficulty = diffEl ? parseInt(diffEl.value) : 1;
-    
-    if (!name) {
-        showToast('请输入名字');
-        return;
-    }
-    
-    var data = loadData();
-    
-    // 检查名字是否重复
-    if (data.users.some(function(u) { return u.name === name; })) {
-        showToast('名字已存在，请换一个');
-        return;
-    }
-    
-    var newUser = {
-        id: 'user_' + Date.now(),
-        name: name,
-        grade: grade,
-        difficulty: difficulty,
-        points: 1000,
-        createdAt: new Date().toISOString(),
-        stats: {
-            totalQuestions: 0,
-            correctAnswers: 0,
-            totalMinutes: 0,
-            streakDays: 0,
-            lastActiveDate: null
-        },
-        weeklyProgress: {},
-        wrongNotes: [],
-        completedTopics: []
-    };
-    
-    data.users.push(newUser);
-    data.currentUser = newUser.id;
-    saveData(data);
-    
-    closeCreateUserModal();
-    
-    // 同步所有模块数据
-    updateUI();
-    syncTodayStats();
-    renderUserList();
-    
-    // 更新所有相关显示
-    var headerAvatar = document.getElementById('header-avatar');
-    if (headerAvatar) headerAvatar.textContent = name.charAt(0);
-    
-    var greetingName = document.getElementById('greeting-name');
-    if (greetingName) greetingName.textContent = name;
-    
-    var dropdownName = document.getElementById('dropdown-name');
-    if (dropdownName) dropdownName.textContent = name;
-    
-    var dropdownInfo = document.getElementById('dropdown-info');
-    if (dropdownInfo) dropdownInfo.textContent = gradeNames[grade] + ' · Lv.' + difficulty;
-    
-    var difficultyText = document.getElementById('difficulty-text');
-    if (difficultyText) difficultyText.textContent = 'Lv.' + difficulty;
-    
-    showToast('创建成功: ' + name);
-    
-    // 清空表单
-    if (nameEl) nameEl.value = '';
-}
-function clearAllData() {
-    if (!confirm('⚠️ 确定要清除所有数据吗？')) return;
-    localStorage.removeItem(STORAGE_KEY); location.reload();
-}
-
-// ====== UI更新 ======
-function updateUI() {
-    const user = getCurrentUserData();
-    if (!user) return;
-    const greetingEl = document.getElementById('greeting-name');
-    const diffEl = document.getElementById('difficulty-text');
-    const avatarEl = document.getElementById('header-avatar');
-    const dropNameEl = document.getElementById('dropdown-name');
-    const dropInfoEl = document.getElementById('dropdown-info');
-    if (greetingEl) greetingEl.textContent = user.name;
-    if (diffEl) diffEl.textContent = 'Lv.' + user.difficulty;
-    if (avatarEl) avatarEl.textContent = user.name.charAt(0);
-    if (dropNameEl) dropNameEl.textContent = user.name;
-    if (dropInfoEl) dropInfoEl.textContent = gradeNames[user.grade] + ' · Lv.' + user.difficulty;
-}
-
-function syncTodayStats() {
-    const user = getCurrentUserData();
-    if (!user) return;
-    const today = new Date().toDateString();
-    let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
-    if (todayStats.date !== today) { 
-        todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; 
-        user.todayStats = todayStats; 
-        syncUserData(user); 
-    }
-    // 安全地更新DOM元素
-    const questionsEl = document.getElementById('today-questions');
-    const correctEl = document.getElementById('today-correct');
-    const minutesEl = document.getElementById('today-minutes');
-    const streakEl = document.getElementById('today-streak');
-    if (questionsEl) questionsEl.textContent = user.aiChatCount || 0;
-    if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
-    if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
-    const studyDays = user.studyDays || {};
-    let streak = 0;
-    for (let i = 0; i < 365; i++) {
-        const d = new Date(); 
-        d.setDate(d.getDate() - i);
-        if (studyDays[d.toISOString().split('T')[0]]) streak++; 
-        else if (i > 0) break;
-    }
-    if (streakEl) streakEl.textContent = streak;
-}
-
-// ====== 页面切换 ======
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById('page-' + pageId);
-    if (target) target.classList.add('active');
-    // 登录页面隐藏底部导航
-    const bottomNav = document.querySelector('.bottom-nav');
-    if (bottomNav) {
-        bottomNav.style.display = pageId === 'login' ? 'none' : 'flex';
-    }
-    // 登录页面特殊处理：隐藏首页内容
-    const homePage = document.getElementById('page-home');
-    if (homePage) {
-        homePage.style.display = pageId === 'login' ? 'none' : '';
-    }
-}
-
-function closeFullscreenPage() { const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
-function toggleUserMenu() {
-    var el = document.getElementById('user-dropdown');
-    if (el) el.classList.toggle('show');
-}
-
-
-
-function closeUserMenu() {
-    var el = document.getElementById('user-dropdown');
-    if (el) el.classList.remove('show');
-}
-
-
-
-function showUserSwitchModal() {
-    closeUserMenu();
-    var data = loadData();
-    
-    if (data.users.length === 0) {
-        showToast('暂无用户，请先创建账号');
-        return;
-    }
-    
-    if (data.users.length === 1) {
-        showToast('只有一个用户：' + data.users[0].name + '，无需切换');
-        return;
-    }
-    
-    var container = document.getElementById('switch-user-list');
-    if (!container) {
-        showToast('页面加载异常');
-        return;
-    }
-    
-    var colors = ['#667eea', '#FF9A63', '#43E97B'];
-    var htmlContent = '';
-    
-    data.users.forEach(function(u, i) {
-        var isCurrent = u.id === data.currentUser;
-        htmlContent += '<div class="user-select-item" onclick="switchToUser(\'' + u.id + '\')" style="' + (isCurrent ? 'background:#f0f7ff;' : '') + '">';
-        htmlContent += '<div class="item-avatar" style="background:' + colors[i % 3] + ';color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">' + u.name.charAt(0) + '</div>';
-        htmlContent += '<div class="item-info" style="flex:1;margin-left:10px;">';
-        htmlContent += '<div style="font-weight:600;">' + u.name + (isCurrent ? ' (当前)' : '') + '</div>';
-        htmlContent += '<div style="font-size:11px;color:#999;">' + gradeNames[u.grade] + ' · Lv.' + u.difficulty + '</div>';
-        htmlContent += '</div></div>';
+async function handleChat(inputId, msgContainerId, userAvatar, botAvatar, systemPrompt) {
+    const input = document.getElementById(inputId);
+    const container = document.getElementById(msgContainerId);
+    if (!input || !container) return;
+    const message = input.value.trim();
+    if (!message) return;
+    container.innerHTML += `<div class="chat-msg user"><div class="chat-avatar" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);">${userAvatar}</div><div class="chat-bubble">${message}</div></div>`;
+    input.value = '';
+    const aiId = 'ai-' + Date.now();
+    container.innerHTML += `<div class="chat-msg" id="${aiId}"><div class="chat-avatar">${botAvatar}</div><div class="chat-bubble"><span class="ai-loading">正在思考</span></div></div>`;
+    container.scrollTop = container.scrollHeight;
+    await callDeepSeek([{role:'system',content:systemPrompt||'你是友好的AI学习助手'}, {role:'user',content:message}], null, (content) => {
+        document.getElementById(aiId).querySelector('.chat-bubble').innerHTML = content.replace(/\n/g, '<br>');
+        container.scrollTop = container.scrollHeight;
     });
-    
-    container.innerHTML = htmlContent;
-    document.getElementById('user-switch-modal').classList.add('show');
 }
 
-
-
-function closeUserSwitchModal() { document.getElementById('user-switch-modal').classList.remove('show'); }
-function switchToUser(userId) {
-    var data = loadData();
-    var user = data.users.find(function(u) { return u.id === userId; });
-    
-    if (!user) {
-        showToast('用户不存在');
-        return;
-    }
-    
-    data.currentUser = userId;
-    saveData(data);
-    closeUserSwitchModal();
-    updateUI();
-    syncTodayStats();
-    showToast('已切换到: ' + user.name);
+function insertDeepseekMsg(text) { document.getElementById('deepseek-input').value = text; }
+async function sendDeepseekMsg() { await handleChat('deepseek-input', 'deepseek-messages', '👤', '🤖', '你是友好的AI学习助手，擅长解答各学科问题，请给出详细解答。'); }
+function insertTeacherMsg(text) { document.getElementById('teacher-input').value = text; }
+async function sendTeacherMsg() { await handleChat('teacher-input', 'teacher-messages', '👤', '📐', '你是一位经验丰富的学科老师，擅长教学辅导，用通俗易懂的方式讲解。'); }
+function selectTeacher(subject, el) {
+    document.querySelectorAll('.teacher-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const subs = {math:'数学',chinese:'语文',english:'英语',physics:'物理',chemistry:'化学'};
+    const avs = {math:'📐',chinese:'📝',english:'📖',physics:'⚡',chemistry:'🧪'};
+    document.getElementById('teacher-messages').innerHTML = `<div class="chat-msg"><div class="chat-avatar">${avs[subject]}</div><div class="chat-bubble">同学你好！我是${subs[subject]}老师，擅长${subs[subject]}辅导。有什么${subs[subject]}问题可以问我哦！😊</div></div>`;
 }
 
+// ====== 认知地图 ======
+function initMap() {
+    const user = getCurrentUserData() || {};
+    const abilities = user.abilities || {attention:65,memory:60,logic:70,creativity:55,problem:65,strategy:60};
+    const knowledge = user.knowledge || {math:30,chinese:30,english:30,physics:0,chemistry:0};
+    ['attention','memory','logic','creativity','problem','strategy'].forEach((k,i) => {
+        const el = document.getElementById('radar-'+k);
+        if (el) el.textContent = abilities[k] || 0;
+    });
+    document.getElementById('know-math').textContent = (knowledge.math||0)+'%';
+    document.getElementById('know-chinese').textContent = (knowledge.chinese||0)+'%';
+    document.getElementById('know-english').textContent = (knowledge.english||0)+'%';
+    document.getElementById('know-physics').textContent = (knowledge.physics||0)+'%';
+    document.getElementById('know-chemistry').textContent = (knowledge.chemistry||0)+'%';
+    drawRadar(abilities);
+    initStudyCalendar();
+}
 
-function clearCurrentUserData() {
-    if (!confirm('确定要清除当前用户的所有数据吗？')) return;
-    
-    var data = loadData();
-    var user = data.users.find(function(u) { return u.id === data.currentUser; });
-    
-    if (!user) {
-        showToast('用户不存在');
+function drawRadar(abilities) {
+    const canvas = document.getElementById('radar-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height, cx = w/2, cy = h/2+10, r = Math.min(w,h)/2-30;
+    const labels = ['注意力','记忆力','逻辑思维','创造力','问题解决','学习策略'];
+    const values = [abilities.attention||0, abilities.memory||0, abilities.logic||0, abilities.creativity||0, abilities.problem||0, abilities.strategy||0];
+    const colors = ['#3377FF','#43E97B','#FF9A63','#9B59B6','#3498db','#f1c40f'];
+    ctx.clearRect(0,0,w,h);
+    for (let level=1; level<=4; level++) {
+        ctx.beginPath();
+        for (let i=0; i<=6; i++) {
+            const angle = i*Math.PI*2/6 - Math.PI/2;
+            const x = cx + r*(level/4)*Math.cos(angle);
+            const y = cy + r*(level/4)*Math.sin(angle);
+            if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        }
+        ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.stroke();
+    }
+    for (let i=0; i<6; i++) {
+        const angle = i*Math.PI*2/6 - Math.PI/2;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy); ctx.lineTo(cx+r*Math.cos(angle),cy+r*Math.sin(angle));
+        ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.stroke();
+        ctx.fillStyle='#666'; ctx.font='10px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(labels[i], cx+(r+18)*Math.cos(angle), cy+(r+18)*Math.sin(angle));
+    }
+    ctx.beginPath();
+    for (let i=0; i<6; i++) {
+        const angle = i*Math.PI*2/6 - Math.PI/2;
+        const v = Math.min(100,Math.max(0,values[i]))/100;
+        const x = cx + r*v*Math.cos(angle), y = cy + r*v*Math.sin(angle);
+        if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath(); ctx.fillStyle='rgba(51,119,255,0.25)'; ctx.fill();
+    ctx.strokeStyle='#3377FF'; ctx.lineWidth=2; ctx.stroke();
+    for (let i=0; i<6; i++) {
+        const angle = i*Math.PI*2/6 - Math.PI/2;
+        const v = Math.min(100,Math.max(0,values[i]))/100;
+        ctx.beginPath(); ctx.arc(cx+r*v*Math.cos(angle),cy+r*v*Math.sin(angle),4,0,Math.PI*2);
+        ctx.fillStyle=colors[i]; ctx.fill();
+    }
+}
+
+function initStudyCalendar() {
+    const user = getCurrentUserData() || {};
+    const studyDays = user.studyDays || {};
+    const container = document.getElementById('study-calendar');
+    if (!container) return;
+    const today = new Date();
+    let html = '';
+    for (let i=29; i>=0; i--) {
+        const d = new Date(today); d.setDate(d.getDate()-i);
+        const dateStr = d.toISOString().split('T')[0];
+        const minutes = studyDays[dateStr] || 0;
+        const intensity = Math.min(1, minutes/60);
+        const color = `rgba(67,233,123,${0.15+intensity*0.7})`;
+        html += `<div style="height:24px;background:${color};border-radius:4px;"></div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ====== 学习计划 ======
+function initPlan() {
+    const container = document.getElementById('plan-calendar-grid');
+    if (!container) return;
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    document.getElementById('plan-month').textContent = `${year}年${month+1}月`;
+    const firstDay = new Date(year,month,1).getDay();
+    const daysInMonth = new Date(year,month+1,0).getDate();
+    let html = '';
+    for (let i=0; i<firstDay; i++) html += '<div class="calendar-day disabled"></div>';
+    for (let d=1; d<=daysInMonth; d++) {
+        const isToday = d === today.getDate();
+        html += `<div class="calendar-day ${isToday?'today':''}" onclick="this.classList.toggle('checked')">${d}</div>`;
+    }
+    container.innerHTML = html;
+}
+
+// ====== 母题训练 ======
+let currentGrade = 7;
+let currentSubject = 'math';
+let currentTopics = [];
+
+function initTopics() {
+    document.getElementById('topic-total').textContent = getTotalTopicCount();
+    filterTopics(7);
+}
+
+function updateTopicStats() {
+    const user = getCurrentUserData() || {};
+    const results = user.topicResults || {};
+    const wrongNoteIds = user.wrongNoteIds || [];
+    const done = Object.keys(results).length;
+    let correct = 0;
+    Object.values(results).forEach(r => { if (r.correct) correct++; });
+    document.getElementById('topic-done').textContent = done;
+    document.getElementById('topic-accuracy').textContent = done > 0 ? Math.round(correct/done*100)+'%' : '0%';
+    document.getElementById('topic-wrong').textContent = wrongNoteIds.length;
+    document.getElementById('wrong-note-count').textContent = wrongNoteIds.length;
+}
+
+function filterTopics(grade, el) {
+    if (el) {
+        document.querySelectorAll('.grade-tab-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+    currentGrade = grade;
+    const subjects = Object.keys(allTopics[grade] || {});
+    currentSubject = subjects[0] || 'math';
+    document.querySelectorAll('.subject-tab-btn').forEach((b,i) => {
+        b.classList.toggle('active', subjects[i] === currentSubject);
+    });
+    filterSubjects(currentSubject);
+}
+
+function filterSubjects(subject, el) {
+    if (el) {
+        document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+    currentSubject = subject;
+    const topics = allTopics[currentGrade]?.[subject] || [];
+    currentTopics = topics;
+    const container = document.getElementById('topics-list');
+    if (!container) return;
+    if (topics.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text-light);">该模块暂无题目</div>';
         return;
     }
-    
-    // 重置用户数据
-    user.points = 0;
-    user.stats = {
-        totalQuestions: 0,
-        correctAnswers: 0,
-        totalMinutes: 0,
-        streakDays: 0,
-        lastActiveDate: null
+    const gradients = ['linear-gradient(135deg,#3377FF,#66A3FF)','linear-gradient(135deg,#43E97B,#7CE7A0)','linear-gradient(135deg,#FF9A63,#FFB088)','linear-gradient(135deg,#667eea,#764ba2)'];
+    container.innerHTML = topics.map((t,i) => `
+        <div class="topic-card" onclick="startPractice(${t.id})">
+            <div class="topic-header" style="background:${gradients[i%4]};">
+                <div class="topic-title">${t.title}</div>
+                <div class="topic-subtitle">${'★'.repeat(t.diff)}</div>
+            </div>
+            <div class="topic-footer">
+                <div class="topic-difficulty">难度: ${'★'.repeat(t.diff)}</div>
+                <div style="color:var(--blue);font-size:12px;">开始练习 →</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function findTopic(id) {
+    for (const grade in allTopics) {
+        for (const subject in allTopics[grade]) {
+            const found = allTopics[grade][subject].find(t => t.id === id);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+function startPractice(topicId) {
+    const topic = findTopic(topicId);
+    if (!topic) return;
+    const user = getCurrentUserData() || {};
+    const result = user.topicResults?.[topicId];
+    const content = document.getElementById('detail-content');
+    content.innerHTML = `
+        <div style="font-size:16px;font-weight:bold;margin-bottom:16px;">📚 ${topic.title}</div>
+        <div class="practice-card">
+            <div class="practice-question">${topic.q}</div>
+            <div class="practice-input">
+                <input type="text" id="practice-answer" placeholder="输入你的答案..."/>
+                <button onclick="checkAnswer(${topicId})">提交</button>
+            </div>
+            <div id="practice-result"></div>
+        </div>
+        <div style="margin-top:16px;">
+            <button class="camera-btn" onclick="document.getElementById('topic-photo').click()">📷 拍照上传错题</button>
+            <input type="file" id="topic-photo" accept="image/*" capture="environment" style="display:none" onchange="uploadTopicPhoto(${topicId},this)">
+        </div>
+        <button class="login-btn login-btn-primary" style="margin-top:12px;" onclick="requestAITopicExplanation(${topicId})">🤖 AI智能解说</button>
+        <div id="ai-explanation-area" style="display:none;margin-top:12px;padding:12px;background:#f0f7ff;border-radius:12px;">
+            <div style="font-size:12px;color:var(--blue);margin-bottom:8px;">🤖 AI解说</div>
+            <div id="ai-explanation-text" style="font-size:14px;"></div>
+        </div>
+        <button class="login-btn login-btn-secondary" style="margin-top:12px;" onclick="closeDetail()">关闭</button>
+    `;
+    document.getElementById('detail-modal').classList.add('show');
+}
+
+function checkAnswer(topicId) {
+    const topic = findTopic(topicId);
+    if (!topic) return;
+    const input = document.getElementById('practice-answer');
+    const resultDiv = document.getElementById('practice-result');
+    const userAnswer = input.value.trim().toLowerCase().replace(/\s/g,'');
+    const correctAnswer = topic.a.toLowerCase().replace(/\s/g,'');
+    const isCorrect = userAnswer === correctAnswer || userAnswer.includes(correctAnswer) || correctAnswer.includes(userAnswer);
+    if (isCorrect) {
+        resultDiv.innerHTML = '<div class="practice-result correct">✓ 回答正确！<div class="explanation">答案：<span class="answer-highlight">'+topic.a+'</span></div><div class="explanation">'+topic.e+'</div></div>';
+    } else {
+        resultDiv.innerHTML = '<div class="practice-result wrong">✗ 回答错误<div class="explanation">正确答案：<span class="answer-highlight">'+topic.a+'</span></div><div class="explanation">'+topic.e+'</div></div>';
+    }
+    // 保存结果
+    const user = getCurrentUserData() || {};
+    user.topicResults = user.topicResults || {};
+    user.topicResults[topicId] = { correct: isCorrect, wrong: !isCorrect, lastTime: Date.now() };
+    if (!isCorrect) {
+        user.wrongNoteIds = user.wrongNoteIds || [];
+        if (!user.wrongNoteIds.includes(topicId)) {
+            user.wrongNoteIds.push(topicId);
+            user.wrongNotes = user.wrongNotes || [];
+            if (!user.wrongNotes.find(n => n.topicId === topicId)) {
+                user.wrongNotes.push({ topicId, question: topic.q, answer: topic.a, time: Date.now() });
+            }
+        }
+    }
+    user.todayStats = user.todayStats || { questions: 0, correct: 0 };
+    user.todayStats.questions++;
+    if (isCorrect) user.todayStats.correct++;
+    syncUserData(user);
+    updateTopicStats();
+}
+
+async function requestAITopicExplanation(topicId) {
+    const topic = findTopic(topicId);
+    if (!topic) return;
+    const area = document.getElementById('ai-explanation-area');
+    const text = document.getElementById('ai-explanation-text');
+    if (!area || !text) return;
+    area.style.display = 'block';
+    text.innerHTML = '<span class="ai-loading">正在生成AI解说</span>';
+    await callDeepSeek([
+        {role:'system',content:'你是数学辅导老师，请详细解释题目解题思路。'},
+        {role:'user',content:`请详细讲解这道题目：${topic.q}\n答案是：${topic.a}\n请给出详细的解题思路、解题技巧和举一反三的练习。`}
+    ], null, (content) => { text.innerHTML = content.replace(/\n/g,'<br>'); });
+}
+
+function uploadTopicPhoto(topicId, input) {
+    if (!input.files[0]) return;
+    const user = getCurrentUserData() || {};
+    user.uploadedImages = user.uploadedImages || [];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        user.uploadedImages.push({ id: Date.now(), topicId, image: e.target.result, time: Date.now() });
+        syncUserData(user);
+        showToast('错题照片上传成功！');
     };
-    user.wrongNotes = [];
-    user.completedTopics = [];
-    user.weeklyProgress = {};
-    
-    saveData(data);
-    updateUI();
-    syncTodayStats();
-    closeUserMenu();
-    showToast('已清除 ' + user.name + ' 的数据');
+    reader.readAsDataURL(input.files[0]);
+    input.value = '';
 }
-
-
-
-
 
 function showWrongNotes() {
     const user = getCurrentUserData() || {};
@@ -1578,29 +2315,25 @@ let gameScore = 0, gameType = '', gameLevel = 1, gameTimer = null, gameStartTime
 
 function startGame(type) {
     gameType = type; gameScore = 0; gameLevel = 1;
-    // 先打开game-play模块来渲染游戏容器
-    openFullscreenPage('game-play');
-    // 延迟启动游戏，等待DOM渲染完成
-    setTimeout(() => {
-        const gameFullscreen = document.getElementById('game-fullscreen-container');
-        if (gameFullscreen) {
-            gameFullscreen.style.display = 'flex';
-            const gameArea = document.getElementById('game-area');
-            if (gameArea) gameArea.style.display = 'block';
-        }
-        const gameScoreEl = document.getElementById('game-score');
-        if (gameScoreEl) gameScoreEl.textContent = '0';
-        switch(type) {
-            case 'schulte': startSchulte(); break;
-            case 'visual': startVisual(); break;
-            case 'digit': startDigit(); break;
-            case 'pattern': startPattern(); break;
-            case 'tap': startTap(); break;
-            case 'color': startColor(); break;
-            case 'diff': startDiff(); break;
-            case 'reason': startReason(); break;
-        }
-    }, 100);
+    // 显示全屏游戏区域
+    const gameFullscreen = document.getElementById('game-fullscreen-container');
+    if (gameFullscreen) {
+        gameFullscreen.style.display = 'flex';
+        document.getElementById('game-area').style.display = 'block';
+    } else {
+        document.getElementById('game-area').style.display = 'block';
+    }
+    document.getElementById('game-score').textContent = '0';
+    switch(type) {
+        case 'schulte': startSchulte(); break;
+        case 'visual': startVisual(); break;
+        case 'digit': startDigit(); break;
+        case 'pattern': startPattern(); break;
+        case 'tap': startTap(); break;
+        case 'color': startColor(); break;
+        case 'diff': startDiff(); break;
+        case 'reason': startReason(); break;
+    }
 }
 
 function startSchulte() {
@@ -1777,67 +2510,29 @@ function endGame() {
 function resetGame() { startGame(gameType); }
 function closeGame() { 
     if (gameTimer) clearInterval(gameTimer); 
-    // 关闭全屏容器并返回games模块
-    closeFullscreenPage();
-    // 重新打开games模块显示游戏列表
-    setTimeout(() => openFullscreenPage('games'), 50);
+    document.getElementById('game-area').style.display = 'none';
+    const gameFullscreen = document.getElementById('game-fullscreen-container');
+    if (gameFullscreen) gameFullscreen.style.display = 'none';
 }
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户 V71 加载完成');
-    
-    // 初始化数据
-    let data = loadData();
-    console.log('用户数量:', data.users.length);
-    
-    // 如果没有用户，自动创建默认用户"邱宇菲"
-    if (data.users.length === 0) {
-        console.log('无用户，自动创建默认用户');
-        const defaultUser = {
-            id: 'user_' + Date.now(),
-            name: '邱宇菲',
-            grade: 7,
-            difficulty: 1,
-            points: 1142,
-            createdAt: new Date().toISOString(),
-            stats: {
-                totalQuestions: 0,
-                correctAnswers: 0,
-                totalMinutes: 0,
-                streakDays: 0,
-                lastActiveDate: null
-            },
-            weeklyProgress: {},
-            wrongNotes: [],
-            completedTopics: []
-        };
-        data.users.push(defaultUser);
-        data.currentUser = defaultUser.id;
-        saveData(data);
-        console.log('默认用户创建成功:', defaultUser.name);
-        data = loadData(); // 重新加载数据
-    }
-    
-    // 直接显示首页
-    showPage('home');
-    updateUI();
-    syncTodayStats();
-    
-    // 点击外部关闭下拉菜单
+    console.log('认知训练门户 V49 加载完成');
+    const data = loadData();
+    if (data.currentUser && data.users.find(u=>u.id===data.currentUser)) {
+        updateUI(); syncTodayStats(); showPage('home');
+    } else { initLoginPage(); }
     document.addEventListener('click', (e) => {
-        try {
-            if (!e.target.closest('.user-select-wrapper')) { 
-                const dropdown = document.getElementById('user-select-dropdown');
-                if (dropdown) dropdown.classList.remove('show'); 
-            }
-            if (!e.target.closest('.user-menu-wrapper')) { 
-                const userDropdown = document.getElementById('user-dropdown');
-                if (userDropdown) userDropdown.classList.remove('show'); 
-            }
-        } catch(err) {}
+        if (!e.target.closest('.user-select-wrapper')) { document.getElementById('user-select-dropdown').classList.remove('show'); }
+        if (!e.target.closest('.user-menu-wrapper')) { document.getElementById('user-dropdown').classList.remove('show'); }
     });
 });
+
+function initLoginPage() {
+    const data = loadData();
+    renderUserList();
+    if (data.users.length === 0) { showCreateUserModal(); }
+}
 
 // ====== 播客音频播放 ======
 const audioResources = {
@@ -2604,10 +3299,6 @@ function toggleEnhancedVideoPlay() {
 
 function seekEnhancedVideo(e) { if (!evpVideo || !evpVideo.duration) return; var bar = document.getElementById('evp-progress'); if (!bar) return; var rect = bar.getBoundingClientRect(); var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)); evpVideo.currentTime = percent * evpVideo.duration; }
 function seekEnhancedVideoBy(seconds) { if (!evpVideo) return; evpVideo.currentTime = Math.max(0, Math.min(evpVideo.duration, evpVideo.currentTime + seconds)); }
-function seekEnhancedVideoBackward() { seekEnhancedVideoBy(-10); }
-function seekEnhancedVideoForward() { seekEnhancedVideoBy(10); }
-function toggleVolume() { if (!evpVideo) return; evpVideo.muted = !evpVideo.muted; var btn = document.getElementById('vp-volume-btn'); if (btn) btn.textContent = evpVideo.muted ? '🔇' : '🔊'; }
-function closeModal() { var modal = document.getElementById('detail-modal'); if (modal) modal.classList.remove('show'); }
 function setEnhancedVolume(value) { videoCtx.volume = value / 100; if (evpVideo) evpVideo.volume = videoCtx.volume; updateEnhancedVolumeIcon(value); }
 
 function toggleEnhancedMute() {
@@ -2836,617 +3527,6 @@ function deleteWrongPhoto(photoId) {
     showWrongPhotoGallery();
 }
 
-
-/**
- * 认知训练门户 V79 - 关键函数修复代码
- * 
- * 使用方法：将以下代码添加到 <script> 标签末尾，确保在 DOMContentLoaded 事件之前加载
- */
-
-// ====== 全屏页面导航函数 ======
-function openFullscreenPage(page) {
-    const container = document.getElementById('fullscreen-container');
-    const title = document.getElementById('fullscreen-title');
-    const content = document.getElementById('fullscreen-content');
-    
-    if (!container || !title || !content) {
-        console.error('找不到全屏容器元素');
-        return;
-    }
-    
-    // 检查用户是否已登录
-    const currentUser = localStorage.getItem(STORAGE_KEY + '_currentUser');
-    if (!currentUser && page !== 'settings') {
-        showToast('请先登录后再使用');
-        return;
-    }
-    
-    // 设置标题映射
-    const titles = {
-        'avatar': '🎓 AI数字分身',
-        'practice': '🎯 AI精准练',
-        'map': '🧠 认知地图',
-        'plan': '📅 学习计划',
-        'topics': '📚 母题训练',
-        'method': '💡 学霸方法',
-        'thinking': '🧩 思维训练',
-        'podcast': '🎧 播客课堂',
-        'video': '📺 视频课堂',
-        'games': '🎮 训练游戏',
-        'deepseek': '🤖 DeepSeek AI'
-    };
-    
-    title.textContent = titles[page] || '功能页面';
-    
-    // 渲染对应内容
-    try {
-        switch(page) {
-            case 'avatar':
-                content.innerHTML = renderAvatar();
-                break;
-            case 'practice':
-                content.innerHTML = renderPractice();
-                break;
-            case 'map':
-                content.innerHTML = renderMap();
-                break;
-            case 'plan':
-                content.innerHTML = renderPlan();
-                break;
-            case 'topics':
-                content.innerHTML = renderTopics();
-                break;
-            case 'method':
-                content.innerHTML = renderMethod();
-                break;
-            case 'thinking':
-                content.innerHTML = renderThinking();
-                break;
-            case 'podcast':
-                content.innerHTML = renderPodcast();
-                break;
-            case 'video':
-                content.innerHTML = renderVideo();
-                break;
-            case 'games':
-                content.innerHTML = renderGames();
-                break;
-            case 'deepseek':
-                content.innerHTML = renderDeepseek();
-                initDeepseekChat();
-                break;
-            default:
-                content.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:48px;margin-bottom:16px;">🚧</div><p style="color:#666;">该功能正在开发中...</p></div>';
-        }
-    } catch (e) {
-        console.error('渲染页面出错:', e);
-        content.innerHTML = '<div style="text-align:center;padding:40px;color:#ff6b6b;">加载失败，请重试</div>';
-    }
-    
-    // 显示全屏容器
-    container.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeFullscreenPage() {
-    const container = document.getElementById('fullscreen-container');
-    if (container) {
-        container.classList.remove('active');
-    }
-    document.body.style.overflow = '';
-}
-
-// ====== 12大模块渲染函数 ======
-
-function renderAvatar() {
-    const teachers = [
-        {name: '数学老师', subject: '数学', icon: '📐'},
-        {name: '语文老师', subject: '语文', icon: '📖'},
-        {name: '英语老师', subject: '英语', icon: '🔤'},
-        {name: '物理老师', subject: '物理', icon: '⚡'},
-        {name: '化学老师', subject: '化学', icon: '🧪'}
-    ];
-    
-    return `
-        <div class="teacher-list">
-            ${teachers.map((t, i) => `
-                <div class="teacher-item" onclick="selectTeacher(${i})">
-                    <div class="teacher-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);">${t.icon}</div>
-                    <div class="teacher-name">${t.name}</div>
-                    <div class="teacher-subject">${t.subject}</div>
-                </div>
-            `).join('')}
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <div style="text-align:center;padding:30px;">
-                <div style="font-size:48px;margin-bottom:12px;">💬</div>
-                <h3>选择一个AI老师</h3>
-                <p style="color:#666;margin-top:8px;">点击上方老师头像开始对话</p>
-            </div>
-        </div>
-    `;
-}
-
-function renderPractice() {
-    return `
-        <div class="practice-card">
-            <div style="text-align:center;padding:30px 0;">
-                <div style="font-size:48px;margin-bottom:12px;">🎯</div>
-                <h3>AI精准练</h3>
-                <p style="color:#666;margin-top:8px;">基于您的学习数据，AI将为您推荐最需要练习的题目</p>
-            </div>
-            <button class="camera-btn" onclick="startPractice()">
-                📷 拍照上传题目
-            </button>
-            <button class="camera-btn" onclick="startDiagnosis()" style="background:linear-gradient(135deg,#43E97B,#38F9D7);">
-                📝 开始诊断
-            </button>
-            <div style="margin-top:16px;padding:16px;background:#f5f7ff;border-radius:12px;">
-                <h4 style="margin-bottom:8px;">📊 薄弱点诊断</h4>
-                <div style="display:flex;justify-content:space-between;margin-top:8px;">
-                    <span>一元一次方程</span><span style="color:#ff6b6b;">需加强</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:8px;">
-                    <span>平面几何</span><span style="color:#ffb700;">一般</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderMap() {
-    return `
-        <div class="card">
-            <h3 style="margin-bottom:16px;">🧠 能力雷达图</h3>
-            <div style="height:200px;display:flex;align-items:center;justify-content:center;background:#f5f7ff;border-radius:12px;">
-                <div style="text-align:center;">
-                    <div style="font-size:48px;margin-bottom:8px;">📊</div>
-                    <p style="color:#666;">能力雷达图展示区</p>
-                </div>
-            </div>
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <h3 style="margin-bottom:16px;">📈 能力热力图</h3>
-            <div class="heatmap-grid" style="grid-template-columns:repeat(5,1fr);">
-                ${Array(25).fill(0).map(() => `<div class="heatmap-cell" style="background:#e8f5e9;"></div>`).join('')}
-            </div>
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <h3 style="margin-bottom:12px;">📋 能力详情</h3>
-            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                <span>注意力</span><span style="color:#43E97B;">85/100</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
-                <span>记忆力</span><span style="color:#43E97B;">78/100</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:8px 0;">
-                <span>逻辑思维</span><span style="color:#ffb700;">65/100</span>
-            </div>
-        </div>
-    `;
-}
-
-function renderPlan() {
-    return `
-        <div class="plan-calendar">
-            <div class="calendar-header">
-                <span onclick="changeMonth(-1)" style="cursor:pointer;">◀</span>
-                <span id="calendar-month">2024年1月</span>
-                <span onclick="changeMonth(1)" style="cursor:pointer;">▶</span>
-            </div>
-            <div class="calendar-grid" style="margin-bottom:8px;">
-                ${['日','一','二','三','四','五','六'].map(d => 
-                    `<div style="text-align:center;font-size:12px;color:#999;padding:4px;">${d}</div>`
-                ).join('')}
-            </div>
-            <div class="calendar-grid">
-                ${Array(35).fill(0).map((_, i) => {
-                    const day = i % 30 + 1;
-                    const isToday = day === 15;
-                    const isChecked = day < 15;
-                    return `<div class="calendar-day${isToday ? ' today' : ''}${isChecked ? ' checked' : ''}" onclick="toggleDay(${day})">${day}</div>`;
-                }).join('')}
-            </div>
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <h3 style="margin-bottom:12px;">📋 今日任务</h3>
-            <div class="plan-task" onclick="toggleTask(this)">
-                <div class="task-checkbox"></div>
-                <div class="task-text">完成数学练习 10道题</div>
-            </div>
-            <div class="plan-task completed" onclick="toggleTask(this)">
-                <div class="task-checkbox checked">✓</div>
-                <div class="task-text">记忆单词 20个</div>
-            </div>
-            <div class="plan-task" onclick="toggleTask(this)">
-                <div class="task-checkbox"></div>
-                <div class="task-text">观看学习视频 1个</div>
-            </div>
-        </div>
-    `;
-}
-
-function renderTopics() {
-    return `
-        <div class="grade-tab">
-            <button class="grade-tab-btn active" onclick="selectGrade(this, 7)">初一</button>
-            <button class="grade-tab-btn" onclick="selectGrade(this, 8)">初二</button>
-            <button class="grade-tab-btn" onclick="selectGrade(this, 9)">初三</button>
-        </div>
-        <div class="topic-card" onclick="startTopic(1)">
-            <div class="topic-header" style="background:linear-gradient(135deg,#3377FF,#4A80F5);">
-                <div class="topic-title">一元一次方程</div>
-                <div class="topic-subtitle">掌握方程基础 · 10道变式题</div>
-            </div>
-            <div class="topic-footer">
-                <span class="topic-difficulty">难度: ⭐⭐</span>
-                <span class="topic-difficulty">已掌握: 60%</span>
-            </div>
-        </div>
-        <div class="topic-card" onclick="startTopic(2)">
-            <div class="topic-header" style="background:linear-gradient(135deg,#667eea,#764ba2);">
-                <div class="topic-title">平面几何证明</div>
-                <div class="topic-subtitle">三角形与四边形 · 15道变式题</div>
-            </div>
-            <div class="topic-footer">
-                <span class="topic-difficulty">难度: ⭐⭐⭐</span>
-                <span class="topic-difficulty">已掌握: 35%</span>
-            </div>
-        </div>
-        <div class="topic-card" onclick="startTopic(3)">
-            <div class="topic-header" style="background:linear-gradient(135deg,#FF9A63,#E87A4E);">
-                <div class="topic-title">一次函数</div>
-                <div class="topic-subtitle">函数概念与图像 · 12道变式题</div>
-            </div>
-            <div class="topic-footer">
-                <span class="topic-difficulty">难度: ⭐⭐⭐</span>
-                <span class="topic-difficulty">已掌握: 45%</span>
-            </div>
-        </div>
-    `;
-}
-
-function renderMethod() {
-    const methods = [
-        {title: '费曼学习法', desc: '用简单语言解释复杂概念', icon: '🎓'},
-        {title: '艾宾浩斯记忆', desc: '科学遗忘曲线复习法', icon: '🧠'},
-        {title: '番茄工作法', desc: '25分钟专注工作法', icon: '🍅'},
-        {title: '思维导图', desc: '可视化知识整理法', icon: '🗺️'},
-        {title: 'SQ3R阅读法', desc: '高效阅读理解技巧', icon: '📖'}
-    ];
-    
-    return methods.map(m => `
-        <div class="method-card" onclick="showMethodDetail('${m.title}')">
-            <div style="display:flex;align-items:center;gap:12px;">
-                <div style="font-size:32px;">${m.icon}</div>
-                <div>
-                    <div class="method-title">${m.title}</div>
-                    <div class="method-content">${m.desc}</div>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-function renderThinking() {
-    return `
-        <div class="stats-bar">
-            <div class="stats-bar-item">
-                <div class="stats-bar-value">85</div>
-                <div class="stats-bar-label">逻辑思维</div>
-            </div>
-            <div class="stats-bar-item">
-                <div class="stats-bar-value">72</div>
-                <div class="stats-bar-label">创造性</div>
-            </div>
-            <div class="stats-bar-item">
-                <div class="stats-bar-value">90</div>
-                <div class="stats-bar-label">批判性</div>
-            </div>
-        </div>
-        <div class="thinking-card">
-            <div class="thinking-header">
-                <div class="thinking-icon" style="background:linear-gradient(135deg,#3377FF,#4A80F5);">🧩</div>
-                <div class="thinking-title">逻辑推理</div>
-            </div>
-            <div class="thinking-question">小明比小红高，小红比小华高。谁最高？</div>
-            <div class="thinking-options">
-                <div class="thinking-option" onclick="selectThinkingOption(this, true)">A. 小明</div>
-                <div class="thinking-option" onclick="selectThinkingOption(this, false)">B. 小红</div>
-            </div>
-        </div>
-        <div class="thinking-card">
-            <div class="thinking-header">
-                <div class="thinking-icon" style="background:linear-gradient(135deg,#667eea,#764ba2);">🔢</div>
-                <div class="thinking-title">数列规律</div>
-            </div>
-            <div class="thinking-question">找规律：2, 4, 8, 16, ?</div>
-            <div class="thinking-options">
-                <div class="thinking-option" onclick="selectThinkingOption(this, true)">A. 32</div>
-                <div class="thinking-option" onclick="selectThinkingOption(this, false)">B. 24</div>
-            </div>
-        </div>
-        <button class="camera-btn" style="margin-top:12px;" onclick="loadMoreThinking()">
-            加载更多题目
-        </button>
-    `;
-}
-
-function renderPodcast() {
-    return `
-        <div class="media-item" onclick="playPodcast(1)">
-            <div class="media-thumb">🎧</div>
-            <div class="media-info">
-                <div class="media-title">青少年高效记忆法全攻略</div>
-                <div class="media-meta">
-                    <span>6:14</span>
-                    <span class="media-badge">学霸方法</span>
-                </div>
-            </div>
-        </div>
-        <div class="media-item" onclick="playPodcast(2)">
-            <div class="media-thumb">🎧</div>
-            <div class="media-info">
-                <div class="media-title">青少年高效笔记法大揭秘</div>
-                <div class="media-meta">
-                    <span>8:10</span>
-                    <span class="media-badge">学霸方法</span>
-                </div>
-            </div>
-        </div>
-        <div class="media-item" onclick="playPodcast(3)">
-            <div class="media-thumb">🎧</div>
-            <div class="media-info">
-                <div class="media-title">青少年高效时间管理秘籍</div>
-                <div class="media-meta">
-                    <span>7:22</span>
-                    <span class="media-badge">学霸方法</span>
-                </div>
-            </div>
-        </div>
-        <div class="media-item" onclick="playPodcast(4)">
-            <div class="media-thumb">🎧</div>
-            <div class="media-info">
-                <div class="media-title">如何克服学习拖延症</div>
-                <div class="media-meta">
-                    <span>10:30</span>
-                    <span class="media-badge">学习方法</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderVideo() {
-    return `
-        <div class="media-item" onclick="playVideo(1)">
-            <div class="media-thumb" style="background:linear-gradient(135deg,#FF6B6B,#FF4757);">
-                <span class="play-icon">▶</span>
-            </div>
-            <div class="media-info">
-                <div class="media-title">初一数学入门：认识有理数</div>
-                <div class="media-meta">
-                    <span>12:30</span>
-                    <span class="media-badge video">视频</span>
-                </div>
-            </div>
-        </div>
-        <div class="media-item" onclick="playVideo(2)">
-            <div class="media-thumb" style="background:linear-gradient(135deg,#FF6B6B,#FF4757);">
-                <span class="play-icon">▶</span>
-            </div>
-            <div class="media-info">
-                <div class="media-title">英语语法基础：五种基本句型</div>
-                <div class="media-meta">
-                    <span>15:45</span>
-                    <span class="media-badge video">视频</span>
-                </div>
-            </div>
-        </div>
-        <div class="media-item" onclick="playVideo(3)">
-            <div class="media-thumb" style="background:linear-gradient(135deg,#FF6B6B,#FF4757);">
-                <span class="play-icon">▶</span>
-            </div>
-            <div class="media-info">
-                <div class="media-title">物理实验：测量物体密度</div>
-                <div class="media-meta">
-                    <span>18:20</span>
-                    <span class="media-badge video">视频</span>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-function renderGames() {
-    const games = [
-        {name: '记忆翻牌', desc: '提升记忆力', icon: '🃏', color: '#3377FF'},
-        {name: '舒尔特方格', desc: '提升注意力', icon: '🎯', color: '#FF9A63'},
-        {name: '数独挑战', desc: '逻辑推理', icon: '🔢', color: '#43E97B'},
-        {name: '成语接龙', desc: '语言能力', icon: '📝', color: '#667eea'},
-        {name: '速算24点', desc: '数学计算', icon: '➕', color: '#ff6b6b'},
-        {name: '颜色识别', desc: '反应速度', icon: '🎨', color: '#FFB6C1'}
-    ];
-    
-    return `
-        <div class="games-grid">
-            ${games.map(g => `
-                <div class="game-card" onclick="startGame('${g.name}')">
-                    <div class="game-icon-area" style="background:${g.color};color:white;">
-                        ${g.icon}
-                    </div>
-                    <div class="game-name">${g.name}</div>
-                    <div class="game-desc">${g.desc}</div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
-
-function renderDeepseek() {
-    return `
-        <div class="chat-container" style="display:flex;flex-direction:column;height:calc(100vh - 150px);">
-            <div class="chat-messages" id="chat-messages" style="flex:1;overflow-y:auto;padding:12px;">
-                <div class="chat-msg">
-                    <div class="chat-avatar">🤖</div>
-                    <div class="chat-bubble">你好！我是DeepSeek AI学习助手。有什么可以帮助你的吗？</div>
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chat-input" placeholder="输入问题..." onkeypress="handleChatKeypress(event)">
-                <button class="chat-send" onclick="sendChatMessage()">发送</button>
-            </div>
-            <div class="template-btns" style="display:flex;gap:6px;padding:8px 12px;overflow-x:auto;background:#f8f9fa;">
-                <button class="template-btn" onclick="sendTemplate('帮我制定学习计划')">📅 学习计划</button>
-                <button class="template-btn" onclick="sendTemplate('解释这个概念')">📚 解释概念</button>
-                <button class="template-btn" onclick="sendTemplate('出一道练习题')">✏️ 出题</button>
-            </div>
-        </div>
-    `;
-}
-
-// ====== 辅助函数 ======
-
-function showToast(message) {
-    const existing = document.querySelector('.toast');
-    if (existing) existing.remove();
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => toast.remove(), 3000);
-}
-
-function toggleTask(element) {
-    const checkbox = element.querySelector('.task-checkbox');
-    checkbox.classList.toggle('checked');
-    element.classList.toggle('completed');
-    if (checkbox.classList.contains('checked')) {
-        checkbox.textContent = '✓';
-    } else {
-        checkbox.textContent = '';
-    }
-}
-
-function selectGrade(btn, grade) {
-    document.querySelectorAll('.grade-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-function selectThinkingOption(element, isCorrect) {
-    const card = element.closest('.thinking-card');
-    card.querySelectorAll('.thinking-option').forEach(opt => {
-        opt.classList.remove('selected', 'correct', 'wrong');
-    });
-    
-    if (isCorrect) {
-        element.classList.add('correct');
-    } else {
-        element.classList.add('wrong');
-        // 显示正确答案
-        card.querySelectorAll('.thinking-option').forEach(opt => {
-            if (opt.onclick.toString().includes('true')) {
-                opt.classList.add('correct');
-            }
-        });
-    }
-}
-
-function playPodcast(id) {
-    const podcast = podcastList.find(p => p.id === id);
-    if (podcast) {
-        const audio = document.getElementById('hidden-audio');
-        audio.src = podcast.url;
-        audio.play();
-        showToast(`正在播放: ${podcast.title}`);
-    }
-}
-
-function playVideo(id) {
-    showToast('视频播放功能开发中...');
-}
-
-function startGame(gameName) {
-    showToast(`正在加载: ${gameName}`);
-    // 游戏逻辑...
-}
-
-function sendChatMessage() {
-    const input = document.getElementById('chat-input');
-    const message = input.value.trim();
-    if (!message) return;
-    
-    const messages = document.getElementById('chat-messages');
-    
-    // 添加用户消息
-    messages.innerHTML += `
-        <div class="chat-msg user">
-            <div class="chat-avatar">👤</div>
-            <div class="chat-bubble">${message}</div>
-        </div>
-    `;
-    
-    input.value = '';
-    
-    // 添加加载状态
-    messages.innerHTML += `
-        <div class="chat-msg" id="loading-msg">
-            <div class="chat-avatar">🤖</div>
-            <div class="chat-bubble ai-loading">
-                <div class="loading-dots"><span></span><span></span><span></span></div>
-            </div>
-        </div>
-    `;
-    
-    // 滚动到底部
-    messages.scrollTop = messages.scrollHeight;
-    
-    // 调用 DeepSeek API
-    callDeepSeekAPI(message, (response) => {
-        document.getElementById('loading-msg').remove();
-        messages.innerHTML += `
-            <div class="chat-msg">
-                <div class="chat-avatar">🤖</div>
-                <div class="chat-bubble">${response}</div>
-            </div>
-        `;
-        messages.scrollTop = messages.scrollHeight;
-    });
-}
-
-function handleChatKeypress(event) {
-    if (event.key === 'Enter') {
-        sendChatMessage();
-    }
-}
-
-function sendTemplate(text) {
-    const input = document.getElementById('chat-input');
-    input.value = text;
-    sendChatMessage();
-}
-
-function initDeepseekChat() {
-    // DeepSeek 聊天初始化
-    console.log('DeepSeek 聊天已初始化');
-}
-
-function callDeepSeekAPI(message, callback) {
-    // 简单的模拟响应
-    setTimeout(() => {
-        const responses = [
-            '好的，我来帮你制定一个学习计划。首先，我需要了解一下你的学习目标是什么？',
-            '这个概念很基础但很重要。简单来说，它的核心思想是...',
-            '根据你目前的学习情况，我建议每天安排2-3小时的专注学习时间。'
-        ];
-        callback(responses[Math.floor(Math.random() * responses.length)]);
-    }, 1500);
-}
-
-// ====== Storage Key 已由原文件定义 ======
-
 </script>
 <!-- 统一媒体播放器 -->
 <div id="media-player" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:1500;display:none;flex-direction:column;">
@@ -3501,67 +3581,5 @@ function callDeepSeekAPI(message, callback) {
 <!-- 隐藏的音频元素 -->
 <audio id="mp-audio-element" style="display:none;"></audio>
 
-
-<!-- 音频播放器容器（隐藏） -->
-<div id="audio-player-fullscreen" class="audio-player-modal" style="display:none;">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
-        <div id="ap-cover" style="width:200px;height:200px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:80px;background:linear-gradient(135deg,#667eea,#764ba2);">🎧</div>
-        <div id="ap-title" style="color:white;font-size:20px;font-weight:bold;margin-top:20px;"></div>
-        <div id="ap-course-title" style="color:rgba(255,255,255,0.8);font-size:14px;margin-top:8px;"></div>
-        <div id="ap-course-teacher" style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px;"></div>
-    </div>
-    <div style="padding:20px;">
-        <div id="ap-progress-bar" style="height:4px;background:rgba(255,255,255,0.2);border-radius:2px;cursor:pointer;" onclick="seekAudioPlayer(event)">
-            <div id="ap-progress-fill" style="height:100%;background:var(--blue);border-radius:2px;width:0%;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px;">
-            <span id="ap-current-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-            <span id="ap-total-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-        </div>
-    </div>
-    <div style="padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:32px;">
-        <button onclick="playPrevTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;">⏮</button>
-        <button id="ap-play-btn" onclick="toggleAudioPlay()" style="width:64px;height:64px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:28px;cursor:pointer;">▶</button>
-        <button onclick="playNextTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;">⏭</button>
-    </div>
-    <div style="padding:10px 20px;display:flex;justify-content:center;gap:16px;">
-        <button id="ap-speed-btn" onclick="toggleSpeedDropdown()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;">1x</button>
-        <button id="ap-volume-btn" onclick="toggleMute()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:20px;font-size:14px;cursor:pointer;">🔊</button>
-        <input type="range" id="ap-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)" style="width:100px;">
-        <button onclick="closeAudioPlayer()" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:20px;font-size:14px;cursor:pointer;">✕</button>
-    </div>
-    <div id="ap-speed-dropdown" style="display:none;position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);border-radius:8px;padding:8px;">
-        <div class="ap-speed-option active" onclick="setPlaybackSpeed(0.5)" style="padding:8px 16px;color:white;cursor:pointer;">0.5x</div>
-        <div class="ap-speed-option" onclick="setPlaybackSpeed(1)" style="padding:8px 16px;color:white;cursor:pointer;">1x</div>
-        <div class="ap-speed-option" onclick="setPlaybackSpeed(1.5)" style="padding:8px 16px;color:white;cursor:pointer;">1.5x</div>
-        <div class="ap-speed-option" onclick="setPlaybackSpeed(2)" style="padding:8px 16px;color:white;cursor:pointer;">2x</div>
-    </div>
-</div>
-
-<!-- 迷你播放器 -->
-<div id="mini-player" class="mini-player" style="display:none;">
-    <div id="mini-player-thumb" style="width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;background:linear-gradient(135deg,#667eea,#764ba2);">🎧</div>
-    <div style="flex:1;padding:0 12px;">
-        <div id="mini-player-title" style="font-size:14px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
-        <div id="mini-player-teacher" style="font-size:11px;color:var(--text-gray);"></div>
-        <div style="height:2px;background:#e0e0e0;border-radius:1px;margin-top:4px;">
-            <div id="mini-player-progress-bar" style="height:100%;background:var(--blue);border-radius:1px;width:0%;"></div>
-        </div>
-    </div>
-    <button id="mini-player-btn" onclick="toggleMiniPlayer()" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:16px;cursor:pointer;">▶</button>
-    <button onclick="closeMiniPlayer()" style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:12px;cursor:pointer;margin-left:8px;">✕</button>
-</div>
-
-
-<!-- 隐藏的音频元素 -->
-<audio id="main-audio" style="display:none;"></audio>
-
-<!-- 隐藏的控制元素 -->
-<div style="display:none;">
-    <button id="mp-volume-btn" onclick="toggleMediaMute()">🔊</button>
-    <input type="range" id="evp-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
-</div>
-
-<!-- V77 Build 1777055100475 -->
 </body>
 </html>
