@@ -740,9 +740,12 @@ function handleLogin() {
         user.lastLogin = Date.now(); 
         data.currentUser = userId; 
         saveData(data); 
-        updateUI(); 
-        syncTodayStats(); 
+        // 先切换页面，再更新UI
         showPage('home');
+        setTimeout(() => {
+            updateUI();
+            syncTodayStats();
+        }, 50);
     } else {
         showToast('用户不存在，请重新选择');
     }
@@ -795,10 +798,13 @@ function createNewUser() {
     data.currentUser = user.id;
     saveData(data);
     closeCreateUserModal();
-    updateUI();
-    syncTodayStats();
+    // 先切换页面，再更新UI
     showPage('home');
-    showToast('账号创建成功！');
+    setTimeout(() => {
+        updateUI();
+        syncTodayStats();
+        showToast('账号创建成功！');
+    }, 50);
 }
 
 function confirmClearAllData() {
@@ -832,17 +838,28 @@ function syncTodayStats() {
     if (!user) return;
     const today = new Date().toDateString();
     let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
-    if (todayStats.date !== today) { todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; user.todayStats = todayStats; syncUserData(user); }
-    document.getElementById('today-questions').textContent = user.aiChatCount || 0;
-    document.getElementById('today-correct').textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
-    document.getElementById('today-minutes').textContent = todayStats.minutes || 0;
+    if (todayStats.date !== today) { 
+        todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; 
+        user.todayStats = todayStats; 
+        syncUserData(user); 
+    }
+    // 安全地更新DOM元素
+    const questionsEl = document.getElementById('today-questions');
+    const correctEl = document.getElementById('today-correct');
+    const minutesEl = document.getElementById('today-minutes');
+    const streakEl = document.getElementById('today-streak');
+    if (questionsEl) questionsEl.textContent = user.aiChatCount || 0;
+    if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
+    if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
     const studyDays = user.studyDays || {};
     let streak = 0;
     for (let i = 0; i < 365; i++) {
-        const d = new Date(); d.setDate(d.getDate() - i);
-        if (studyDays[d.toISOString().split('T')[0]]) streak++; else if (i > 0) break;
+        const d = new Date(); 
+        d.setDate(d.getDate() - i);
+        if (studyDays[d.toISOString().split('T')[0]]) streak++; 
+        else if (i > 0) break;
     }
-    document.getElementById('today-streak').textContent = streak;
+    if (streakEl) streakEl.textContent = streak;
 }
 
 // ====== 页面切换 ======
@@ -862,22 +879,25 @@ function showPage(pageId) {
     }
 }
 
-function closeFullscreenPage() { document.getElementById('fullscreen-container').classList.remove('active'); }
-function toggleUserMenu() { document.getElementById('user-dropdown').classList.toggle('show'); }
+function closeFullscreenPage() { const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
+function toggleUserMenu() { const el = document.getElementById('user-dropdown'); if (el) el.classList.toggle('show'); }
 
 function showUserSwitchModal() {
     closeUserMenu();
     const data = loadData();
     const container = document.getElementById('switch-user-list');
-    container.innerHTML = data.users.map(u => `
-        <div class="user-select-item" onclick="switchToUser('${u.id}')" style="${u.id === data.currentUser ? 'background:#f0f7ff;' : ''}">
-            <div class="item-avatar" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;">${u.name.charAt(0)}</div>
-            <div class="item-info">
-                <div class="item-name">${u.name} ${u.id === data.currentUser ? '(当前)' : ''}</div>
-                <div class="item-grade">${gradeNames[u.grade]} · Lv.${u.difficulty}</div>
-            </div>
-        </div>
-    `).join('');
+    if (!container) return;
+    const colors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#FF9A63,#E87A4E)', 'linear-gradient(135deg,#43E97B,#38F9D7)'];
+    let html = '';
+    data.users.forEach((u, i) => {
+        html += '<div class="user-select-item" onclick="switchToUser(\'' + u.id + '\')" style="' + (u.id === data.currentUser ? 'background:#f0f7ff;' : '') + '">';
+        html += '<div class="item-avatar" style="background:' + colors[i % 3] + ';color:white;">' + u.name.charAt(0) + '</div>';
+        html += '<div class="item-info">';
+        html += '<div class="item-name">' + u.name + (u.id === data.currentUser ? ' (当前)' : '') + '</div>';
+        html += '<div class="item-grade">' + gradeNames[u.grade] + ' · Lv.' + u.difficulty + '</div>';
+        html += '</div></div>';
+    });
+    container.innerHTML = html;
     document.getElementById('user-switch-modal').classList.add('show');
 }
 
