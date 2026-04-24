@@ -3394,6 +3394,10 @@ function toggleEnhancedVideoPlay() {
 
 function seekEnhancedVideo(e) { if (!evpVideo || !evpVideo.duration) return; var bar = document.getElementById('evp-progress'); if (!bar) return; var rect = bar.getBoundingClientRect(); var percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)); evpVideo.currentTime = percent * evpVideo.duration; }
 function seekEnhancedVideoBy(seconds) { if (!evpVideo) return; evpVideo.currentTime = Math.max(0, Math.min(evpVideo.duration, evpVideo.currentTime + seconds)); }
+function seekEnhancedVideoBackward() { seekEnhancedVideoBy(-10); }
+function seekEnhancedVideoForward() { seekEnhancedVideoBy(10); }
+function toggleVolume() { if (!evpVideo) return; evpVideo.muted = !evpVideo.muted; var btn = document.getElementById('vp-volume-btn'); if (btn) btn.textContent = evpVideo.muted ? '🔇' : '🔊'; }
+function closeModal() { var modal = document.getElementById('detail-modal'); if (modal) modal.classList.remove('show'); }
 function setEnhancedVolume(value) { videoCtx.volume = value / 100; if (evpVideo) evpVideo.volume = videoCtx.volume; updateEnhancedVolumeIcon(value); }
 
 function toggleEnhancedMute() {
