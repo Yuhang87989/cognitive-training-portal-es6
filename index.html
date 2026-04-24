@@ -528,10 +528,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
     <div class="modal-content" id="detail-content" style="max-width:400px;"></div>
 </div>
 
+
+<!-- 隐藏的音频元素 -->
+<audio id="hidden-audio" style="display:none;"></audio>
+
+<!-- 增强版视频播放器 -->
+<div id="enhanced-video-player" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;flex-direction:column;">
+    <video id="evp-video" playsinline style="width:100%;height:100%;object-fit:contain;"></video>
+    <!-- 控制面板 -->
+    <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:20px;">
+        <div id="evp-title" style="color:white;font-size:16px;font-weight:bold;margin-bottom:12px;"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+            <span id="evp-time" style="color:white;font-size:12px;min-width:80px;">0:00 / 0:00</span>
+            <div id="evp-progress" style="flex:1;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;cursor:pointer;" onclick="seekEnhancedVideo(event)">
+                <div id="evp-progress-bar" style="height:100%;background:var(--blue);border-radius:2px;width:0%;"></div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button onclick="toggleEnhancedVideoPlay()" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;" id="evp-play-btn">▶</button>
+                <button onclick="seekEnhancedVideoBackward()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⏪</button>
+                <button onclick="seekEnhancedVideoForward()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⏩</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button id="evp-speed-btn" onclick="toggleEnhancedSpeedDropdown()" style="background:none;border:none;color:white;font-size:12px;cursor:pointer;">1x</button>
+                <button id="evp-volume-btn" onclick="toggleEnhancedMute()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">🔊</button>
+                <button onclick="togglePictureInPicture()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">📺</button>
+                <button onclick="toggleEnhancedFullscreen()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⛶</button>
+                <button onclick="closeEnhancedVideoPlayer()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">✕</button>
+            </div>
+        </div>
+    </div>
+    <div id="evp-big-play" onclick="toggleEnhancedVideoPlay()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;">▶</div>
+</div>
+
 <script>
 // ====== 全局配置 ======
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+const DEEPSEEK_MODEL = 'deepseek-chat';
 const STORAGE_KEY = 'cognitive_training_v49';
 const OLD_KEYS = ['cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
 function migrateData() {
@@ -2743,3 +2778,5 @@ function playPodcast(title, id) { if (id) { for (var i = 0; i < podcastCourses.l
 // 兼容原视频
 
 </script>
+</body>
+</html>
