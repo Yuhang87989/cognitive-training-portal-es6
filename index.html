@@ -712,31 +712,40 @@ function quickLogin(userId) {
     if (!user) return;
     data.currentUser = userId;
     saveData(data);
-    document.getElementById('selected-user-display').innerHTML = `<span>${user.name.charAt(0)}</span> ${user.name}`;
-    document.getElementById('login-form-section').style.display = 'block';
-    document.getElementById('login-difficulty').value = user.difficulty || 1;
-    document.querySelector('.user-select-btn').dataset.userId = userId;
-    document.getElementById('user-select-dropdown').classList.remove('show');
+    const displayEl = document.getElementById('selected-user-display');
+    const formEl = document.getElementById('login-form-section');
+    const diffEl = document.getElementById('login-difficulty');
+    const btn = document.querySelector('.user-select-btn');
+    const dropdown = document.getElementById('user-select-dropdown');
+    if (displayEl) displayEl.innerHTML = '<span>' + user.name.charAt(0) + '</span> ' + user.name;
+    if (formEl) formEl.style.display = 'block';
+    if (diffEl) diffEl.value = user.difficulty || 1;
+    if (btn) btn.dataset.userId = userId;
+    if (dropdown) dropdown.classList.remove('show');
 }
 
 function handleLogin() {
     const data = loadData();
     const btn = document.querySelector('.user-select-btn');
-    const userId = btn.dataset.userId;
-    const difficulty = parseInt(document.getElementById('login-difficulty').value);
-    if (userId) {
-        const user = data.users.find(u => u.id === userId);
-        if (user) { 
-            user.difficulty = difficulty; 
-            user.lastLogin = Date.now(); 
-            data.currentUser = userId; 
-            saveData(data); 
-        }
-    } else {
+    if (!btn || !btn.dataset.userId) {
         showToast('请先选择学习者');
         return;
     }
-    updateUI(); syncTodayStats(); showPage('home');
+    const userId = btn.dataset.userId;
+    const diffEl = document.getElementById('login-difficulty');
+    const difficulty = diffEl ? parseInt(diffEl.value) : 1;
+    const user = data.users.find(u => u.id === userId);
+    if (user) { 
+        user.difficulty = difficulty; 
+        user.lastLogin = Date.now(); 
+        data.currentUser = userId; 
+        saveData(data); 
+        updateUI(); 
+        syncTodayStats(); 
+        showPage('home');
+    } else {
+        showToast('用户不存在，请重新选择');
+    }
 }
 
 function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
