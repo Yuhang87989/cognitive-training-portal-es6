@@ -282,6 +282,79 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </style>
 </head>
 <body>
+<script>
+// V33: 立即强制隐藏登录页面，防止部署系统干扰
+(function(){
+    // 创建多层保护样式
+    var style = document.createElement('style');
+    style.id = 'v33-login-protect';
+    style.textContent = `
+        .login-page{display:none !important;;;;opacity:0 !important}
+        .login-page.active{display:flex !important;visibility:visible !important;position:relative !important;left:auto !important;opacity:1 !important}
+    `;
+    document.head.appendChild(style);
+    
+    // 立即隐藏登录页
+    var loginPage = document.getElementById('page-login');
+    if(loginPage){
+        loginPage.style.cssText = 'display:none !important;;;;opacity:0 !important';
+    }
+    
+    // 延迟500ms后再次检查并强制隐藏（应对部署系统后续修改）
+    setTimeout(function(){
+        var lp = document.getElementById('page-login');
+        if(lp && !lp.classList.contains('active')){
+            lp.style.cssText = 'display:none !important;;;;opacity:0 !important';
+        }
+    }, 500);
+    
+    // 延迟1秒后再次强制检查
+    setTimeout(function(){
+        var lp = document.getElementById('page-login');
+        if(lp && !lp.classList.contains('active')){
+            lp.style.cssText = 'display:none !important;;;;opacity:0 !important';
+        }
+    }, 1000);
+})();
+
+// ====== 关于系统 ======
+function showAboutModal() {
+    document.getElementById('about-modal').classList.add('show');
+}
+function closeAboutModal() {
+    document.getElementById('about-modal').classList.remove('show');
+}
+
+// ====== 系统更新 ======
+const CURRENT_VERSION = 'V86';
+const GITHUB_REPO = 'https://api.github.com/repos/Yuhang87989/cognitive-training-portal/commits?per_page=1';
+
+async function checkSystemUpdate() {
+    const statusEl = document.getElementById('update-status');
+    document.getElementById('update-modal').classList.add('show');
+    
+    statusEl.innerHTML = '<div style="font-size:48px;margin-bottom:12px;">🔄</div><div style="font-size:14px;color:#666;">正在检查更新...</div>';
+    
+    try {
+        const response = await fetch(GITHUB_REPO);
+        const commits = await response.json();
+        
+        if (commits && commits.length > 0) {
+            const latestCommit = commits[0];
+            const commitDate = new Date(latestCommit.commit.committer.date);
+            const commitMsg = latestCommit.commit.message;
+            
+            statusEl.innerHTML = '<div style="font-size:48px;margin-bottom:12px;">✅</div><div style="font-size:16px;font-weight:600;margin-bottom:8px;">当前版本：' + CURRENT_VERSION + '</div><div style="font-size:12px;color:#666;margin-bottom:8px;">最新更新：' + commitDate.toLocaleDateString('zh-CN') + '</div><div style="font-size:11px;color:#999;background:#f5f5f5;padding:8px;border-radius:8px;margin-bottom:12px;">' + commitMsg + '</div><button class="login-btn login-btn-primary" onclick="location.reload()" style="margin-bottom:8px;">🔄 刷新页面获取最新版本</button>';
+        }
+    } catch (e) {
+        statusEl.innerHTML = '<div style="font-size:48px;margin-bottom:12px;">⚠️</div><div style="font-size:14px;color:#666;">无法检查更新</div><div style="font-size:12px;color:#999;margin-top:8px;">请检查网络连接</div><button class="login-btn login-btn-primary" onclick="location.reload()" style="margin-top:12px;">🔄 手动刷新页面</button>';
+    }
+}
+
+function closeUpdateModal() {
+    document.getElementById('update-modal').classList.remove('show');
+}
+</script>
 <!-- 登录页 -->
 <div id="page-login" class="page login-page" >
     <div class="login-header-bg"></div>
