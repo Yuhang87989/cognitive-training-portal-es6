@@ -2057,116 +2057,6 @@ let currentAudioIndex = 0;
 let currentPodcastCategory = 'method';
 
 // ====== AI智能回复（无需配置API Key） ======
-// 内置智能回复系统，根据问题类型自动匹配最佳回复
-
-async function callDeepSeek(prompt) {
-    // 模拟AI思考
-    await new Promise(r => setTimeout(r, 800));
-    
-    // 智能回复匹配
-    const q = prompt.toLowerCase();
-    
-    // 数学相关
-    if (q.includes('数学') || q.includes('计算') || q.includes('方程') || q.includes('分数') || q.includes('几何')) {
-        return '📐 数学问题分析：\n\n' + getMathResponse(prompt);
-    }
-    // 语文相关
-    if (q.includes('语文') || q.includes('阅读') || q.includes('作文') || q.includes('古诗词') || q.includes('文言文')) {
-        return '📝 语文问题分析：\n\n' + getChineseResponse(prompt);
-    }
-    // 英语相关
-    if (q.includes('英语') || q.includes('english') || q.includes('语法') || q.includes('单词')) {
-        return '📖 英语问题分析：\n\n' + getEnglishResponse(prompt);
-    }
-    // 物理相关
-    if (q.includes('物理') || q.includes('力学') || q.includes('电学') || q.includes('光学')) {
-        return '⚡ 物理问题分析：\n\n' + getPhysicsResponse(prompt);
-    }
-    // 化学相关
-    if (q.includes('化学') || q.includes('元素') || q.includes('方程式')) {
-        return '🧪 化学问题分析：\n\n' + getChemistryResponse(prompt);
-    }
-    // 批改相关
-    if (q.includes('批改') || q.includes('学生答案')) {
-        return '✏️ 批改结果：\n\n' + getCorrectResponse(prompt);
-    }
-    // 解说相关
-    if (q.includes('解说') || q.includes('讲解') || q.includes('分析')) {
-        return '💡 题目解说：\n\n' + getExplainResponse(prompt);
-    }
-    
-    // 默认回复
-    return '好的，我理解你的问题。让我为你分析：\n\n这是一个很好的问题，建议你：\n1. 仔细审题，找出关键信息\n2. 回顾相关知识点\n3. 尝试从不同角度思考\n4. 如果还有疑问，可以继续问我！';
-}
-
-function getMathResponse(prompt) {
-    if (prompt.includes('方程')) {
-        return '解方程的关键步骤：\n1. 移项（注意变号）\n2. 合并同类项\n3. 系数化为1\n\n记住：移项要变号，乘除要谨慎！';
-    }
-    if (prompt.includes('分数')) {
-        return '分数运算要点：\n1. 加减法：先通分\n2. 乘法：分子乘分子，分母乘分母\n3. 除法：除以一个数等于乘以它的倒数\n\n别忘了约分到最简形式！';
-    }
-    if (prompt.includes('几何') || prompt.includes('面积')) {
-        return '几何题目解题技巧：\n1. 画图标注已知条件\n2. 找出图形之间的关系\n3. 选择合适的公式\n4. 注意单位的统一';
-    }
-    return '数学学习建议：\n1. 理解概念比死记公式更重要\n2. 多做练习巩固知识\n3. 建立错题本，定期复习\n4. 遇到难题先尝试，再请教';
-}
-
-function getChineseResponse(prompt) {
-    if (prompt.includes('阅读')) {
-        return '阅读理解技巧：\n1. 先看题目，带着问题读文章\n2. 找出中心句和关键词\n3. 注意文章结构和过渡词\n4. 答题时结合原文';
-    }
-    if (prompt.includes('作文')) {
-        return '作文写作要点：\n1. 审题要准确，立意要深刻\n2. 开头要吸引人\n3. 中间内容充实，层次分明\n4. 结尾要总结升华';
-    }
-    if (prompt.includes('古诗词') || prompt.includes('文言文')) {
-        return '古诗词/文言文学习方法：\n1. 理解字词含义\n2. 掌握特殊句式\n3. 背诵经典篇目\n4. 多做翻译练习';
-    }
-    return '语文学习建议：\n1. 多读多写多积累\n2. 注意词语搭配和句式\n3. 培养语感和理解能力\n4. 做好读书笔记';
-}
-
-function getEnglishResponse(prompt) {
-    if (prompt.includes('语法')) {
-        return '英语语法学习要点：\n1. 掌握基本句型结构\n2. 理解时态和语态\n3. 注意主谓一致\n4. 多做练习巩固';
-    }
-    if (prompt.includes('单词') || prompt.includes('词汇')) {
-        return '单词记忆方法：\n1. 联想记忆法\n2. 词根词缀法\n3. 语境记忆法\n4. 定期复习（艾宾浩斯曲线）';
-    }
-    return '英语学习建议：\n1. 每天坚持听读练习\n2. 积累常用词汇和短语\n3. 模仿标准发音\n4. 勇敢开口说';
-}
-
-function getPhysicsResponse(prompt) {
-    if (prompt.includes('力学')) {
-        return '力学解题步骤：\n1. 画受力分析图\n2. 确定研究对象\n3. 列出力的平衡方程\n4. 注意单位的统一';
-    }
-    if (prompt.includes('电学')) {
-        return '电学解题要点：\n1. 画电路图\n2. 理解串并联特点\n3. 运用欧姆定律\n4. 注意电功率公式';
-    }
-    return '物理学习建议：\n1. 理解概念和原理\n2. 多做实验观察\n3. 掌握公式推导\n4. 联系生活实际';
-}
-
-function getChemistryResponse(prompt) {
-    if (prompt.includes('方程式')) {
-        return '化学方程式配平方法：\n1. 最小公倍数法\n2. 奇数配偶数法\n3. 观察法\n\n记住：质量守恒，原子个数相等';
-    }
-    return '化学学习建议：\n1. 熟记元素周期表\n2. 理解化学反应原理\n3. 多做实验观察\n4. 掌握计算方法';
-}
-
-function getCorrectResponse(prompt) {
-    return '根据你的答案：\n\n✓ 解题思路清晰\n✓ 关键步骤正确\n\n建议：\n- 注意书写规范\n- 检查计算过程\n- 确认单位是否正确';
-}
-
-function getExplainResponse(prompt) {
-    return '题目详细分析：\n\n📋 题目类型：基础应用题\n\n📝 解题步骤：\n1. 审题，找出已知条件和所求\n2. 确定解题方法\n3. 列出计算式\n4. 得出答案并检验\n\n💡 知识点：这道题考查基础运算能力\n\n🔄 举一反三：可以尝试改变数值，做类似的练习';
-}
-
-async function aiCorrectAnswer(question, userAnswer) {
-    return await callDeepSeek(`批改题目：${question}\n学生答案：${userAnswer}`);
-}
-
-async function aiExplainTopic(topic) {
-    return await callDeepSeek(`详细解说这道题：${topic}`);
-}
 
 
 // ====== 登录函数 ======
@@ -4052,7 +3942,7 @@ function closeAboutModal() {
 }
 
 // ====== 系统更新 ======
-const CURRENT_VERSION = 'V95';
+const CURRENT_VERSION = 'V96';
 const GITHUB_REPO = 'https://api.github.com/repos/Yuhang87989/cognitive-training-portal/commits?per_page=1';
 
 async function checkSystemUpdate() {
