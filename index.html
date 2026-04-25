@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V109</title>
+<title>认知训练 V110</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -120,11 +120,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .teacher-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px}
 .teacher-name{font-size:12px;font-weight:600;margin-top:6px}
 .teacher-subject{font-size:10px;color:var(--text-light)}
-.game-board{display:grid;gap:10px;margin:0 auto;max-width:300px}
+.game-board{display:grid;gap:12px;margin:0 auto;max-width:340px;width:100%}
 .game-board.size-3{grid-template-columns:repeat(3,1fr)}
 .game-board.size-4{grid-template-columns:repeat(4,1fr)}
-.game-cell{aspect-ratio:1;background:var(--border-gray);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer}
-.game-cell:active{transform:scale(0.95)}
+.game-board.size-5{grid-template-columns:repeat(5,1fr)}
+.game-board.size-6{grid-template-columns:repeat(6,1fr)}
+.game-cell{aspect-ratio:1;background:var(--border-gray);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;cursor:pointer;transition:all 0.15s ease;min-height:50px}
+.game-cell:active{transform:scale(0.92)}
 .games-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
 .game-card{background:white;border-radius:16px;padding:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:center}
 .game-icon-area{width:56px;height:56px;border-radius:16px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px}
@@ -3433,7 +3435,7 @@ function handleFullscreenChange() {
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户 V109 加载完成');
+    console.log('认知训练门户 V110 加载完成');
     
     // 监听全屏状态变化（用户按ESC退出全屏时自动关闭游戏）
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -5238,7 +5240,7 @@ function submitTopicAnswer(topicId) {
     <input type="range" id="evp-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
 </div>
 
-<!-- V109 Build 1745616000000 -->
+<!-- V110 Build 1745616000000 -->
 <!-- 关于系统弹窗 -->
 <div class="modal-overlay" id="about-modal">
     <div class="modal-content" style="max-height:85vh;overflow-y:auto;">
@@ -5269,7 +5271,7 @@ function submitTopicAnswer(topicId) {
                 <div style="font-weight:600;margin-bottom:8px;">✨ 12大核心模块</div>
                 <div style="font-size:12px;opacity:0.9;">🤖 AI数字分身 | 🎯 AI精准练 | 🗺️ 认知地图 | 📋 学习计划<br>📚 母题训练 | 🏆 学霸方法 | 🧠 思维训练 | 🎧 播客课堂<br>🎬 视频课堂 | 🎮 训练游戏 | 🤖 DeepSeek | ⚙️ 设置</div>
             </div>
-            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V109 | 更新时间：2026年4月26日</div>
+            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V110 | 更新时间：2026年4月26日</div>
         </div>
         <button class="login-btn login-btn-primary" onclick="closeAboutModal()" style="margin-top:16px;">了解了</button>
     </div>
@@ -5287,27 +5289,52 @@ function submitTopicAnswer(topicId) {
     </div>
 </div>
 
+
+<!-- 游戏专用全屏容器（手机屏幕优化） -->
+<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);z-index:9999;display:none;flex-direction:column;overflow:hidden;">
+    
+    <!-- 顶部标题栏 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);min-height:60px;">
+        
+        <button onclick="closeGame()" style="background:rgba(255,255,255,0.95);border:none;border-radius:24px;padding:12px 24px;font-size:16px;font-weight:700;color:#667eea;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:flex;align-items:center;gap:6px;">
+            <span style="font-size:18px;">←</span> 返回
+        </button>
+        
+        <div id="game-title" style="font-size:20px;font-weight:bold;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.3);">游戏</div>
+        
+        <div style="width:90px;"></div>
+    
+    </div>
+    
+    <!-- 得分区域 -->
+    <div style="padding:24px 20px;text-align:center;background:rgba(255,255,255,0.05);">
+        
+        <div style="font-size:15px;color:rgba(255,255,255,0.85);margin-bottom:6px;font-weight:500;">当前得分</div>
+        
+        <div id="game-score" style="font-size:56px;font-weight:800;color:white;text-shadow:0 4px 12px rgba(0,0,0,0.4);line-height:1;">0</div>
+    
+    </div>
+    
+    <!-- 游戏区域 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;overflow:auto;">
+        
+        <div id="game-board" style="width:100%;max-width:360px;min-height:280px;background:rgba(255,255,255,0.98);border-radius:24px;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,0.25);"></div>
+    
+    </div>
+    
+    <!-- 底部按钮栏 -->
+    <div style="padding:20px 24px 32px;background:rgba(0,0,0,0.1);display:flex;gap:16px;">
+        
+        <button onclick="resetGame()" style="flex:1;background:rgba(255,255,255,0.95);border:none;border-radius:28px;padding:16px;font-size:17px;font-weight:700;color:#667eea;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:transform 0.1s;">
+            🔄 重新开始
+        </button>
+        
+        <button onclick="closeGame()" style="flex:1;background:linear-gradient(135deg,#ff6b6b,#ee5a5a);border:none;border-radius:28px;padding:16px;font-size:17px;font-weight:700;color:white;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,0.2);transition:transform 0.1s;">
+            ✕ 退出游戏
+        </button>
+    
+    </div>
+
+</div>
 </body>
 </html>
-
-
-<!-- 游戏专用全屏容器 -->
-<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-page);z-index:300;display:none;flex-direction:column;">
-    <div style="display:flex;align-items:center;padding:12px 16px;background:white;border-bottom:1px solid #f0f0f0;">
-        <div onclick="closeGame()" style="font-size:20px;cursor:pointer;padding:8px;">←</div>
-        <div id="game-title" style="flex:1;font-size:16px;font-weight:bold;text-align:center;">游戏</div>
-        <div style="width:40px;"></div>
-    </div>
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;">
-        <div style="margin-bottom:16px;text-align:center;">
-            <div style="font-size:14px;color:var(--text-gray);">当前得分</div>
-            <div id="game-score" style="font-size:36px;font-weight:bold;color:var(--blue);">0</div>
-        </div>
-        <div id="game-board" style="width:100%;max-width:320px;min-height:320px;"></div>
-    </div>
-    <div style="padding:16px;background:white;border-top:1px solid #f0f0f0;display:flex;gap:12px;">
-        <button onclick="resetGame()" class="game-btn btn-blue" style="flex:1;">🔄 重置</button>
-        <button onclick="closeGame()" class="game-btn btn-orange" style="flex:1;">返回</button>
-    </div>
-</div>
-
