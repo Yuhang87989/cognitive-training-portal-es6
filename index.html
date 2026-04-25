@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V111</title>
+<title>认知训练 V112</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -609,7 +609,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
-const STORAGE_KEY = 'cognitive_training_v49';
+const STORAGE_KEY = 'cognitive_training_v50';
+
+// 统一数据结构模板
+function getDefaultData() {
+    return {
+        version: 50,
+        users: [],
+        currentUser: null,
+        // 用户上传的视频
+        userVideos: [],
+        // 播客播放位置
+        podcastPositions: {},
+        // 媒体播放位置
+        mediaPositions: {},
+        // 当前导师
+        currentMentor: null,
+        // 错题本
+        wrongQuestions: [],
+        // 学习记录
+        studyRecords: [],
+        // 游戏记录
+        gameRecords: {},
+        // 训练进度
+        trainingProgress: {},
+        // 最后同步时间
+        lastSyncTime: new Date().toISOString()
+    };
+}
 
 // ====== 播客音频数据 - 21个真实音频 ======
 const podcastList = [
@@ -781,36 +808,86 @@ function migrateData() {
     }
 }
 
-// ====== 数据存储 ======
+// ====== 统一数据存储 ======
 function loadData() {
     try {
-        // 尝试迁移旧数据
         migrateData();
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { users: [], currentUser: null };
+        if (!raw) return getDefaultData();
+        
         const data = JSON.parse(raw);
-        // 验证数据格式
-        if (!data || typeof data !== 'object') {
-            console.log('数据格式错误，重置');
-            return { users: [], currentUser: null };
+        if (!data || typeof data !== 'object') return getDefaultData();
+        
+        // 确保所有字段存在
+        const defaultData = getDefaultData();
+        if (!Array.isArray(data.users)) data.users = defaultData.users;
+        if (!data.userVideos) data.userVideos = [];
+        if (!data.podcastPositions) data.podcastPositions = {};
+        if (!data.mediaPositions) data.mediaPositions = {};
+        if (!data.wrongQuestions) data.wrongQuestions = [];
+        if (!data.gameRecords) data.gameRecords = {};
+        if (!data.trainingProgress) data.trainingProgress = {};
+        
+        // 迁移旧的分散存储数据
+        if (!data.userVideos) {
+            try {
+                const oldVideos = localStorage.getItem('userVideos');
+                if (oldVideos) data.userVideos = JSON.parse(oldVideos);
+            } catch(e) {}
         }
-        if (!Array.isArray(data.users)) data.users = [];
+        if (Object.keys(data.podcastPositions).length === 0) {
+            try {
+                const oldPositions = localStorage.getItem('podcastPositions');
+                if (oldPositions) data.podcastPositions = JSON.parse(oldPositions);
+            } catch(e) {}
+        }
+        if (Object.keys(data.mediaPositions).length === 0) {
+            try {
+                const oldMedia = localStorage.getItem('mediaPositions');
+                if (oldMedia) data.mediaPositions = JSON.parse(oldMedia);
+            } catch(e) {}
+        }
+        
         if (!data.currentUser && data.users.length > 0) {
             data.currentUser = data.users[0].id;
         }
+        
+        // 更新同步时间
+        data.lastSyncTime = new Date().toISOString();
+        
         return data;
     } catch(e) {
-        console.log('数据加载错误，重置:', e.message);
-        // 清除损坏的数据
-        try { localStorage.removeItem(STORAGE_KEY); } catch(e2) {}
-        return { users: [], currentUser: null };
+        console.log('数据加载错误:', e.message);
+        return getDefaultData();
     }
 }
 
 function saveData(data) {
     try {
+        if (!data) data = getDefaultData();
+        data.lastSyncTime = new Date().toISOString();
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch(e) {}
+        
+        // 同时更新旧的存储键以保持兼容
+        if (data.userVideos) localStorage.setItem('userVideos', JSON.stringify(data.userVideos));
+        if (data.podcastPositions) localStorage.setItem('podcastPositions', JSON.stringify(data.podcastPositions));
+        if (data.mediaPositions) localStorage.setItem('mediaPositions', JSON.stringify(data.mediaPositions));
+    } catch(e) {
+        console.log('数据保存错误:', e.message);
+    }
+}
+
+// 获取特定模块数据
+function getModuleData(module) {
+    const data = loadData();
+    return data[module] || null;
+}
+
+// 保存特定模块数据
+function saveModuleData(module, value) {
+    const data = loadData();
+    data[module] = value;
+    saveData(data);
 }
 
 function getCurrentUserData() {
@@ -2522,7 +2599,7 @@ function addVideoByLink() {
     if (ext === 'webm') format = 'webm';
     else if (ext === 'ogg' || ext === 'ogv') format = 'ogg';
     
-    var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+    var userVideos = getModuleData('userVideos') || [];
     userVideos.push({
         id: 'user_video_' + Date.now(),
         title: title,
@@ -2531,7 +2608,7 @@ function addVideoByLink() {
         format: format,
         uploadTime: new Date().toISOString()
     });
-    localStorage.setItem('userVideos', JSON.stringify(userVideos));
+    saveModuleData('userVideos', userVideos);
     
     showToast('视频添加成功！');
     urlInput.value = '';
@@ -2575,7 +2652,7 @@ function handleVideoFileUpload(input) {
         var durationStr = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
         
         // 保存到localStorage（存储URL）
-        var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+        var userVideos = getModuleData('userVideos') || [];
         userVideos.push({
             id: 'user_video_' + Date.now(),
             title: title,
@@ -2586,14 +2663,14 @@ function handleVideoFileUpload(input) {
             uploadTime: new Date().toISOString(),
             fileSize: (file.size / 1024 / 1024).toFixed(1) + 'MB'
         });
-        localStorage.setItem('userVideos', JSON.stringify(userVideos));
+        saveModuleData('userVideos', userVideos);
         
         showToast('视频上传成功！');
         renderVideos(document.getElementById('fullscreen-content'));
     };
     tempVideo.onerror = function() {
         showToast('无法读取视频信息，但仍可播放');
-        var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+        var userVideos = getModuleData('userVideos') || [];
         userVideos.push({
             id: 'user_video_' + Date.now(),
             title: title,
@@ -2604,7 +2681,7 @@ function handleVideoFileUpload(input) {
             uploadTime: new Date().toISOString(),
             fileSize: (file.size / 1024 / 1024).toFixed(1) + 'MB'
         });
-        localStorage.setItem('userVideos', JSON.stringify(userVideos));
+        saveModuleData('userVideos', userVideos);
         renderVideos(document.getElementById('fullscreen-content'));
     };
     tempVideo.src = videoUrl;
@@ -2612,7 +2689,7 @@ function handleVideoFileUpload(input) {
 
 // 播放用户上传的视频
 function playUserVideo(index) {
-    var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+    var userVideos = getModuleData('userVideos') || [];
     if (index >= 0 && index < userVideos.length) {
         var video = userVideos[index];
         showEnhancedVideoPlayer(video.title, video.url);
@@ -2621,14 +2698,14 @@ function playUserVideo(index) {
 
 // 删除用户上传的视频
 function deleteUserVideo(index) {
-    var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+    var userVideos = getModuleData('userVideos') || [];
     if (index >= 0 && index < userVideos.length) {
         // 释放blob URL
         if (userVideos[index].blobUrl) {
             URL.revokeObjectURL(userVideos[index].blobUrl);
         }
         userVideos.splice(index, 1);
-        localStorage.setItem('userVideos', JSON.stringify(userVideos));
+        saveModuleData('userVideos', userVideos);
         showToast('视频已删除');
         renderVideos(document.getElementById('fullscreen-content'));
     }
@@ -2636,12 +2713,12 @@ function deleteUserVideo(index) {
 
 // 清空所有用户上传的视频
 function clearUserVideos() {
-    var userVideos = JSON.parse(localStorage.getItem('userVideos') || '[]');
+    var userVideos = getModuleData('userVideos') || [];
     // 释放所有blob URL
     userVideos.forEach(function(v) {
         if (v.blobUrl) URL.revokeObjectURL(v.blobUrl);
     });
-    localStorage.removeItem('userVideos');
+    saveModuleData('userVideos', []);
     showToast('已清空所有上传视频');
     renderVideos(document.getElementById('fullscreen-content'));
 }
@@ -3630,7 +3707,7 @@ function handleFullscreenChange() {
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户 V111 加载完成');
+    console.log('认知训练门户 V112 加载完成');
     
     // 监听全屏状态变化（用户按ESC退出全屏时自动关闭游戏）
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -4053,7 +4130,7 @@ function initAudioPlayer() {
     currentAudio.addEventListener('ended', onAudioEnded);
     currentAudio.addEventListener('play', function() { audioCtx.isPlaying = true; updatePlayButtons(); });
     currentAudio.addEventListener('pause', function() { audioCtx.isPlaying = false; updatePlayButtons(); });
-    try { var saved = localStorage.getItem('podcastPositions'); if (saved) savedPositions = JSON.parse(saved); } catch(e) {}
+    try { savedPositions = getModuleData('podcastPositions') || {}; } catch(e) {}
 }
 
 function playPodcastCourse(courseId) {
@@ -4096,7 +4173,7 @@ function updateAudioProgress() {
     if (fillEl) fillEl.style.width = progress + '%';
     if (currentTimeEl) currentTimeEl.textContent = formatTimeFull(currentAudio.currentTime);
     if (miniBarEl) miniBarEl.style.width = progress + '%';
-    if (audioCtx.currentTrack) { savedPositions[audioCtx.currentTrack.id] = currentAudio.currentTime; try { localStorage.setItem('podcastPositions', JSON.stringify(savedPositions)); } catch(e) {} }
+    if (audioCtx.currentTrack) { savedPositions[audioCtx.currentTrack.id] = currentAudio.currentTime; try { saveModuleData('podcastPositions', savedPositions); } catch(e) {} }
 }
 
 function onAudioEnded() { playNextTrack(); }
@@ -4209,7 +4286,7 @@ function initUnifiedPlayer() {
     videoEl.addEventListener('pause', function() { mediaPlayer.isPlaying = false; updateMediaPlayButtons(); });
     
     try { 
-        var saved = localStorage.getItem('mediaPositions'); 
+        var saved = JSON.stringify(getModuleData('mediaPositions') || {}); 
         if (saved) mediaPlayer.savedPositions = JSON.parse(saved); 
         else mediaPlayer.savedPositions = {};
     } catch(e) { mediaPlayer.savedPositions = {}; }
@@ -4311,7 +4388,7 @@ function updateMediaProgress() {
     // 保存进度
     if (mediaPlayer.currentMedia) {
         mediaPlayer.savedPositions[mediaPlayer.currentMedia.id] = mediaEl.currentTime;
-        try { localStorage.setItem('mediaPositions', JSON.stringify(mediaPlayer.savedPositions)); } catch(e) {}
+        try { saveModuleData('mediaPositions', mediaPlayer.savedPositions); } catch(e) {}
     }
 }
 
@@ -5435,7 +5512,7 @@ function submitTopicAnswer(topicId) {
     <input type="range" id="evp-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
 </div>
 
-<!-- V111 Build 1745616000000 -->
+<!-- V112 Build 1745616000000 -->
 <!-- 关于系统弹窗 -->
 <div class="modal-overlay" id="about-modal">
     <div class="modal-content" style="max-height:85vh;overflow-y:auto;">
@@ -5466,7 +5543,7 @@ function submitTopicAnswer(topicId) {
                 <div style="font-weight:600;margin-bottom:8px;">✨ 12大核心模块</div>
                 <div style="font-size:12px;opacity:0.9;">🤖 AI数字分身 | 🎯 AI精准练 | 🗺️ 认知地图 | 📋 学习计划<br>📚 母题训练 | 🏆 学霸方法 | 🧠 思维训练 | 🎧 播客课堂<br>🎬 视频课堂 | 🎮 训练游戏 | 🤖 DeepSeek | ⚙️ 设置</div>
             </div>
-            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V111 | 更新时间：2026年4月26日</div>
+            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V112 | 更新时间：2026年4月26日</div>
         </div>
         <button class="login-btn login-btn-primary" onclick="closeAboutModal()" style="margin-top:16px;">了解了</button>
     </div>
