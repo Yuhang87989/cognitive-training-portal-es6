@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V112</title>
+<title>认知训练 V113</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -3707,7 +3707,7 @@ function handleFullscreenChange() {
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户 V112 加载完成');
+    console.log('认知训练门户 V113 加载完成');
     
     // 监听全屏状态变化（用户按ESC退出全屏时自动关闭游戏）
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -5298,12 +5298,48 @@ function closeSettingsPanel(e) {
 }
 
 // 难度调整功能
+const difficultyNames = {1:'入门', 2:'基础', 3:'进阶', 4:'提高', 5:'挑战'};
+const difficultyColors = {1:'#43E97B', 2:'#4facfe', 3:'#667eea', 4:'#f6d365', 5:'#FF6B6B'};
+
 function openDifficultyModal() {
-    document.getElementById('difficulty-modal').classList.add('show');
+    const modal = document.getElementById('difficulty-modal');
+    if (modal) modal.classList.add('show');
+    updateDifficultyButtons();
 }
 
 function closeDifficultyModal() {
-    document.getElementById('difficulty-modal').classList.remove('show');
+    const modal = document.getElementById('difficulty-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+function updateDifficultyButtons() {
+    const userData = getCurrentUserData();
+    const currentLevel = userData ? (userData.difficulty || 1) : 1;
+    
+    // 更新所有按钮状态
+    for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById('diff-btn-' + i);
+        if (btn) {
+            if (i === currentLevel) {
+                btn.style.borderColor = difficultyColors[i];
+                btn.style.background = difficultyColors[i];
+                btn.style.color = 'white';
+                btn.querySelector('div:last-child').style.color = 'rgba(255,255,255,0.8)';
+            } else {
+                btn.style.borderColor = '#ddd';
+                btn.style.background = 'white';
+                btn.style.color = '#333';
+                btn.querySelector('div:last-child').style.color = '#999';
+            }
+        }
+    }
+    
+    // 更新当前难度显示
+    const displayEl = document.getElementById('current-difficulty-display');
+    if (displayEl) {
+        displayEl.textContent = 'Lv.' + currentLevel + ' ' + difficultyNames[currentLevel];
+        displayEl.style.color = difficultyColors[currentLevel];
+    }
 }
 
 function setDifficulty(level) {
@@ -5311,8 +5347,21 @@ function setDifficulty(level) {
     if (userData) {
         userData.difficulty = level;
         syncUserData(userData);
-        document.getElementById('difficulty-text').textContent = 'Lv.' + level;
-        showToast('难度已调整为 Lv.' + level);
+        
+        // 更新首页显示
+        const diffText = document.getElementById('difficulty-text');
+        if (diffText) diffText.textContent = 'Lv.' + level;
+        
+        // 更新下拉菜单信息
+        const dropInfo = document.getElementById('dropdown-info');
+        if (dropInfo && userData) {
+            dropInfo.textContent = gradeNames[userData.grade] + ' · Lv.' + level;
+        }
+        
+        // 更新按钮状态
+        updateDifficultyButtons();
+        
+        showToast('难度已调整为 Lv.' + level + ' ' + difficultyNames[level]);
     }
     closeDifficultyModal();
 }
@@ -5512,7 +5561,7 @@ function submitTopicAnswer(topicId) {
     <input type="range" id="evp-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)">
 </div>
 
-<!-- V112 Build 1745616000000 -->
+<!-- V113 Build 1745616000000 -->
 <!-- 关于系统弹窗 -->
 <div class="modal-overlay" id="about-modal">
     <div class="modal-content" style="max-height:85vh;overflow-y:auto;">
@@ -5543,7 +5592,7 @@ function submitTopicAnswer(topicId) {
                 <div style="font-weight:600;margin-bottom:8px;">✨ 12大核心模块</div>
                 <div style="font-size:12px;opacity:0.9;">🤖 AI数字分身 | 🎯 AI精准练 | 🗺️ 认知地图 | 📋 学习计划<br>📚 母题训练 | 🏆 学霸方法 | 🧠 思维训练 | 🎧 播客课堂<br>🎬 视频课堂 | 🎮 训练游戏 | 🤖 DeepSeek | ⚙️ 设置</div>
             </div>
-            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V112 | 更新时间：2026年4月26日</div>
+            <div style="text-align:center;margin-top:16px;font-size:11px;color:#999;">版本：V113 | 更新时间：2026年4月26日</div>
         </div>
         <button class="login-btn login-btn-primary" onclick="closeAboutModal()" style="margin-top:16px;">了解了</button>
     </div>
