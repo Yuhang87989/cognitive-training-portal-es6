@@ -1206,17 +1206,17 @@ function createNewUser() {
     if (nameEl) nameEl.value = '';
 }
 function confirmClearAllData() {
-    // 显示登录页让用户确认
-    const loginPage = document.getElementById('page-login');
-    if (loginPage) {
-        loginPage.style.display = 'flex';
-        loginPage.classList.add('active');
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    if (!data.currentUser) {
+        const loginPage = document.getElementById('page-login');
+        if (loginPage) loginPage.setAttribute('style', 'display:flex !important;position:fixed;z-index:1000;');
+        showToast('请先登录');
+        return;
     }
-}
-
-function clearAllData() {
-    if (!confirm('⚠️ 确定要清除所有数据吗？')) return;
-    localStorage.removeItem(STORAGE_KEY); location.reload();
+    if (confirm('确定要清除所有数据吗？')) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+    }
 }
 
 // ====== UI更新 ======
