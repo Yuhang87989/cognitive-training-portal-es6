@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练V33</title>
+<title>认知训练V105</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -267,7 +267,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
     <div class="login-content">
         <div class="login-logo-area">
             <div class="login-avatar">🧠</div>
-            <div class="login-title">认知训练V33</div>
+            <div class="login-title">认知训练V105</div>
             <div class="login-subtitle">青少年注意力和记忆力训练</div>
         </div>
         <div class="login-card">
@@ -525,6 +525,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         </div>
         <div style="padding:12px;border-top:1px solid #eee;display:flex;gap:8px;align-items:center;">
             <button onclick="showDeepSeekPhoto()" style="background:none;border:none;font-size:20px;cursor:pointer;">📷</button>
+            <button onclick="toggleDeepSeekVoice()" style="background:none;border:none;font-size:20px;cursor:pointer;">🎤</button>
             <input type="text" class="chat-input" id="deepseek-chat-input" placeholder="输入问题..." style="flex:1;" onkeypress="if(event.key==='Enter')sendDeepSeekChat()"/>
             <button class="chat-send" onclick="sendDeepSeekChat()">发送</button>
         </div>
@@ -980,6 +981,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 </div>
                 <div class="task-time">30分钟</div>
             </div>
+            <div class="plan-task" onclick="toggleTask(this, 'week5')">
+                <div class="task-checkbox">✓</div>
+                <div style="flex:1;">
+                    <div style="font-size:14px;">Week5 - 综合提升</div>
+                    <div style="font-size:11px;color:var(--text-gray);">知识整合 × 4 | 综合应用 × 3</div>
+                </div>
+                <div class="task-time">45分钟</div>
+            </div>
             <div class="plan-task" onclick="toggleTask(this, 'week6')">
                 <div class="task-checkbox">✓</div>
                 <div style="flex:1;">
@@ -1127,6 +1136,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                     <div class="method-title">费曼学习法</div>
                 </div>
                 <div class="method-content">选择一个概念，用自己的话教给别人，发现不足重新学习，直到能用简单语言解释清楚。</div>
+            </div>
+            <div class="method-card" onclick="showMethodDetail(4)">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+                    <span style="font-size:28px;">🗺️</span>
+                    <div class="method-title">思维导图法</div>
+                </div>
+                <div class="method-content">中心主题+分支+关键词，可视化思维，便于记忆和理解各知识点之间的关系。</div>
             </div>
 
             <div class="method-card" onclick="showMethodDetail(5)">
@@ -2568,6 +2584,19 @@ function insertDeepSeekTemplate(text) {
     document.getElementById('deepseek-chat-input').focus();
 }
 
+function toggleDeepSeekVoice() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('您的浏览器不支持语音输入');
+        return;
+    }
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'zh-CN';
+    recognition.onresult = (event) => {
+        document.getElementById('deepseek-chat-input').value = event.results[0][0].transcript;
+    };
+    recognition.start();
+}
+
 function clearDeepSeekChat() {
     if (!confirm('确定要清空对话记录吗？')) return;
     deepseekHistory = [];
@@ -3044,6 +3073,25 @@ function startDailyThinking() {
     const types = ['logic', 'creative', 'critical', 'system'];
     const type = types[Math.floor(Math.random() * types.length)];
     startThinkingTrain(type);
+}
+
+// ====== 学霸方法详解 ======
+function showMethodDetail(index) {
+    const methods = [
+        {icon:'⏱', title:'番茄工作法', content:'学习25分钟，休息5分钟，循环4个周期后长休息。提高专注力，避免疲劳。'},
+        {icon:'🧠', title:'艾宾浩斯记忆法', content:'按照遗忘曲线复习：5分钟、30分钟、12小时、1天、2天、4天、7天、15天。'},
+        {icon:'📝', title:'康奈尔笔记法', content:'将笔记分为：右侧主栏（记录）、左侧副栏（线索）、底部总结栏（思考）。'},
+        {icon:'🎯', title:'费曼学习法', content:'选择一个概念，用自己的话教给别人，发现不足重新学习。'},
+        {icon:'🗺️', title:'思维导图法', content:'中心主题+分支+关键词，可视化思维，便于记忆和理解。'},
+        {icon:'📖', title:'SQ3R阅读法', content:'浏览、提问、阅读、复述、复习，系统化阅读理解。'},
+        {icon:'⏰', title:'时间管理法', content:'四象限法则：重要紧急、重要不紧急、紧急不重要、不重要不紧急。'},
+        {icon:'✍️', title:'高效笔记法', content:'大纲笔记+关键词+图表结合，听课时只记要点，课后整理完善。'},
+        {icon:'🏆', title:'考试策略', content:'先易后难、审题仔细、合理分配时间、检查验算。'}
+    ];
+    const method = methods[index];
+    if (method) {
+        alert(method.icon + ' ' + method.title + '\n\n' + method.content);
+    }
 }
 
 function playMethodVideo(index) {
@@ -4039,7 +4087,7 @@ function closeAboutModal() {
 }
 
 // ====== 系统更新 ======
-const CURRENT_VERSION = 'V104';
+const CURRENT_VERSION = 'V105';
 const GITHUB_REPO = 'https://api.github.com/repos/Yuhang87989/cognitive-training-portal/commits?per_page=1';
 
 async function checkSystemUpdate() {
