@@ -1730,7 +1730,126 @@
 <script src="js/modules/games.js"></script>
 <script src="js/modules/ai.js"></script>
 <script src="js/modules/player.js"></script>
-<script src="js/app.js"></script>
+<script src="js/app.js">
+
+// ====== 核心页面函数 ======
+function showPage(pageId) {
+    console.log('showPage:', pageId);
+    
+    // 隐藏登录遮罩
+    const loginOverlay = document.getElementById('home-login-overlay');
+    if (loginOverlay) loginOverlay.style.display = 'none';
+    
+    // 隐藏所有页面
+    document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.style.display = 'none';
+    });
+    
+    // 显示目标页面
+    const page = document.getElementById('page-' + pageId);
+    if (page) {
+        page.classList.add('active');
+        page.style.display = 'block';
+    }
+    
+    // 更新底部导航
+    document.querySelectorAll('.bottom-nav .nav-item').forEach((n, i) => {
+        const navMap = {home:0, avatar:1, games:2, map:3, plan:4};
+        n.classList.toggle('active', navMap[pageId] === i);
+    });
+    
+    // 页面特定初始化
+    if (pageId === 'topics' && typeof renderTopics === 'function') renderTopics();
+    if (pageId === 'podcast' && typeof renderPodcastList === 'function') renderPodcastList();
+}
+
+function handleHomeLogin() {
+    const name = document.getElementById('home-name').value.trim();
+    const grade = parseInt(document.getElementById('home-grade').value) || 7;
+    const difficulty = parseInt(document.getElementById('home-difficulty').value) || 1;
+    
+    if (!name) { alert('请输入名字'); return; }
+    
+    const data = loadData();
+    
+    // 检查是否已存在
+    let user = data.users.find(u => u.name === name);
+    
+    if (!user) {
+        user = {
+            id: 'user_' + Date.now(),
+            name: name,
+            grade: grade,
+            difficulty: difficulty,
+            score: 1000,
+            streak: 0,
+            todayQuestions: 0,
+            todayCorrect: 0,
+            todayMinutes: 0,
+            wrongTopics: [],
+            createdAt: Date.now()
+        };
+        data.users.push(user);
+    }
+    
+    data.currentUser = user.id;
+    saveData(data);
+    
+    document.getElementById('home-login-overlay').style.display = 'none';
+    updateUI();
+    showPage('home');
+}
+
+function updateUI() {
+    const user = getCurrentUserData();
+    if (!user) return;
+    
+    // 更新首页用户信息
+    const nameEl = document.getElementById('greeting-name');
+    const gradeEl = document.getElementById('user-grade');
+    const diffEl = document.getElementById('difficulty-text');
+    const avatarEl = document.getElementById('header-avatar');
+    
+    if (nameEl) nameEl.textContent = user.name;
+    if (gradeEl) {
+        const gradeNames = {5:'五年级',6:'六年级',7:'初一',8:'初二',9:'初三'};
+        gradeEl.textContent = gradeNames[user.grade] || '初一';
+    }
+    if (diffEl) diffEl.textContent = 'Lv.' + (user.difficulty || 1);
+    if (avatarEl) avatarEl.textContent = user.name.charAt(0);
+    
+    // 更新今日数据
+    const todayQ = document.getElementById('today-questions');
+    const todayC = document.getElementById('today-correct');
+    const todayM = document.getElementById('today-minutes');
+    const todayS = document.getElementById('today-streak');
+    
+    if (todayQ) todayQ.textContent = user.todayQuestions || 0;
+    if (todayC) todayC.textContent = (user.todayCorrect || 0) + '%';
+    if (todayM) todayM.textContent = user.todayMinutes || 0;
+    if (todayS) todayS.textContent = user.streak || 0;
+    
+    // 更新难度滑块显示
+    const homeDiff = document.getElementById('home-difficulty');
+    const diffDisplay = document.getElementById('home-diff-display');
+    if (homeDiff) homeDiff.value = user.difficulty || 1;
+    if (diffDisplay) diffDisplay.textContent = 'Lv.' + (user.difficulty || 1);
+}
+
+// 难度滑块更新
+document.addEventListener('DOMContentLoaded', () => {
+    const slider = document.getElementById('home-difficulty');
+    if (slider) {
+        slider.addEventListener('input', function() {
+            const display = document.getElementById('home-diff-display');
+            if (display) display.textContent = 'Lv.' + this.value;
+        });
+    }
+});
+
+
+</script>
 </body>
 </html>
 // ====== 播客播放器完善 ======
@@ -1870,22 +1989,221 @@ function nextPodcast() {
     playPodcast(currentPodcastIndex);
 }
 
+// ====== 播客播放器完整功能 ======
+let currentPodcastIndex = 0;
+let podcastAudio = null;
+
+function selectPodcastCategory(cat) {
+    currentPodcastCategory = cat;
+    currentPodcastIndex = 0;
+    
+    // 更新分类按钮样式
+    ['method', 'knowledge', 'focus', 'share'].forEach(c => {
+        const btn = document.getElementById('cat-' + c);
+        if (btn) {
+            if (c === cat) {
+                btn.style.background = 'linear-gradient(135deg,#667eea,#764ba2)';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = '#f0f0f0';
+                btn.style.color = '#666';
+            }
+        }
+    });
+    
+    renderPodcastList();
+}
+
+function renderPodcastList() {
+    const list = podcastData[currentPodcastCategory] || [];
+    const container = document.getElementById('podcast-list');
+    if (!container) return;
+    
+    let html = '';
+    list.forEach((p, i) => {
+        const isActive = i === currentPodcastIndex;
+        html += '<div class="topic-item' + (isActive ? ' active' : '') + '" onclick="playPodcast(' + i + ')" style="padding:12px;border-radius:10px;background:' + (isActive ? 'rgba(102,126,234,0.1)' : 'transparent') + '">';
+        html += '<span style="font-size:20px">' + p.icon + '</span>';
+        html += '<div style="flex:1"><div style="font-weight:600;font-size:13px">' + p.title + '</div>';
+        html += '<div style="font-size:11px;color:#999;margin-top:2px">' + p.author + ' · ' + formatTime(p.duration) + '</div></div>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
 function playPodcast(index) {
     const list = podcastData[currentPodcastCategory] || [];
     const podcast = list[index];
     if (!podcast) return;
     
-    document.getElementById('playing-icon').textContent = podcast.icon;
-    document.getElementById('playing-title').textContent = podcast.title;
-    document.getElementById('playing-author').textContent = podcast.author;
+    currentPodcastIndex = index;
     
-    const audio = document.getElementById('podcast-audio');
-    if (audio) {
-        // 模拟音频播放（实际需要真实音频URL）
-        // audio.src = podcast.audioUrl;
-        // audio.play();
+    // 更新播放器UI
+    const iconEl = document.getElementById('podcast-icon');
+    const titleEl = document.getElementById('podcast-title');
+    const subtitleEl = document.getElementById('podcast-subtitle');
+    
+    if (iconEl) iconEl.textContent = podcast.icon || '🎵';
+    if (titleEl) titleEl.textContent = podcast.title;
+    if (subtitleEl) subtitleEl.textContent = podcast.author + ' · ' + formatTime(podcast.duration);
+    
+    // 获取或创建audio元素
+    let audio = document.getElementById('podcast-audio');
+    if (!audio) {
+        audio = document.createElement('audio');
+        audio.id = 'podcast-audio';
+        document.body.appendChild(audio);
     }
-    document.getElementById('play-btn').textContent = '⏸';
+    
+    // 设置音频源并播放
+    const audioUrl = podcast.audioUrl || podcast.url;
+    if (audioUrl) {
+        audio.src = audioUrl;
+        audio.load();
+        audio.play().catch(e => console.log('播放需要用户交互'));
+    }
+    
+    // 更新播放按钮
+    const playBtn = document.getElementById('audio-play-btn');
+    if (playBtn) playBtn.textContent = '⏸';
+    
+    // 显示波形动画
+    const wave = document.getElementById('audio-wave');
+    if (wave) wave.classList.add('playing');
+    
+    // 更新列表高亮
+    renderPodcastList();
+    
+    // 绑定音频事件
+    audio.onloadedmetadata = function() {
+        document.getElementById('audio-duration').textContent = formatTime(audio.duration);
+    };
+    audio.ontimeupdate = function() {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        document.getElementById('audio-progress-bar').style.width = progress + '%';
+        document.getElementById('audio-current-time').textContent = formatTime(audio.currentTime);
+    };
+    audio.onended = function() {
+        nextAudio();
+    };
+}
+
+function toggleAudio() {
+    const audio = document.getElementById('podcast-audio');
+    const playBtn = document.getElementById('audio-play-btn');
+    const wave = document.getElementById('audio-wave');
+    
+    if (!audio || !audio.src) {
+        // 没有音频时播放第一个
+        playPodcast(0);
+        return;
+    }
+    
+    if (audio.paused) {
+        audio.play();
+        if (playBtn) playBtn.textContent = '⏸';
+        if (wave) wave.classList.add('playing');
+    } else {
+        audio.pause();
+        if (playBtn) playBtn.textContent = '▶';
+        if (wave) wave.classList.remove('playing');
+    }
+}
+
+function prevAudio() {
+    const list = podcastData[currentPodcastCategory] || [];
+    currentPodcastIndex = (currentPodcastIndex - 1 + list.length) % list.length;
+    playPodcast(currentPodcastIndex);
+}
+
+function nextAudio() {
+    const list = podcastData[currentPodcastCategory] || [];
+    currentPodcastIndex = (currentPodcastIndex + 1) % list.length;
+    playPodcast(currentPodcastIndex);
+}
+
+function seekAudio(event) {
+    const audio = document.getElementById('podcast-audio');
+    if (!audio || !audio.duration) return;
+    
+    const progress = document.getElementById('audio-progress');
+    const rect = progress.getBoundingClientRect();
+    const percent = (event.clientX - rect.left) / rect.width;
+    audio.currentTime = percent * audio.duration;
+}
+
+
+// ====== 播客上传功能 ======
+let tempPodcastFile = null;
+
+function handlePodcastUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    tempPodcastFile = file;
+    const isVideo = file.type.startsWith('video/');
+    
+    // 更新上传预览
+    const preview = document.getElementById('podcast-upload-preview');
+    const titleInput = document.getElementById('podcast-upload-title');
+    
+    if (preview) {
+        preview.style.display = 'block';
+        preview.innerHTML = '<div style="padding:20px;text-align:center;">' +
+            '<div style="font-size:40px;margin-bottom:8px;">' + (isVideo ? '🎬' : '🎵') + '</div>' +
+            '<div style="font-size:13px;color:#333;">' + file.name + '</div>' +
+            '<div style="font-size:11px;color:#999;margin-top:4px;">' + 
+            (file.size / 1024 / 1024).toFixed(2) + ' MB · ' + (isVideo ? '视频' : '音频') + '</div></div>';
+    }
+    
+    if (titleInput) {
+        titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+    }
+}
+
+function savePodcastUpload() {
+    const title = document.getElementById('podcast-upload-title').value.trim();
+    if (!title) {
+        alert('请输入标题');
+        return;
+    }
+    
+    if (!tempPodcastFile) {
+        alert('请选择文件');
+        return;
+    }
+    
+    // 创建本地URL
+    const fileUrl = URL.createObjectURL(tempPodcastFile);
+    const isVideo = tempPodcastFile.type.startsWith('video/');
+    
+    // 添加到播客数据
+    const newPodcast = {
+        id: Date.now(),
+        title: title,
+        duration: 0,
+        icon: isVideo ? '🎬' : '🎵',
+        desc: '用户上传',
+        author: '我的上传',
+        audioUrl: fileUrl,
+        isUserUpload: true
+    };
+    
+    // 添加到method分类
+    if (!podcastData.method) podcastData.method = [];
+    podcastData.method.unshift(newPodcast);
+    
+    // 关闭弹窗并刷新列表
+    document.getElementById('podcast-upload-modal').classList.remove('show');
+    renderPodcastList();
+    
+    // 清空
+    tempPodcastFile = null;
+    document.getElementById('podcast-file-upload').value = '';
+    document.getElementById('podcast-upload-title').value = '';
+    document.getElementById('podcast-upload-preview').style.display = 'none';
+    
+    alert('上传成功！');
 }
 
 function formatTime(seconds) {
