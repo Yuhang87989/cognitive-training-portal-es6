@@ -311,7 +311,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 
 <!-- 主页 -->
-<div id="page-home" class="page">
+<div id="page-home" class="page active" style="display:block;">
     <div class="home-header">
         <div class="header-top">
             <div class="user-info">
@@ -4457,54 +4457,61 @@ function initLoginPageProtection() {
 
 // ====== V33: 延迟初始化 - 等待部署系统完成修改 ======
 function delayedInit() {
-    console.log('[V99] 开始初始化...');
+    console.log('[V116] 开始初始化...');
+    
+    // 先显示首页，防止白屏
+    const homePage = document.getElementById('page-home');
+    if (homePage) {
+        homePage.classList.add('active');
+        homePage.style.display = 'block';
+    }
+    
+    // 隐藏登录页
+    const loginPage = document.getElementById('page-login');
+    if (loginPage) {
+        loginPage.style.display = 'none';
+        loginPage.classList.remove('active');
+    }
     
     try {
-        const data = loadData();
-        console.log('[V99] 加载数据完成');
-        
-        // 隐藏登录页，直接显示首页
-        const loginPage = document.getElementById('page-login');
-        if (loginPage) {
-            loginPage.style.display = 'none';
-            loginPage.classList.remove('active');
-        }
+        let data = loadData();
+        console.log('[V116] 加载数据完成, 用户数:', data.users?.length);
         
         // 如果没有用户数据，创建默认用户
         if (!data.users || data.users.length === 0) {
-            data.users = [{
-                id: 'default_user',
-                name: '学习者',
-                grade: 7,
-                difficulty: 2,
-                score: 0,
-                streak: 0,
-                wrongTopics: [],
-                completedTopics: [],
-                createdAt: Date.now()
-            }];
-            data.currentUser = 'default_user';
+            data = {
+                users: [{
+                    id: 'default_user',
+                    name: '学习者',
+                    grade: 7,
+                    difficulty: 2,
+                    score: 0,
+                    streak: 0,
+                    wrongTopics: [],
+                    completedTopics: [],
+                    createdAt: Date.now()
+                }],
+                currentUser: 'default_user'
+            };
             saveData(data);
+            console.log('[V116] 创建默认用户');
         }
         
-        // 如果没有当前用户，设置第一个用户
+        // 确保有当前用户
         if (!data.currentUser && data.users.length > 0) {
             data.currentUser = data.users[0].id;
             saveData(data);
         }
         
         updateUI();
-        showPage('home');
         
     } catch(e) {
-        console.error('[V99] 初始化错误:', e);
-        // 出错也直接显示首页
-        showPage('home');
+        console.error('[V116] 初始化错误:', e);
     }
     
     // 初始化播客
-    renderPodcastList();
-    updatePodcastDisplay();
+    try { renderPodcastList(); } catch(e) {}
+    try { updatePodcastDisplay(); } catch(e) {}
 }
 
 // ====== 页面初始化 ======
