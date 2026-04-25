@@ -1733,6 +1733,257 @@
 <script src="js/app.js">
 
 
+
+// ====== DeepSeek助手完整功能 ======
+
+// 插入模板文本
+function insertDeepSeekTemplate(text) {
+    const input = document.getElementById('deepseek-chat-input');
+    if (input) {
+        input.value = text;
+        input.focus();
+    }
+}
+
+// 清空聊天
+function clearDeepSeekChat() {
+    if (!confirm('确定要清空聊天记录吗？')) return;
+    const messages = document.getElementById('deepseek-chat-messages');
+    if (messages) {
+        messages.innerHTML = '<div class="chat-msg"><div class="chat-avatar">🤖</div><div class="chat-bubble">你好！我是DeepSeek智能助手，可以回答各学科问题。有什么可以帮你的吗？</div></div>';
+    }
+}
+
+// ====== 语音输入功能 ======
+let deepseekRecognition = null;
+let deepseekIsRecording = false;
+
+function toggleDeepSeekVoice() {
+    if (deepseekIsRecording) {
+        stopDeepSeekVoice();
+    } else {
+        startDeepSeekVoice();
+    }
+}
+
+function startDeepSeekVoice() {
+    // 检查浏览器支持
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('您的浏览器不支持语音识别，建议使用Chrome浏览器');
+        return;
+    }
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    deepseekRecognition = new SpeechRecognition();
+    deepseekRecognition.lang = 'zh-CN';
+    deepseekRecognition.continuous = false;
+    deepseekRecognition.interimResults = true;
+    
+    const voiceBtn = document.querySelector('[onclick="toggleDeepSeekVoice()"]');
+    if (voiceBtn) voiceBtn.textContent = '🔴';
+    
+    deepseekIsRecording = true;
+    
+    deepseekRecognition.onresult = function(event) {
+        const result = event.results[event.results.length - 1];
+        const transcript = result[0].transcript;
+        
+        const input = document.getElementById('deepseek-chat-input');
+        if (input) input.value = transcript;
+        
+        if (result.isFinal) {
+            // 自动发送
+            setTimeout(() => {
+                sendDeepSeekChat();
+            }, 500);
+        }
+    };
+    
+    deepseekRecognition.onerror = function(event) {
+        console.error('语音识别错误:', event.error);
+        stopDeepSeekVoice();
+        if (event.error === 'not-allowed') {
+            alert('请允许麦克风权限');
+        }
+    };
+    
+    deepseekRecognition.onend = function() {
+        stopDeepSeekVoice();
+    };
+    
+    deepseekRecognition.start();
+}
+
+function stopDeepSeekVoice() {
+    if (deepseekRecognition) {
+        deepseekRecognition.stop();
+    }
+    deepseekIsRecording = false;
+    const voiceBtn = document.querySelector('[onclick="toggleDeepSeekVoice()"]');
+    if (voiceBtn) voiceBtn.textContent = '🎤';
+}
+
+// ====== 图片上传功能 ======
+let deepseekImageBase64 = null;
+
+function showDeepSeekPhoto() {
+    // 创建隐藏的文件输入
+    let input = document.getElementById('deepseek-file-input');
+    if (!input) {
+        input = document.createElement('input');
+        input.type = 'file';
+        input.id = 'deepseek-file-input';
+        input.accept = 'image/*,video/*';
+        input.style.display = 'none';
+        input.onchange = handleDeepSeekFileUpload;
+        document.body.appendChild(input);
+    }
+    input.click();
+}
+
+function handleDeepSeekFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const isVideo = file.type.startsWith('video/');
+    const isImage = file.type.startsWith('image/');
+    
+    if (!isImage && !isVideo) {
+        alert('请选择图片或视频文件');
+        return;
+    }
+    
+    // 显示预览
+    const preview = document.getElementById('deepseek-upload-preview');
+    const previewContainer = document.getElementById('deepseek-preview-container');
+    
+    if (!previewContainer) {
+        // 创建预览容器
+        const container = document.createElement('div');
+        container.id = 'deepseek-preview-container';
+        container.style.cssText = 'padding:8px;border-top:1px solid #eee;';
+        container.innerHTML = '<div id="deepseek-upload-preview" style="display:flex;align-items:center;gap:8px;background:#f0f0f0;padding:8px;border-radius:8px;"><span id="deepseek-preview-icon">📷</span><span id="deepseek-preview-name" style="flex:1;font-size:12px;"></span><button onclick="clearDeepSeekUpload()" style="background:none;border:none;color:#999;cursor:pointer;">✕</button></div>';
+        
+        const inputArea = document.querySelector('#page-deepseek .chat-input').parentElement;
+        inputArea.insertBefore(container, inputArea.firstChild);
+    }
+    
+    const iconEl = document.getElementById('deepseek-preview-icon');
+    const nameEl = document.getElementById('deepseek-preview-name');
+    
+    if (iconEl) iconEl.textContent = isVideo ? '🎬' : '📷';
+    if (nameEl) nameEl.textContent = file.name;
+    if (preview) preview.style.display = 'flex';
+    
+    // 转换为Base64
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        deepseekImageBase64 = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearDeepSeekUpload() {
+    deepseekImageBase64 = null;
+    const container = document.getElementById('deepseek-preview-container');
+    if (container) container.remove();
+}
+
+// ====== 增强的发送功能 ======
+async function sendDeepSeekChatEnhanced() {
+    const input = document.getElementById('deepseek-chat-input');
+    const text = input.value.trim();
+    
+    if (!text && !deepseekImageBase64) return;
+    
+    const messages = document.getElementById('deepseek-chat-messages');
+    
+    // 显示用户消息
+    let userHtml = '<div class="chat-msg user"><div class="chat-bubble">';
+    if (deepseekImageBase64) {
+        userHtml += '<img src="' + deepseekImageBase64 + '" style="max-width:200px;border-radius:8px;margin-bottom:8px;"><br>';
+    }
+    userHtml += text + '</div></div>';
+    messages.innerHTML += userHtml;
+    
+    // 清空输入
+    input.value = '';
+    const imageData = deepseekImageBase64;
+    clearDeepSeekUpload();
+    
+    // 显示加载
+    messages.innerHTML += '<div class="chat-msg" id="deepseek-loading"><div class="chat-avatar">🤖</div><div class="chat-bubble">思考中...</div></div>';
+    messages.scrollTop = messages.scrollHeight;
+    
+    try {
+        const response = await callDeepSeekEnhanced(text, imageData);
+        
+        // 移除加载
+        const loading = document.getElementById('deepseek-loading');
+        if (loading) loading.remove();
+        
+        // 显示回复
+        messages.innerHTML += '<div class="chat-msg"><div class="chat-avatar">🤖</div><div class="chat-bubble">' + response + '</div></div>';
+    } catch(e) {
+        const loading = document.getElementById('deepseek-loading');
+        if (loading) {
+            loading.querySelector('.chat-bubble').textContent = '抱歉，发生了错误：' + e.message;
+        }
+    }
+    
+    messages.scrollTop = messages.scrollHeight;
+}
+
+// 增强的API调用（支持图片）
+async function callDeepSeekEnhanced(text, imageBase64) {
+    const apiKey = localStorage.getItem('deepseek_api_key') || 'sk-8413f72a3f084fb08c84389555a76d37';
+    
+    const messages = [
+        { role: 'system', content: '你是专业的学习助手，擅长解答数学、语文、英语、物理、化学等学科问题。回答要清晰、有条理。' }
+    ];
+    
+    if (imageBase64) {
+        // 多模态消息
+        messages.push({
+            role: 'user',
+            content: [
+                { type: 'text', text: text || '请分析这张图片' },
+                { type: 'image_url', image_url: { url: imageBase64 } }
+            ]
+        });
+    } else {
+        messages.push({ role: 'user', content: text });
+    }
+    
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + apiKey
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: messages
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            return 'API错误: ' + data.error.message;
+        }
+        
+        return data.choices[0].message.content;
+    } catch(e) {
+        return '服务暂时不可用，请稍后重试';
+    }
+}
+
+// 替换原有的sendDeepSeekChat
+var sendDeepSeekChat = sendDeepSeekChatEnhanced;
+
+
 // ====== 视频课堂播放器功能 ======
 
 // B站视频播放
