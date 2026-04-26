@@ -519,10 +519,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                             <div class="user-dropdown-name" id="dropdown-name">同学</div>
                             <div class="user-dropdown-info" id="dropdown-info">初一 · Lv.1</div>
                         </div>
-                        <div class="user-dropdown-item" onclick="showUserSwitchModal()">
-                            <span>👥</span>
-                            <span><!-- 切换用户 --></span>
-                        </div>
+                        
+                        
                         <div class="user-dropdown-item" onclick="openDifficultyModal()">
                             <span>⭐</span>
                             <span>难度调整</span>
@@ -542,10 +540,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                             <span>⚙️</span>
                             <span>设置</span>
                         </div>
-                        <div class="user-dropdown-item danger" onclick="logoutAndReturn()">
-                            <span>🚪</span>
-                            <span><!-- 退出登录 --></span>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -5266,35 +5261,29 @@ document.addEventListener('DOMContentLoaded', () => {
     let data = loadData();
     console.log('用户数量:', data.users.length);
     
-    // 检查是否需要显示注册模态框
-    checkAndShowRegisterModal();
-    
-    // 如果没有用户，自动创建默认用户"邱宇菲"
-    if (data.users.length === 0) {
-        console.log('无用户，自动创建默认用户');
+    // 自动创建默认用户"邱宇菲"（如果不存在）
+    // 确保有默认用户
+    if (data.users.length === 0 || !data.users.find(u => u.name === '邱宇菲')) {
         const defaultUser = {
-            id: 'user_' + Date.now(),
+            id: 'user_default',
             name: '邱宇菲',
             grade: 7,
             difficulty: 1,
             points: 1142,
             createdAt: new Date().toISOString(),
-            stats: {
-                totalQuestions: 0,
-                correctAnswers: 0,
-                totalMinutes: 0,
-                streakDays: 0,
-                lastActiveDate: null
-            },
-            weeklyProgress: {},
-            wrongNotes: [],
-            completedTopics: []
+            stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
+            weeklyProgress: {}, wrongNotes: [], completedTopics: []
         };
-        data.users.push(defaultUser);
+        data.users = [defaultUser];
         data.currentUser = defaultUser.id;
         saveData(data);
-        console.log('默认用户创建成功:', defaultUser.name);
-        data = loadData(); // 重新加载数据
+        console.log('默认用户已创建');
+    }
+    
+    // 始终使用默认用户
+    if (!data.currentUser) {
+        data.currentUser = data.users[0].id;
+        saveData(data);
     }
     
     // 初始化用户列表
