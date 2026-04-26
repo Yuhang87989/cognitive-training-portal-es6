@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#1A6BFF"/>
-<title>认知训练 V115</title>
+<title>认知训练 V116</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#1A6BFF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#1A6BFF;--orange:#E87A4E}
@@ -715,6 +715,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="module-icon">🤖</div>
                 <div class="module-name">DeepSeek</div>
                 <div class="module-desc">AI智能助手</div>
+            </button>
+            <button class="module-btn gradient-cyan" onclick="openFullscreenPage('focus')">
+                <div class="module-icon">🎯</div>
+                <div class="module-name">专注模式</div>
+                <div class="module-desc">番茄钟计时</div>
             </button>
         </div>
     </div>
@@ -2343,6 +2348,7 @@ function openFullscreenPage(module) {
         'practice': '🎯 AI精准练',
         'aiteacher': '👨‍🏫 AI超级老师',
         'growth': '📈 成长中心',
+        'focus': '🎯 专注模式',
         'map': '🧠 认知地图',
         'plan': '📅 学习计划',
         'topics': '📚 母题训练',
@@ -2362,6 +2368,7 @@ function openFullscreenPage(module) {
         case 'practice': renderPractice(contentEl); break;
         case 'aiteacher': renderAITeacher(contentEl); break;
         case 'growth': renderGrowth(contentEl); break;
+        case 'focus': renderFocus(contentEl); break;
         case 'map': renderMap(contentEl); break;
         case 'plan': renderPlan(contentEl); break;
         case 'topics': renderTopics(contentEl); break;
@@ -4002,88 +4009,327 @@ async function sendToAITeacher() {
     }
 }
 
-// 成长中心
+// 成长中心 - 知识卡片、数据看板、打卡中心
 function renderGrowth(container) {
     const user = getCurrentUserData() || {};
     const points = user.points || 1142;
-    const level = Math.floor(points / 500) + 1;
-    const exp = points % 500;
     
     container.innerHTML = `
-        <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px;border-radius:16px;">
-            <div style="text-align:center;margin-bottom:16px;">
-                <div style="font-size:48px;margin-bottom:8px;">${user.avatar || '👤'}</div>
-                <div style="font-size:20px;font-weight:bold;">${user.name || '同学'}</div>
-                <div style="font-size:13px;opacity:0.9;">${user.grade ? ['五年级','六年级','初一','初二','初三'][user.grade-5] : '初一'} · Lv.${user.difficulty || 1}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">
+            <div onclick="showGrowthModule('cards')" style="text-align:center;padding:20px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:16px;cursor:pointer;">
+                <div style="font-size:32px;margin-bottom:8px;">📚</div>
+                <div style="font-size:14px;font-weight:600;">知识卡片</div>
+                <div style="font-size:11px;opacity:0.9;margin-top:4px;">核心知识点</div>
             </div>
-            <div style="background:rgba(255,255,255,0.2);border-radius:12px;padding:12px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                    <span>等级进度</span>
-                    <span>Lv.${level}</span>
-                </div>
-                <div style="height:8px;background:rgba(255,255,255,0.3);border-radius:4px;overflow:hidden;">
-                    <div style="width:${exp/500*100}%;height:100%;background:white;border-radius:4px;"></div>
-                </div>
-                <div style="font-size:11px;margin-top:4px;opacity:0.9;">${exp}/500 经验值</div>
+            <div onclick="showGrowthModule('dashboard')" style="text-align:center;padding:20px;background:linear-gradient(135deg,#1A6BFF,#4A90E2);color:white;border-radius:16px;cursor:pointer;">
+                <div style="font-size:32px;margin-bottom:8px;">📊</div>
+                <div style="font-size:14px;font-weight:600;">数据看板</div>
+                <div style="font-size:11px;opacity:0.9;margin-top:4px;">学习统计</div>
             </div>
-        </div>
-        
-        <div class="card" style="margin-top:12px;">
-            <h4 style="margin-bottom:12px;">📊 学习数据</h4>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-                <div style="text-align:center;padding:16px;background:#f5f7ff;border-radius:12px;">
-                    <div style="font-size:28px;font-weight:bold;color:#1A6BFF;">${points}</div>
-                    <div style="font-size:12px;color:#666;">总积分</div>
-                </div>
-                <div style="text-align:center;padding:16px;background:#fff5f0;border-radius:12px;">
-                    <div style="font-size:28px;font-weight:bold;color:#FF9A63;">${user.studyDays ? Object.keys(user.studyDays).length : 0}</div>
-                    <div style="font-size:12px;color:#666;">学习天数</div>
-                </div>
-                <div style="text-align:center;padding:16px;background:#f0fff4;border-radius:12px;">
-                    <div style="font-size:28px;font-weight:bold;color:#43E97B;">${user.totalCorrect || 0}</div>
-                    <div style="font-size:12px;color:#666;">答对题数</div>
-                </div>
-                <div style="text-align:center;padding:16px;background:#fff0f6;border-radius:12px;">
-                    <div style="font-size:28px;font-weight:bold;color:#FF6B9D;">${user.streakDays || 0}</div>
-                    <div style="font-size:12px;color:#666;">连续天数</div>
-                </div>
+            <div onclick="showGrowthModule('checkin')" style="text-align:center;padding:20px;background:linear-gradient(135deg,#43E97B,#38F9D7);color:white;border-radius:16px;cursor:pointer;">
+                <div style="font-size:32px;margin-bottom:8px;">✅</div>
+                <div style="font-size:14px;font-weight:600;">打卡中心</div>
+                <div style="font-size:11px;opacity:0.9;margin-top:4px;">每日签到</div>
             </div>
         </div>
-        
-        <div class="card" style="margin-top:12px;">
-            <h4 style="margin-bottom:12px;">🏆 成就徽章</h4>
-            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-                <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;">
-                    <div style="font-size:24px;">🌟</div>
-                    <div style="font-size:10px;color:#666;">初学者</div>
+        <div id="growth-content">
+            <div class="card">
+                <h4 style="margin-bottom:12px;">📈 快速概览</h4>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+                    <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;">
+                        <div style="font-size:20px;font-weight:bold;color:#1A6BFF;">Lv.${Math.floor(points/500)+1}</div>
+                        <div style="font-size:10px;color:#666;">等级</div>
+                    </div>
+                    <div style="text-align:center;padding:12px;background:#fff5f0;border-radius:12px;">
+                        <div style="font-size:20px;font-weight:bold;color:#FF9A63;">${points}</div>
+                        <div style="font-size:10px;color:#666;">积分</div>
+                    </div>
+                    <div style="text-align:center;padding:12px;background:#f0fff4;border-radius:12px;">
+                        <div style="font-size:20px;font-weight:bold;color:#43E97B;">${user.todayFocusMinutes || 0}</div>
+                        <div style="font-size:10px;color:#666;">专注</div>
+                    </div>
+                    <div style="text-align:center;padding:12px;background:#fff0f6;border-radius:12px;">
+                        <div style="font-size:20px;font-weight:bold;color:#FF6B9D;">${user.streakDays || 0}</div>
+                        <div style="font-size:10px;color:#666;">连续</div>
+                    </div>
                 </div>
-                <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:${points>=500?1:0.3}">
-                    <div style="font-size:24px;">🔥</div>
-                    <div style="font-size:10px;color:#666;">坚持者</div>
-                </div>
-                <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:${points>=1000?1:0.3}">
-                    <div style="font-size:24px;">💎</div>
-                    <div style="font-size:10px;color:#666;">学霸</div>
-                </div>
-                <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:${points>=2000?1:0.3}">
-                    <div style="font-size:24px;">👑</div>
-                    <div style="font-size:10px;color:#666;">学神</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" style="margin-top:12px;">
-            <h4 style="margin-bottom:12px;">📅 本周学习</h4>
-            <div style="display:flex;justify-content:space-around;">
-                ${['一','二','三','四','五','六','日'].map((d,i) => {
-                    const active = user.studyDays && user.studyDays[new Date(Date.now() - (6-i)*86400000).toISOString().split('T')[0]];
-                    return \`<div style="text-align:center;padding:8px;">
-                        <div style="width:28px;height:28px;border-radius:50%;background:\${active?'#1A6BFF':'#e0e0e0'};color:\${active?'white':'#999'};display:flex;align-items:center;justify-content:center;font-size:11px;margin:0 auto;">\${d}</div>
-                    </div>\`;
-                }).join('')}
             </div>
         </div>
     `;
+}
+
+function showGrowthModule(module) {
+    const contentEl = document.getElementById('growth-content');
+    if (!contentEl) return;
+    if (module === 'cards') showKnowledgeCards(contentEl);
+    else if (module === 'dashboard') showDataDashboard(contentEl);
+    else if (module === 'checkin') showCheckinCenter(contentEl);
+}
+
+function showKnowledgeCards(container) {
+    const cards = [
+        {title:'勾股定理',subject:'数学',content:'直角三角形两直角边的平方和等于斜边的平方：a²+b²=c²'},
+        {title:'牛顿第一定律',subject:'物理',content:'物体不受外力时，保持匀速直线运动或静止状态'},
+        {title:'元素周期表',subject:'化学',content:'元素按原子序数排列，横行周期，纵行族'},
+        {title:'过去进行时',subject:'英语',content:'was/were + doing，表示过去正在进行的动作'}
+    ];
+    const colors = ['#667eea,#764ba2','#1A6BFF,#4A90E2','#43E97B,#38F9D7','#FF9A63,#E87A4E'];
+    container.innerHTML = \`<div class="card"><h4 style="margin-bottom:12px;">📚 知识卡片</h4>
+        <div style="display:grid;gap:12px;">
+            \${cards.map((c,i)=>\`<div style="background:linear-gradient(135deg,\${colors[i]});color:white;padding:16px;border-radius:12px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-size:16px;font-weight:600;">\${c.title}</span>
+                    <span style="font-size:11px;background:rgba(255,255,255,0.2);padding:4px 8px;border-radius:12px;">\${c.subject}</span>
+                </div>
+                <div style="font-size:13px;opacity:0.95;">\${c.content}</div>
+            </div>\`).join('')}
+        </div></div>\`;
+}
+
+function showDataDashboard(container) {
+    const user = getCurrentUserData() || {};
+    const points = user.points || 1142;
+    const level = Math.floor(points/500)+1;
+    const exp = points%500;
+    container.innerHTML = \`<div class="card">
+        <h4 style="margin-bottom:12px;">📊 数据看板</h4>
+        <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>等级进度</span><span style="color:#1A6BFF;">Lv.\${level}</span></div>
+            <div style="height:8px;background:rgba(26,107,255,0.2);border-radius:4px;overflow:hidden;"><div style="width:\${exp/500*100}%;height:100%;background:#1A6BFF;"></div></div>
+            <div style="font-size:11px;color:#666;margin-top:4px;">\${exp}/500</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+            <div style="text-align:center;padding:16px;background:#f5f7ff;border-radius:12px;"><div style="font-size:24px;font-weight:bold;color:#1A6BFF;">\${points}</div><div style="font-size:11px;color:#666;">总积分</div></div>
+            <div style="text-align:center;padding:16px;background:#fff5f0;border-radius:12px;"><div style="font-size:24px;font-weight:bold;color:#FF9A63;">\${user.studyDays?Object.keys(user.studyDays).length:0}</div><div style="font-size:11px;color:#666;">学习天数</div></div>
+            <div style="text-align:center;padding:16px;background:#f0fff4;border-radius:12px;"><div style="font-size:24px;font-weight:bold;color:#43E97B;">\${user.totalCorrect||0}</div><div style="font-size:11px;color:#666;">答对题数</div></div>
+            <div style="text-align:center;padding:16px;background:#fff0f6;border-radius:12px;"><div style="font-size:24px;font-weight:bold;color:#FF6B9D;">\${user.todayFocusMinutes||0}</div><div style="font-size:11px;color:#666;">专注分钟</div></div>
+        </div>
+        <div style="margin-top:12px;"><h5 style="font-size:13px;margin-bottom:8px;">🏆 成就徽章</h5>
+            <div style="display:flex;gap:8px;">
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;"><div style="font-size:20px;">🌟</div><div style="font-size:10px;color:#666;">初学者</div></div>
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:\${points>=500?1:0.3}"><div style="font-size:20px;">🔥</div><div style="font-size:10px;color:#666;">坚持者</div></div>
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:\${points>=1000?1:0.3}"><div style="font-size:20px;">💎</div><div style="font-size:10px;color:#666;">学霸</div></div>
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;opacity:\${points>=2000?1:0.3}"><div style="font-size:20px;">👑</div><div style="font-size:10px;color:#666;">学神</div></div>
+            </div>
+        </div>
+    </div>\`;
+}
+
+function showCheckinCenter(container) {
+    const user = getCurrentUserData() || {};
+    const today = new Date().toISOString().split('T')[0];
+    const checkedToday = user.checkinDays && user.checkinDays[today];
+    const totalCheckins = user.checkinDays ? Object.keys(user.checkinDays).length : 0;
+    let weekHtml = '';
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate()-i);
+        const dateStr = d.toISOString().split('T')[0];
+        const isChecked = user.checkinDays && user.checkinDays[dateStr];
+        const isToday = i === 0;
+        weekHtml += \`<div style="text-align:center;padding:4px;"><div style="width:28px;height:28px;border-radius:50%;background:\${isChecked?'#1A6BFF':isToday?'#e8f4ff':'#f0f0f0'};color:\${isChecked?'white':'#999'};display:flex;align-items:center;justify-content:center;font-size:11px;margin:0 auto;border:\${isToday?'2px solid #1A6BFF':'none'};">\${d.getDate()}</div></div>\`;
+    }
+    container.innerHTML = \`<div class="card">
+        <h4 style="margin-bottom:12px;">✅ 打卡中心</h4>
+        <div style="text-align:center;padding:24px;background:linear-gradient(135deg,\${checkedToday?'#43E97B,#38F9D7':'#667eea,#764ba2'});color:white;border-radius:16px;margin-bottom:12px;">
+            <div style="font-size:48px;margin-bottom:8px;">\${checkedToday?'🎉':'📅'}</div>
+            <div style="font-size:16px;font-weight:600;">\${checkedToday?'今日已打卡':'今日未打卡'}</div>
+            <div style="font-size:12px;opacity:0.9;">已连续 \${user.streakDays||0} 天</div>
+            \${!checkedToday?\`<button onclick="doCheckin()" style="margin-top:12px;padding:10px 30px;background:white;color:#667eea;border:none;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;">立即打卡</button>\`:''}
+        </div>
+        <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;color:#666;margin-bottom:8px;">本周记录</div>
+            <div style="display:flex;justify-content:space-around;">\${weekHtml}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+            <div style="text-align:center;padding:12px;background:#f5f7ff;border-radius:12px;"><div style="font-size:20px;font-weight:bold;color:#1A6BFF;">\${totalCheckins}</div><div style="font-size:10px;color:#666;">累计打卡</div></div>
+            <div style="text-align:center;padding:12px;background:#fff5f0;border-radius:12px;"><div style="font-size:20px;font-weight:bold;color:#FF9A63;">\${user.streakDays||0}</div><div style="font-size:10px;color:#666;">连续天数</div></div>
+            <div style="text-align:center;padding:12px;background:#f0fff4;border-radius:12px;"><div style="font-size:20px;font-weight:bold;color:#43E97B;">\${(user.streakDays||0)*10}</div><div style="font-size:10px;color:#666;">奖励积分</div></div>
+        </div>
+    </div>\`;
+}
+
+function doCheckin() {
+    const user = getCurrentUserData();
+    const today = new Date().toISOString().split('T')[0];
+    if (!user.checkinDays) user.checkinDays = {};
+    if (user.checkinDays[today]) { showToast('今日已打卡'); return; }
+    const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    user.streakDays = user.checkinDays[yesterdayStr] ? (user.streakDays||0)+1 : 1;
+    user.checkinDays[today] = true;
+    user.points = (user.points||0) + 10;
+    syncUserData(user);
+    showToast('打卡成功！连续'+user.streakDays+'天');
+    showCheckinCenter(document.getElementById('growth-content'));
+}
+
+// 专注模式 - 番茄钟计时器
+let focusTimer = null;
+let focusSeconds = 25 * 60; // 25分钟
+let focusTotalSeconds = 25 * 60;
+let focusRunning = false;
+let focusSessions = 0;
+
+function renderFocus(container) {
+    const user = getCurrentUserData() || {};
+    const todayFocus = user.todayFocusMinutes || 0;
+    const totalSessions = user.totalFocusSessions || 0;
+    
+    container.innerHTML = `
+        <div class="card" style="text-align:center;padding:30px;">
+            <div style="font-size:80px;margin-bottom:20px;" id="focus-emoji">🍅</div>
+            <div style="font-size:48px;font-weight:bold;color:#1A6BFF;margin-bottom:10px;" id="focus-timer">25:00</div>
+            <div style="font-size:14px;color:#666;margin-bottom:20px;" id="focus-status">准备开始专注</div>
+            
+            <div style="display:flex;justify-content:center;gap:12px;margin-bottom:30px;">
+                <button onclick="startFocus()" id="focus-start-btn" style="padding:14px 40px;background:linear-gradient(135deg,#1A6BFF,#4A90E2);color:white;border:none;border-radius:30px;font-size:16px;font-weight:600;cursor:pointer;">开始专注</button>
+                <button onclick="pauseFocus()" id="focus-pause-btn" style="display:none;padding:14px 40px;background:#FF9500;color:white;border:none;border-radius:30px;font-size:16px;font-weight:600;cursor:pointer;">暂停</button>
+                <button onclick="resetFocus()" style="padding:14px 30px;background:#f0f0f0;color:#333;border:none;border-radius:30px;font-size:16px;cursor:pointer;">重置</button>
+            </div>
+            
+            <div style="display:flex;justify-content:center;gap:8px;margin-bottom:20px;">
+                <button onclick="setFocusTime(15)" class="focus-time-btn" style="padding:8px 16px;border:2px solid #1A6BFF;background:white;color:#1A6BFF;border-radius:20px;cursor:pointer;">15分钟</button>
+                <button onclick="setFocusTime(25)" class="focus-time-btn active" style="padding:8px 16px;border:2px solid #1A6BFF;background:#1A6BFF;color:white;border-radius:20px;cursor:pointer;">25分钟</button>
+                <button onclick="setFocusTime(45)" class="focus-time-btn" style="padding:8px 16px;border:2px solid #1A6BFF;background:white;color:#1A6BFF;border-radius:20px;cursor:pointer;">45分钟</button>
+                <button onclick="setFocusTime(60)" class="focus-time-btn" style="padding:8px 16px;border:2px solid #1A6BFF;background:white;color:#1A6BFF;border-radius:20px;cursor:pointer;">60分钟</button>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top:12px;">
+            <h4 style="margin-bottom:12px;">📊 今日专注</h4>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                <div style="text-align:center;padding:16px;background:#f5f7ff;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#1A6BFF;">${todayFocus}</div>
+                    <div style="font-size:12px;color:#666;">专注分钟</div>
+                </div>
+                <div style="text-align:center;padding:16px;background:#fff5f0;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#FF9A63;">${totalSessions}</div>
+                    <div style="font-size:12px;color:#666;">完成次数</div>
+                </div>
+                <div style="text-align:center;padding:16px;background:#f0fff4;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#43E97B;" id="current-sessions">0</div>
+                    <div style="font-size:12px;color:#666;">本次连续</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top:12px;">
+            <h4 style="margin-bottom:12px;">🎯 专注技巧</h4>
+            <div style="font-size:13px;color:#666;line-height:1.8;">
+                <p>🍅 <strong>番茄工作法</strong>：每25分钟专注，休息5分钟</p>
+                <p>📱 专注期间请将手机静音或远离</p>
+                <p>✅ 完成后记得休息，保护眼睛</p>
+                <p>🏆 坚持专注可获得积分奖励</p>
+            </div>
+        </div>
+    `;
+}
+
+function setFocusTime(minutes) {
+    focusSeconds = minutes * 60;
+    focusTotalSeconds = minutes * 60;
+    updateFocusDisplay();
+    
+    document.querySelectorAll('.focus-time-btn').forEach(btn => {
+        btn.style.background = 'white';
+        btn.style.color = '#1A6BFF';
+    });
+    event.target.style.background = '#1A6BFF';
+    event.target.style.color = 'white';
+}
+
+function updateFocusDisplay() {
+    const minutes = Math.floor(focusSeconds / 60);
+    const seconds = focusSeconds % 60;
+    const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const timerEl = document.getElementById('focus-timer');
+    if (timerEl) timerEl.textContent = display;
+}
+
+function startFocus() {
+    if (focusRunning) return;
+    focusRunning = true;
+    
+    const startBtn = document.getElementById('focus-start-btn');
+    const pauseBtn = document.getElementById('focus-pause-btn');
+    const statusEl = document.getElementById('focus-status');
+    const emojiEl = document.getElementById('focus-emoji');
+    
+    if (startBtn) startBtn.style.display = 'none';
+    if (pauseBtn) pauseBtn.style.display = 'inline-block';
+    if (statusEl) statusEl.textContent = '专注中，加油！💪';
+    if (emojiEl) emojiEl.textContent = '🔥';
+    
+    focusTimer = setInterval(() => {
+        focusSeconds--;
+        updateFocusDisplay();
+        
+        if (focusSeconds <= 0) {
+            completeFocus();
+        }
+    }, 1000);
+}
+
+function pauseFocus() {
+    focusRunning = false;
+    clearInterval(focusTimer);
+    
+    const startBtn = document.getElementById('focus-start-btn');
+    const pauseBtn = document.getElementById('focus-pause-btn');
+    const statusEl = document.getElementById('focus-status');
+    
+    if (startBtn) startBtn.style.display = 'inline-block';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    if (statusEl) statusEl.textContent = '已暂停';
+}
+
+function resetFocus() {
+    focusRunning = false;
+    clearInterval(focusTimer);
+    focusSeconds = focusTotalSeconds;
+    updateFocusDisplay();
+    
+    const startBtn = document.getElementById('focus-start-btn');
+    const pauseBtn = document.getElementById('focus-pause-btn');
+    const statusEl = document.getElementById('focus-status');
+    const emojiEl = document.getElementById('focus-emoji');
+    
+    if (startBtn) startBtn.style.display = 'inline-block';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    if (statusEl) statusEl.textContent = '准备开始专注';
+    if (emojiEl) emojiEl.textContent = '🍅';
+}
+
+function completeFocus() {
+    focusRunning = false;
+    clearInterval(focusTimer);
+    focusSessions++;
+    
+    // 更新用户数据
+    const user = getCurrentUserData();
+    const focusMinutes = Math.floor(focusTotalSeconds / 60);
+    user.todayFocusMinutes = (user.todayFocusMinutes || 0) + focusMinutes;
+    user.totalFocusSessions = (user.totalFocusSessions || 0) + 1;
+    user.points = (user.points || 0) + focusMinutes; // 每分钟1积分
+    syncUserData(user);
+    
+    const startBtn = document.getElementById('focus-start-btn');
+    const pauseBtn = document.getElementById('focus-pause-btn');
+    const statusEl = document.getElementById('focus-status');
+    const emojiEl = document.getElementById('focus-emoji');
+    const sessionsEl = document.getElementById('current-sessions');
+    
+    if (startBtn) startBtn.style.display = 'inline-block';
+    if (pauseBtn) pauseBtn.style.display = 'none';
+    if (statusEl) statusEl.textContent = '🎉 太棒了！专注完成！';
+    if (emojiEl) emojiEl.textContent = '🏆';
+    if (sessionsEl) sessionsEl.textContent = focusSessions;
+    
+    showToast(`专注完成！获得 ${focusMinutes} 积分！`);
+    
+    // 重置计时器
+    focusSeconds = focusTotalSeconds;
+    updateFocusDisplay();
 }
 
 function renderDeepseek(container) {
