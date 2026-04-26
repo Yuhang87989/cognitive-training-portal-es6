@@ -333,14 +333,14 @@ a{text-decoration:none;color:inherit}
 </div>
 <div id="toast" class="toast"></div>
 <div class="bottom-nav">
-<div class="nav-item" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span>首页</span></div>
-<div class="nav-item" onclick="switchTab('games')"><span class="nav-icon">🎮</span><span>游戏</span></div>
-<div class="nav-item" onclick="switchTab('moti')"><span class="nav-icon">📚</span><span>母题</span></div>
-<div class="nav-item" onclick="switchTab('ai')"><span class="nav-icon">🤖</span><span>AI练</span></div>
-<div class="nav-item" onclick="switchTab('podcast')"><span class="nav-icon">🎧</span><span>播客</span></div>
-<div class="nav-item" onclick="switchTab('video')"><span class="nav-icon">📺</span><span>视频</span></div>
-<div class="nav-item" onclick="switchTab('map')"><span class="nav-icon">🗺</span><span>地图</span></div>
-<div class="nav-item" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span>我的</span></div>
+<div class="nav-item" data-tab="home" onclick="switchTab('home')"><span class="nav-icon">🏠</span><span>首页</span></div>
+<div class="nav-item" data-tab="games" onclick="switchTab('games')"><span class="nav-icon">🎮</span><span>游戏</span></div>
+<div class="nav-item" data-tab="moti" onclick="switchTab('moti')"><span class="nav-icon">📚</span><span>母题</span></div>
+<div class="nav-item" data-tab="ai" onclick="switchTab('ai')"><span class="nav-icon">🤖</span><span>AI练</span></div>
+<div class="nav-item" data-tab="podcast" onclick="switchTab('podcast')"><span class="nav-icon">🎧</span><span>播客</span></div>
+<div class="nav-item" data-tab="video" onclick="switchTab('video')"><span class="nav-icon">📺</span><span>视频</span></div>
+<div class="nav-item" data-tab="map" onclick="switchTab('map')"><span class="nav-icon">🗺</span><span>地图</span></div>
+<div class="nav-item" data-tab="profile" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span>我的</span></div>
 </div>
 <script>
 const STORAGE_KEY = 'cognitive_training_data';
@@ -409,8 +409,15 @@ function showPage(pageId) {
 }
 function switchTab(tab) {
     showPage(tab);
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    event.currentTarget.classList.add('active');
+    // 更新底部导航active状态
+    document.querySelectorAll('.nav-item').forEach(function(n) {
+        var navTab = n.getAttribute('data-tab');
+        if (navTab === tab) {
+            n.classList.add('active');
+        } else {
+            n.classList.remove('active');
+        }
+    });
 }
 function toggleMenu() { document.getElementById('menu').classList.toggle('show'); }
 function closeMenu() { document.getElementById('menu').classList.remove('show'); }
@@ -1065,7 +1072,7 @@ function initEliminate() {
         for (var c = 0; c < 8; c++) eliminateBoard[r][c] = colors[Math.floor(Math.random() * 5)];
     }
     gameScore = 0;
-    document.getElementById('game-score-display').textContent gameScore = 0;
+    document.getElementById('game-score-display').textContent = gameScore;
     renderEliminate();
 }
 function renderEliminate() {
