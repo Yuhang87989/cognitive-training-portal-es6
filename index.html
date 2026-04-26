@@ -1417,9 +1417,14 @@ function getCurrentUserData() {
 }
 
 function syncUserData(user) {
-    const data = loadData();
-    const idx = data.users.findIndex(u => u.id === user.id);
-    if (idx >= 0) { data.users[idx] = user; saveData(data); }
+    try {
+        if (!user || !user.id) return;
+        const data = loadData();
+        const idx = data.users.findIndex(u => u.id === user.id);
+        if (idx >= 0) { data.users[idx] = user; saveData(data); }
+    } catch(e) {
+        console.error('syncUserData错误:', e);
+    }
 }
 
 const gradeNames = {5:'五年级',6:'六年级',7:'初一',8:'初二',9:'初三'};
@@ -2251,64 +2256,83 @@ function clearAllData() {
 
 // ====== UI更新 ======
 function updateUI() {
-    updateAllAvatarDisplays();
+    try {
+        if (typeof updateAllAvatarDisplays === 'function') {
+            updateAllAvatarDisplays();
+        }
 
-    const user = getCurrentUserData();
-    if (!user) return;
-    const greetingEl = document.getElementById('greeting-name');
-    const diffEl = document.getElementById('difficulty-text');
-    const avatarEl = document.getElementById('header-avatar');
-    const dropNameEl = document.getElementById('dropdown-name');
-    const dropInfoEl = document.getElementById('dropdown-info');
-    if (greetingEl) greetingEl.textContent = user.name;
-    if (diffEl) diffEl.textContent = 'Lv.' + user.difficulty;
-    if (avatarEl) avatarEl.textContent = user.name.charAt(0);
-    if (dropNameEl) dropNameEl.textContent = user.name;
-    if (dropInfoEl) dropInfoEl.textContent = gradeNames[user.grade] + ' · Lv.' + user.difficulty;
+        const user = getCurrentUserData();
+        if (!user) return;
+        
+        const greetingEl = document.getElementById('greeting-name');
+        const diffEl = document.getElementById('difficulty-text');
+        const avatarEl = document.getElementById('header-avatar');
+        const dropNameEl = document.getElementById('dropdown-name');
+        const dropInfoEl = document.getElementById('dropdown-info');
+        
+        if (greetingEl) greetingEl.textContent = user.name || '同学';
+        if (diffEl) diffEl.textContent = 'Lv.' + (user.difficulty || 1);
+        if (avatarEl) avatarEl.textContent = (user.name || '同').charAt(0);
+        if (dropNameEl) dropNameEl.textContent = user.name || '同学';
+        if (dropInfoEl) {
+            const gradeText = (typeof gradeNames !== 'undefined' && gradeNames[user.grade]) || '初一';
+            dropInfoEl.textContent = gradeText + ' · Lv.' + (user.difficulty || 1);
+        }
+    } catch(e) {
+        console.error('updateUI错误:', e);
+    }
 }
 
 function syncTodayStats() {
-    const user = getCurrentUserData();
-    if (!user) return;
-    const today = new Date().toDateString();
-    let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
-    if (todayStats.date !== today) { 
-        todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; 
-        user.todayStats = todayStats; 
-        syncUserData(user); 
+    try {
+        const user = getCurrentUserData();
+        if (!user) return;
+        const today = new Date().toDateString();
+        let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
+        if (todayStats.date !== today) { 
+            todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; 
+            user.todayStats = todayStats; 
+            syncUserData(user); 
+        }
+        // 安全地更新DOM元素
+        const questionsEl = document.getElementById('today-questions');
+        const correctEl = document.getElementById('today-correct');
+        const minutesEl = document.getElementById('today-minutes');
+        const streakEl = document.getElementById('today-streak');
+        if (questionsEl) questionsEl.textContent = user.aiChatCount || 0;
+        if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
+        if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
+        const studyDays = user.studyDays || {};
+        let streak = 0;
+        for (let i = 0; i < 365; i++) {
+            const d = new Date(); 
+            d.setDate(d.getDate() - i);
+            if (studyDays[d.toISOString().split('T')[0]]) streak++; 
+            else if (i > 0) break;
+        }
+        if (streakEl) streakEl.textContent = streak;
+    } catch(e) {
+        console.error('syncTodayStats错误:', e);
     }
-    // 安全地更新DOM元素
-    const questionsEl = document.getElementById('today-questions');
-    const correctEl = document.getElementById('today-correct');
-    const minutesEl = document.getElementById('today-minutes');
-    const streakEl = document.getElementById('today-streak');
-    if (questionsEl) questionsEl.textContent = user.aiChatCount || 0;
-    if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
-    if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
-    const studyDays = user.studyDays || {};
-    let streak = 0;
-    for (let i = 0; i < 365; i++) {
-        const d = new Date(); 
-        d.setDate(d.getDate() - i);
-        if (studyDays[d.toISOString().split('T')[0]]) streak++; 
-        else if (i > 0) break;
-    }
-    if (streakEl) streakEl.textContent = streak;
 }
 
 // ====== 页面切换 ======
 function showPage(pageId) {
-    // 隐藏所有页面
-    document.querySelectorAll('.page').forEach(p => {
-        p.classList.remove('active');
-        p.style.display = 'none';
-    });
-    
-    // 显示目标页面
-    const target = document.getElementById('page-' + pageId);
-    if (target) {
-        target.classList.add('active');
-        target.style.display = pageId === 'login' ? 'flex' : 'block';
+    try {
+        // 隐藏所有页面
+        document.querySelectorAll('.page').forEach(p => {
+            p.classList.remove('active');
+            p.style.display = 'none';
+        });
+        
+        // 显示目标页面
+        const target = document.getElementById('page-' + pageId);
+        if (target) {
+            target.classList.add('active');
+            target.style.display = pageId === 'login' ? 'flex' : 'block';
+        }
+    } catch(e) {
+        console.error('showPage错误:', e);
     }
     
     // 登录页面隐藏底部导航
