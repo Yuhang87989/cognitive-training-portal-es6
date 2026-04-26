@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#1A6BFF"/>
-<title>认知训练 V113</title>
+<title>认知训练 V114</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#1A6BFF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#1A6BFF;--orange:#E87A4E}
@@ -45,57 +45,246 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .create-modal.show{display:flex}
 .create-modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:85vh;overflow-y:auto}
 .create-modal-title{font-size:18px;font-weight:bold;text-align:center;margin-bottom:20px}
-/* 首页顶部用户菜单样式 */
-.home-header{background:linear-gradient(135deg,#E8F4FF,#D4ECFF);padding:16px 16px 20px;border-radius:0 0 24px 24px;position:relative}
-.header-top{display:flex;justify-content:space-between;align-items:center}
-.app-logo{width:44px;height:44px;background:linear-gradient(135deg,#3377FF,#FF9A63);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
-.app-title{font-size:18px;font-weight:bold;color:#333;margin-left:8px}
-.header-right{display:flex;align-items:center;gap:8px}
-.difficulty-tag{background:rgba(255,149,0,0.1);padding:6px 12px;border-radius:18px;font-size:12px;color:var(--orange);cursor:pointer;transition:all 0.2s}
-.difficulty-tag:active{transform:scale(0.95)}
-.difficulty-tag:hover{background:rgba(255,149,0,0.2)}
-.user-menu-wrapper{position:relative}
-.user-avatar-circle{width:42px;height:42px;background:linear-gradient(135deg,#FFD4B8,#FFB6C1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#fff;cursor:pointer;transition:transform 0.2s}
-.user-avatar-circle:active{transform:scale(0.95)}
-.user-dropdown{position:absolute;top:100%;right:0;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.15);width:220px;display:none;z-index:1000;margin-top:8px;overflow:hidden}
-.user-dropdown.show{display:block}
-.user-dropdown-header{padding:16px;background:linear-gradient(135deg,#667eea,#764ba2);color:white}
-.user-dropdown-avatar{width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:8px}
-.user-dropdown-name{font-size:15px;font-weight:bold;margin-bottom:2px}
-.user-dropdown-info{font-size:12px;opacity:0.9}
-.user-dropdown-item{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid #f5f5f5;transition:background 0.2s}
-.user-dropdown-item:hover{background:#f5f7ff}
-.user-dropdown-item:active{background:#e8f4ff}
-.user-dropdown-item.danger{color:#ff6b6b}
-.user-dropdown-item.danger:hover{background:#fff5f5}
-.user-dropdown-arrow{font-size:10px;color:#999;transition:transform 0.2s}
-.user-dropdown.show .user-dropdown-arrow{transform:rotate(180deg)}
-.user-dropdown-divider{height:1px;background:#f0f0f0}
-.module-section{padding:16px 12px 0}
-.module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
-.module-btn{display:flex;flex-direction:column;align-items:center;padding:14px 6px 10px;border-radius:16px;border:none;cursor:pointer;transition:transform 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:relative;min-height:90px}
-.module-btn:active{transform:scale(0.96)}
-.module-icon{font-size:26px;margin-bottom:6px}
-.module-name{font-size:12px;font-weight:bold;color:white;margin-bottom:2px;text-align:center}
-.module-desc{font-size:9px;color:rgba(255,255,255,0.9);text-align:center}
-.module-tag{position:absolute;top:-4px;right:-4px;background:#FF6B6B;color:white;font-size:8px;padding:2px 5px;border-radius:8px;font-weight:bold}
-.gradient-blue{background:linear-gradient(135deg,#3377FF,#4A80F5)}
-.gradient-orange{background:linear-gradient(135deg,#FF9A63,#E87A4E)}
-.gradient-green{background:linear-gradient(135deg,#43E97B,#38F9D7)}
-.gradient-purple{background:linear-gradient(135deg,#667eea,#764ba2)}
-.gradient-pink{background:linear-gradient(135deg,#FFB6C1,#FF9A63)}
-.gradient-cyan{background:linear-gradient(135deg,#4facfe,#00f2fe)}
-.gradient-yellow{background:linear-gradient(135deg,#f6d365,#fda085)}
-.gradient-red{background:linear-gradient(135deg,#ff6b6b,#ff4757)}
-.today-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.stat-item{background:white;border-radius:12px;padding:10px 6px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
-.stat-value{font-size:18px;font-weight:bold;color:var(--blue)}
-.stat-label{font-size:10px;color:var(--text-light);margin-top:2px}
-.bottom-nav{display:fixed;bottom:0;left:50%;transform:translateX(-50%);width:480px;max-width:100vw;background:white;border-top:1px solid #f0f0f0;display:flex;padding:8px 0;z-index:50}#page-login .bottom-nav,#page-login~.bottom-nav{display:none!important}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px;cursor:pointer;color:var(--text-light);transition:all 0.2s}
-.nav-item.active{color:var(--blue)}
-.nav-icon{font-size:22px;margin-bottom:2px}
-.nav-label{font-size:10px}
+/* 首页顶部导航栏 - 深蓝渐变背景 */
+.home-header {
+    background: linear-gradient(135deg, #1A6BFF, #0055FF);
+    padding: 16px 16px 24px;
+    border-radius: 0 0 24px 24px;
+    position: relative;
+    min-height: 160px;
+}
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+/* 左侧Logo区域 */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.brain-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #FF69B4, #FF1493);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 8px rgba(255, 105, 180, 0.4);
+}
+.app-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    letter-spacing: 1px;
+}
+/* 右侧功能区 */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.difficulty-tag {
+    background: rgba(173, 216, 250, 0.9);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    color: #1A6BFF;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+.difficulty-tag:active { transform: scale(0.95); }
+.difficulty-tag:hover { background: rgba(173, 216, 250, 1); }
+.settings-icon-btn {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.settings-icon-btn:active { transform: scale(0.95); }
+.user-avatar-circle {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #FFD4B8, #FFB6C1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+.user-avatar-circle:active { transform: scale(0.95); }
+/* 用户下拉菜单 */
+.user-menu-wrapper { position: relative; }
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 220px;
+    display: none;
+    z-index: 1000;
+    margin-top: 8px;
+    overflow: hidden;
+}
+.user-dropdown.show { display: block; }
+.user-dropdown-header {
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    cursor: pointer;
+}
+.user-dropdown-avatar {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+.user-dropdown-name { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+.user-dropdown-info { font-size: 12px; opacity: 0.9; }
+.user-dropdown-item {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.2s;
+    font-size: 14px;
+    color: #333;
+}
+.user-dropdown-item:hover { background: #f5f7ff; }
+.user-dropdown-item:active { background: #e8f4ff; }
+.user-dropdown-item.danger { color: #ff6b6b; }
+.user-dropdown-item.danger:hover { background: #fff5f5; }
+.user-dropdown-divider { height: 1px; background: #f0f0f0; }
+/* 问候语区域 */
+.greeting-section {
+    margin-bottom: 16px;
+}
+.greeting-text {
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    line-height: 1.5;
+}
+.greeting-text .emoji { font-size: 18px; }
+/* 数据统计区 - 4个白色圆角卡片 */
+.today-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 0;
+}
+.stat-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 6px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.stat-item:active { transform: scale(0.96); }
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1A6BFF;
+    margin-bottom: 2px;
+}
+.stat-label {
+    font-size: 10px;
+    color: #888;
+    white-space: nowrap;
+}
+.module-section { padding: 16px 12px 0; }
+.module-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+.module-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 6px 10px;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    position: relative;
+    min-height: 90px;
+}
+.module-btn:active { transform: scale(0.96); }
+.module-icon { font-size: 26px; margin-bottom: 6px; }
+.module-name { font-size: 12px; font-weight: bold; color: white; margin-bottom: 2px; text-align: center; }
+.module-desc { font-size: 9px; color: rgba(255, 255, 255, 0.9); text-align: center; }
+.module-tag {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #FF6B6B;
+    color: white;
+    font-size: 8px;
+    padding: 2px 5px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+.gradient-blue { background: linear-gradient(135deg, #3377FF, #4A80F5); }
+.gradient-orange { background: linear-gradient(135deg, #FF9A63, #E87A4E); }
+.gradient-green { background: linear-gradient(135deg, #43E97B, #38F9D7); }
+.gradient-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+.gradient-pink { background: linear-gradient(135deg, #FFB6C1, #FF9A63); }
+.gradient-cyan { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.gradient-yellow { background: linear-gradient(135deg, #f6d365, #fda085); }
+.gradient-red { background: linear-gradient(135deg, #ff6b6b, #ff4757); }
+.bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    max-width: 100vw;
+    background: white;
+    border-top: 1px solid #f0f0f0;
+    padding: 10px 0 16px;
+    z-index: 50;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+#page-login .bottom-nav, #page-login ~ .bottom-nav { display: none !important; }
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px;
+    cursor: pointer;
+    color: #999;
+    transition: all 0.2s;
+}
+.nav-item.active { color: #1A6BFF; }
+.nav-icon { font-size: 22px; margin-bottom: 2px; }
+.nav-label { font-size: 11px; font-weight: 500; }
 .fullscreen-page{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-page);z-index:200;display:none;flex-direction:column;overflow:hidden}
 .fullscreen-page.active{display:flex}
 .fp-header{display:flex;align-items:center;padding:12px 16px;background:white;border-bottom:1px solid #f0f0f0}
@@ -372,14 +561,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <div id="page-home" class="page active" style="display:block;">
     <div class="home-header">
         <div class="header-top">
-            <div style="display:flex;align-items:center;">
-                <div class="app-logo">🧠</div>
+            <!-- 左侧：粉色大脑图标 + 白色粗体"认知训练" -->
+            <div class="header-left">
+                <div class="brain-icon">🧠</div>
                 <div class="app-title">认知训练</div>
             </div>
+            <!-- 右侧：Lv.1标识、设置图标、用户头像 -->
             <div class="header-right">
-                <div class="difficulty-tag" onclick="openDifficultyModal()">
-                    <span id="difficulty-text">Lv.1</span>
-                </div>
+                <button class="difficulty-tag" onclick="openDifficultyModal()" id="difficulty-text">Lv.1</button>
+                <div class="settings-icon-btn" onclick="openSettingsPanel()">⚙️</div>
                 <div class="user-menu-wrapper">
                     <div class="user-avatar-circle" id="header-avatar" onclick="toggleUserMenu()">👤</div>
                     <div class="user-dropdown" id="user-dropdown">
@@ -388,8 +578,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                             <div class="user-dropdown-name" id="dropdown-name">同学</div>
                             <div class="user-dropdown-info" id="dropdown-info">初一 · Lv.1</div>
                         </div>
-                        
-                        
                         <div class="user-dropdown-item" onclick="openDifficultyModal()">
                             <span>⭐</span>
                             <span>难度调整</span>
@@ -417,14 +605,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                             <span>⚙️</span>
                             <span>设置</span>
                         </div>
-                        
                     </div>
                 </div>
             </div>
         </div>
-        <div style="margin-top:12px;">
-            <span id="greeting-name">同学</span>，今天也要加油哦 💪
+        <!-- 白色引导文字 -->
+        <div class="greeting-section">
+            <span class="greeting-text"><span id="greeting-name">同学</span>，今天也要加油哦 💪</span>
         </div>
+        <!-- 数据统计区：4个圆角白色卡片 -->
         <div class="today-stats">
             <div class="stat-item">
                 <div class="stat-value" id="today-questions">0</div>
@@ -509,11 +698,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="module-icon">🤖</div>
                 <div class="module-name">DeepSeek</div>
                 <div class="module-desc">AI智能助手</div>
-            </button>
-            <button class="module-btn gradient-red" onclick="openSettingsPanel()" style="display:none;">
-                <div class="module-icon">⚙️</div>
-                <div class="module-name">设置</div>
-                <div class="module-desc">账户与充值</div>
             </button>
         </div>
     </div>
@@ -5089,31 +5273,49 @@ function closeGame() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('认知训练门户加载中...');
     
-    // 清除旧数据
-    try {
-        localStorage.clear();
-    } catch(e) {}
+    // 加载用户数据
+    let data = loadData();
     
-    // 创建默认用户
-    const defaultUser = {
-        id: 'user_default',
-        name: '邱宇菲',
-        grade: 7,
-        difficulty: 1,
-        points: 1142,
-        stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
-        weeklyProgress: {}, wrongNotes: [], completedTopics: []
-    };
+    // 如果没有用户数据，创建默认用户"邱宇菲"
+    if (!data.users || data.users.length === 0) {
+        const defaultUser = {
+            id: 'user_qiuyufei',
+            name: '邱宇菲',
+            grade: 7,
+            difficulty: 1,
+            points: 1142,
+            createdAt: new Date().toISOString(),
+            stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
+            weeklyProgress: {}, wrongNotes: [], completedTopics: []
+        };
+        data = { users: [defaultUser], currentUser: defaultUser.id };
+        saveData(data);
+        console.log('已创建默认用户: 邱宇菲');
+    }
     
-    saveData({ users: [defaultUser], currentUser: defaultUser.id });
+    // 如果没有当前用户，设置为第一个用户
+    if (!data.currentUser && data.users.length > 0) {
+        data.currentUser = data.users[0].id;
+        saveData(data);
+    }
+    
+    // 获取当前用户
+    const currentUser = data.users.find(u => u.id === data.currentUser) || data.users[0];
     
     // 显示首页
     showPage('home');
     
     // 更新用户名显示
-    document.getElementById('greeting-name').textContent = '邱宇菲';
-    document.getElementById('dropdown-name').textContent = '邱宇菲';
-    document.getElementById('header-avatar').textContent = '邱';
+    if (currentUser) {
+        document.getElementById('greeting-name').textContent = currentUser.name;
+        document.getElementById('dropdown-name').textContent = currentUser.name;
+        document.getElementById('dropdown-info').textContent = (currentUser.grade ? ['五年级', '六年级', '初一', '初二', '初三'][currentUser.grade - 5] : '初一') + ' · Lv.' + (currentUser.difficulty || 1);
+        document.getElementById('difficulty-text').textContent = 'Lv.' + (currentUser.difficulty || 1);
+        document.getElementById('dropdown-difficulty').textContent = 'Lv.' + (currentUser.difficulty || 1);
+        document.getElementById('header-avatar').textContent = currentUser.name.charAt(0);
+        document.getElementById('header-avatar').style.background = 'linear-gradient(135deg, #FFD4B8, #FFB6C1)';
+        console.log('当前用户: ' + currentUser.name);
+    }
     
     console.log('初始化完成');
     
@@ -5130,6 +5332,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch(err) {}
     });
+    
+    // 同步数据
+    syncTodayStats();
 });
 
 // ====== 播客音频播放 ======
