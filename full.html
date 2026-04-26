@@ -65,19 +65,30 @@ a{text-decoration:none;color:inherit}
 <body>
 <div class="header">
 <div class="header-top">
-<div style="display:flex;align-items:center"><span style="font-size:20px;margin-right:8px">🧠</span><h1>认知训练门户</h1></div>
-<div style="display:flex;align-items:center;gap:10px">
+<div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">🧠</span><h1>认知训练门户</h1></div>
+<div style="display:flex;align-items:center;gap:8px">
 <div style="font-size:12px"><span style="opacity:0.8">积分:</span> <span id="header-points" style="color:var(--gold);font-weight:bold">0</span></div>
-<div style="position:relative">
+<button onclick="toggleSettingsMenu()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:16px" title="设置">⚙️</button>
 <button onclick="toggleMenu()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:8px;border-radius:8px;cursor:pointer">☰</button>
-<div id="menu" class="dropdown-menu" style="display:none;position:absolute;right:0;top:100%;background:white;border-radius:10px;box-shadow:0 4px 15px rgba(0,0,0,0.15);min-width:150px;z-index:1000;overflow:hidden">
-<a onclick="showPage('deepseek');closeMenu()" style="display:block;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px">🤖 DeepSeek助手</a>
-<a onclick="showPage('avatar');closeMenu()" style="display:block;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px">👥 AI数字分身</a>
-<a onclick="showPage('plan');closeMenu()" style="display:block;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px">📅 学习计划</a>
-<a onclick="showPage('profile');closeMenu()" style="display:block;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px">👤 成长中心</a>
-<a onclick="showPage('settings');closeMenu()" style="display:block;padding:12px 15px;color:var(--text-dark);font-size:13px">⚙️ 设置</a>
 </div>
 </div>
+<div id="settings-menu" style="display:none;position:absolute;right:10px;top:100%;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.2);min-width:200px;z-index:1001;overflow:hidden;margin-top:5px">
+<div style="padding:12px 15px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white">
+<div style="font-weight:bold;font-size:14px">⚙️ 设置中心</div>
+<div style="font-size:11px;opacity:0.8;margin-top:2px">管理您的账户和AI配置</div>
+</div>
+<a onclick="showRecharge();closeSettingsMenu()" style="display:flex;align-items:center;gap:10px;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px;cursor:pointer">
+<span style="font-size:20px">💎</span><div><div style="font-weight:500">充值中心</div><div style="font-size:11px;color:var(--text-gray)">DeepSeek额度充值</div></div><span style="margin-left:auto;color:var(--text-light)">→</span>
+</a>
+<a onclick="showApiConfig();closeSettingsMenu()" style="display:flex;align-items:center;gap:10px;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px;cursor:pointer">
+<span style="font-size:20px">🔑</span><div><div style="font-weight:500">API Key配置</div><div style="font-size:11px;color:var(--text-gray)">设置DeepSeek密钥</div></div><span style="margin-left:auto;color:var(--text-light)">→</span>
+</a>
+<a onclick="showPage('profile');closeSettingsMenu()" style="display:flex;align-items:center;gap:10px;padding:12px 15px;color:var(--text-dark);border-bottom:1px solid #eee;font-size:13px;cursor:pointer">
+<span style="font-size:20px">👤</span><div><div style="font-weight:500">成长中心</div><div style="font-size:11px;color:var(--text-gray)">查看学习进度</div></div><span style="margin-left:auto;color:var(--text-light)">→</span>
+</a>
+<a onclick="showPage('settings');closeSettingsMenu()" style="display:flex;align-items:center;gap:10px;padding:12px 15px;color:var(--text-dark);font-size:13px;cursor:pointer">
+<span style="font-size:20px">📋</span><div><div style="font-weight:500">其他设置</div><div style="font-size:11px;color:var(--text-gray)">通知、数据管理</div></div><span style="margin-left:auto;color:var(--text-light)">→</span>
+</a>
 </div>
 </div>
 <div class="header-stats" id="header-stats">
@@ -157,23 +168,6 @@ a{text-decoration:none;color:inherit}
 <div id="deepseek-page" class="page">
 <div class="card" style="padding:0">
 <div id="deepseek-content"></div>
-</div>
-</div>
-<div id="avatar-page" class="page">
-<div class="card">
-<h2 style="color:var(--text-dark);text-align:center;margin-bottom:20px">🤖 AI数字分身</h2>
-<div id="avatar-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px"></div>
-</div>
-<div id="avatar-chat" class="card" style="display:none;position:fixed;top:60px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;height:calc(100vh - 140px);z-index:200">
-<div style="display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #eee;margin-bottom:10px">
-<button onclick="backToAvatarList()" style="background:none;border:none;font-size:20px;cursor:pointer">←</button>
-<span id="avatar-chat-name" style="font-weight:bold;font-size:16px"></span>
-</div>
-<div id="avatar-messages" style="flex:1;overflow-y:auto;padding:10px 0"></div>
-<div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid #eee">
-<input type="text" id="avatar-input" placeholder="输入消息..." style="flex:1;padding:10px;border:1px solid #ddd;border-radius:20px;font-size:14px">
-<button onclick="sendAvatarMessage()" style="background:var(--blue);color:white;border:none;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:18px">➤</button>
-</div>
 </div>
 </div>
 <div id="plan-page" class="page">
@@ -343,7 +337,6 @@ a{text-decoration:none;color:inherit}
 <div class="nav-item" data-tab="podcast" onclick="switchTab('podcast')"><span class="nav-icon">🎧</span><span>播客</span></div>
 <div class="nav-item" data-tab="video" onclick="switchTab('video')"><span class="nav-icon">📺</span><span>视频</span></div>
 <div class="nav-item" data-tab="map" onclick="switchTab('map')"><span class="nav-icon">🗺</span><span>地图</span></div>
-<div class="nav-item" data-tab="profile" onclick="switchTab('profile')"><span class="nav-icon">👤</span><span>我的</span></div>
 </div>
 <script>
 const STORAGE_KEY = 'cognitive_training_data';
@@ -422,8 +415,18 @@ function switchTab(tab) {
         }
     });
 }
-function toggleMenu() { document.getElementById('menu').classList.toggle('show'); }
+function toggleMenu() { document.getElementById('menu').classList.toggle('show'); closeSettingsMenu(); }
 function closeMenu() { document.getElementById('menu').classList.remove('show'); }
+function toggleSettingsMenu() { 
+    var menu = document.getElementById('settings-menu');
+    if (menu.style.display === 'none') {
+        menu.style.display = 'block';
+        closeMenu();
+    } else {
+        menu.style.display = 'none';
+    }
+}
+function closeSettingsMenu() { document.getElementById('settings-menu').style.display = 'none'; }
 function showToast(msg) {
     var toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -2263,80 +2266,6 @@ function handleVideoUpload(e) {
     }
 }
 
-// ========== AI数字分身 ==========
-var avatars = [
-    {id:'math',name:'数学导师小π',avatar:'📐',persona:'你是一位资深数学老师，擅长用生动有趣的方式讲解数学知识。',color:'#4FACFE'},
-    {id:'physics',name:'物理大师老牛',avatar:'⚡',persona:'你是一位物理学教授，喜欢用生活中的例子解释物理原理。',color:'#FFD700'},
-    {id:'english',name:'英语达人Mike',avatar:'🔤',persona:'你是一位外教老师，发音标准，擅长帮助学生练习口语。',color:'#43E97B'},
-    {id:'method',name:'学霸导师',avatar:'🏆',persona:'你是一位学习方法的专家，研究各种高效学习技巧多年。',color:'#FF6B9D'},
-    {id:'psychology',name:'心理顾问',avatar:'💭',persona:'你是一位心理咨询师，擅长倾听和开导，帮助解决学习压力。',color:'#8B5CF6'}
-];
-var currentAvatar = null;
-var avatarMessages = [];
-var avatarTyping = false;
-function initAvatarChat() {
-    document.getElementById('avatar-list').innerHTML = avatars.map(function(a) {
-        return '<div onclick="selectAvatar(\'' + a.id + '\')" style="background:' + a.color + ';padding:20px;border-radius:12px;color:white;text-align:center;cursor:pointer">' +
-            '<div style="font-size:40px;margin-bottom:10px">' + a.avatar + '</div><div style="font-weight:bold;font-size:15px">' + a.name + '</div></div>';
-    }).join('');
-}
-function selectAvatar(id) {
-    currentAvatar = avatars.find(function(a) { return a.id === id; });
-    if (!currentAvatar) return;
-    avatarMessages = [{role:'system', content:'你是' + currentAvatar.persona}];
-    document.getElementById('avatar-list').style.display = 'none';
-    document.getElementById('avatar-chat').style.display = 'flex';
-    document.getElementById('avatar-chat').style.flexDirection = 'column';
-    document.getElementById('avatar-chat').style.height = 'calc(100vh - 100px)';
-    document.getElementById('avatar-chat-name').textContent = currentAvatar.avatar + ' ' + currentAvatar.name;
-    renderAvatarMessages();
-}
-function backToAvatarList() {
-    document.getElementById('avatar-chat').style.display = 'none';
-    document.getElementById('avatar-list').style.display = 'grid';
-}
-function renderAvatarMessages() {
-    var container = document.getElementById('avatar-messages');
-    container.innerHTML = avatarMessages.filter(function(m) { return m.role !== 'system'; }).map(function(m) {
-        return '<div style="display:flex;gap:10px;margin-bottom:15px;' + (m.role === 'user' ? 'flex-direction:row-reverse' : '') + '">' +
-            '<div style="width:32px;height:32px;background:' + (m.role === 'user' ? 'var(--blue)' : currentAvatar.color) + ';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:white;flex-shrink:0">' + (m.role === 'user' ? '👤' : currentAvatar.avatar) + '</div>' +
-            '<div style="background:#f8f9fa;padding:10px 15px;border-radius:12px;max-width:70%;white-space:pre-wrap;line-height:1.5">' + escapeHtml(m.content) + '</div></div>';
-    }).join('');
-    container.scrollTop = container.scrollHeight;
-}
-function sendAvatarMessage() {
-    var input = document.getElementById('avatar-input');
-    var msg = input.value.trim();
-    if (!msg || avatarTyping) return;
-    avatarMessages.push({role:'user', content:msg});
-    input.value = '';
-    renderAvatarMessages();
-    avatarTyping = true;
-    document.getElementById('avatar-messages').innerHTML += '<div id="avatar-typing" style="display:flex;gap:10px;margin-bottom:15px"><div style="width:32px;height:32px;background:' + currentAvatar.color + ';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:white">' + currentAvatar.avatar + '</div><div style="background:#f8f9fa;padding:10px 15px;border-radius:12px"><span style="animation:blink 1s infinite">...</span></div></div>';
-    document.getElementById('avatar-messages').scrollTop = 999999;
-    fetch('https://api.deepseek.com/chat/completions', {
-        method:'POST',
-        headers:{'Content-Type':'application/json','Authorization':'Bearer ' + DEEPSEEK_API_KEY},
-        body:JSON.stringify({model:'deepseek-chat',messages:avatarMessages,max_tokens:500,temperature:0.7})
-    }).then(function(r) { return r.json(); }).then(function(data) {
-        avatarTyping = false;
-        var typing = document.getElementById('avatar-typing');
-        if (typing) typing.remove();
-        if (data.choices && data.choices[0]) {
-            avatarMessages.push({role:'assistant', content:data.choices[0].message.content});
-        } else {
-            avatarMessages.push({role:'assistant', content:'抱歉，服务暂时不可用。'});
-        }
-        renderAvatarMessages();
-    }).catch(function() {
-        avatarTyping = false;
-        var typing = document.getElementById('avatar-typing');
-        if (typing) typing.remove();
-        avatarMessages.push({role:'assistant', content:'网络错误，请检查连接。'});
-        renderAvatarMessages();
-    });
-}
-
 // ========== DeepSeek助手 ==========
 var deepseekMessages = [];
 var isVoiceInput = false;
@@ -2705,12 +2634,143 @@ function showProfile() {
 }
 
 // ========== 设置页面 ==========
+// 显示充值页面
+function showRecharge() {
+    var html = '<div style="padding:15px">';
+    html += '<div style="background:linear-gradient(135deg,var(--purple),var(--pink));padding:20px;border-radius:16px;margin-bottom:20px;text-align:center;color:white">';
+    html += '<div style="font-size:40px;margin-bottom:10px">💎</div>';
+    html += '<div style="font-size:18px;font-weight:bold">DeepSeek 充值中心</div>';
+    html += '<div style="font-size:12px;opacity:0.9;margin-top:5px">为AI助手充值额度</div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">💰 选择套餐</h3>';
+    html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px">';
+    html += '<div onclick="selectRechargePackage(10)" style="background:#f8f9fa;padding:15px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.3s" id="pkg-10"><div style="font-size:24px;margin-bottom:5px">🌟</div><div style="font-weight:bold;color:var(--text-dark)">10元</div><div style="font-size:11px;color:var(--text-gray)">100万tokens</div><div style="font-size:12px;color:var(--blue);margin-top:5px">基础版</div></div>';
+    html += '<div onclick="selectRechargePackage(50)" style="background:#fff3e0;padding:15px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid var(--orange);transition:all 0.3s" id="pkg-50"><div style="font-size:24px;margin-bottom:5px">💎</div><div style="font-weight:bold;color:var(--orange)">50元</div><div style="font-size:11px;color:var(--text-gray)">600万tokens</div><div style="font-size:12px;color:var(--orange);margin-top:5px">推荐 ★</div></div>';
+    html += '<div onclick="selectRechargePackage(100)" style="background:#f8f9fa;padding:15px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.3s" id="pkg-100"><div style="font-size:24px;margin-bottom:5px">👑</div><div style="font-weight:bold;color:var(--text-dark)">100元</div><div style="font-size:11px;color:var(--text-gray)">1500万tokens</div><div style="font-size:12px;color:var(--purple);margin-top:5px">进阶版</div></div>';
+    html += '<div onclick="selectRechargePackage(200)" style="background:#f8f9fa;padding:15px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all 0.3s" id="pkg-200"><div style="font-size:24px;margin-bottom:5px">🚀</div><div style="font-weight:bold;color:var(--text-dark)">200元</div><div style="font-size:11px;color:var(--text-gray)">4000万tokens</div><div style="font-size:12px;color:var(--green);margin-top:5px">专业版</div></div>';
+    html += '</div>';
+    
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="color:var(--text-gray)">当前余额</span><span style="font-weight:bold;color:var(--gold)">' + (userData.deepseekQuota || 0) + ' tokens</span></div>';
+    html += '<div style="font-size:12px;color:var(--text-gray);margin-bottom:15px">* 充值后额度将自动添加到您的账户</div>';
+    html += '<button onclick="processRecharge()" id="recharge-btn" style="width:100%;background:var(--purple);color:white;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer">立即充值 ¥<span id="recharge-amount">50</span></button>';
+    html += '</div>';
+    
+    html += '<div style="background:#fff3e0;padding:12px;border-radius:10px;margin-bottom:15px">';
+    html += '<div style="font-size:12px;color:var(--orange);font-weight:bold;margin-bottom:5px">💡 温馨提示</div>';
+    html += '<div style="font-size:11px;color:var(--text-gray)">• 充值成功后，额度即时到账<br>• 支持多种支付方式<br>• 如有问题请联系客服</div>';
+    html += '</div>';
+    
+    html += '<button onclick="showSettings()" style="width:100%;background:#f0f0f0;color:var(--text-dark);border:none;padding:12px;border-radius:10px;font-size:14px;cursor:pointer">← 返回设置</button>';
+    html += '</div>';
+    document.getElementById('settings-content').innerHTML = html;
+    userData.selectedPackage = 50;
+}
+
+function selectRechargePackage(amount) {
+    document.querySelectorAll('[id^="pkg-"]').forEach(function(el) { el.style.borderColor = 'transparent'; el.style.background = '#f8f9fa'; });
+    var pkg = document.getElementById('pkg-' + amount);
+    if (pkg) {
+        pkg.style.borderColor = amount === 50 ? 'var(--orange)' : 'var(--blue)';
+        if (amount !== 50) pkg.style.background = 'white';
+    }
+    document.getElementById('recharge-amount').textContent = amount;
+    userData.selectedPackage = amount;
+}
+
+function processRecharge() {
+    var amount = userData.selectedPackage || 50;
+    var tokens = {10: 1000000, 50: 6000000, 100: 15000000, 200: 40000000}[amount];
+    userData.deepseekQuota = (userData.deepseekQuota || 0) + tokens;
+    saveData();
+    showToast('充值成功！+' + (tokens/10000) + '万tokens');
+    showRecharge();
+}
+
+// 显示API Key配置页面
+function showApiConfig() {
+    var html = '<div style="padding:15px">';
+    html += '<div style="background:linear-gradient(135deg,var(--blue),var(--cyan));padding:20px;border-radius:16px;margin-bottom:20px;text-align:center;color:white">';
+    html += '<div style="font-size:40px;margin-bottom:10px">🔑</div>';
+    html += '<div style="font-size:18px;font-weight:bold">API Key 配置</div>';
+    html += '<div style="font-size:12px;opacity:0.9;margin-top:5px">设置您的DeepSeek密钥</div>';
+    html += '</div>';
+    
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div style="font-size:13px;color:var(--text-dark);margin-bottom:10px;font-weight:500">当前API Key</div>';
+    html += '<input type="password" id="api-key-input" value="' + (userData.deepseekApiKey || '') + '" placeholder="请输入DeepSeek API Key" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:13px;margin-bottom:10px;box-sizing:border-box">';
+    html += '<div style="font-size:11px;color:var(--text-gray);margin-bottom:12px">* 从 <span style="color:var(--blue)">platform.deepseek.com</span> 获取您的API Key</div>';
+    html += '<button onclick="saveApiKey()" style="width:100%;background:var(--blue);color:white;border:none;padding:12px;border-radius:8px;font-size:14px;cursor:pointer;font-weight:500">保存配置</button>';
+    html += '</div>';
+    
+    html += '<div style="background:#e8f5e9;padding:12px;border-radius:10px;margin-bottom:15px">';
+    html += '<div style="font-size:12px;color:var(--green);font-weight:bold;margin-bottom:5px">✅ 使用说明</div>';
+    html += '<div style="font-size:11px;color:var(--text-gray)">1. 访问 DeepSeek 开放平台<br>2. 注册并登录账号<br>3. 在"API Keys"中创建新密钥<br>4. 复制密钥并粘贴到上方输入框<br>5. 点击保存配置</div>';
+    html += '</div>';
+    
+    html += '<div style="background:#f8f9fa;padding:12px;border-radius:10px;margin-bottom:20px">';
+    html += '<div style="font-size:12px;color:var(--text-dark);font-weight:500;margin-bottom:8px">余额查询</div>';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<span style="font-size:13px;color:var(--text-gray)">当前额度</span>';
+    html += '<span style="font-size:15px;font-weight:bold;color:var(--gold)">' + (userData.deepseekQuota || 0) + ' <span style="font-size:11px;font-weight:normal;color:var(--text-gray)">tokens</span></span>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<button onclick="showSettings()" style="width:100%;background:#f0f0f0;color:var(--text-dark);border:none;padding:12px;border-radius:10px;font-size:14px;cursor:pointer">← 返回设置</button>';
+    html += '</div>';
+    document.getElementById('settings-content').innerHTML = html;
+}
+
+function saveApiKey() {
+    var apiKey = document.getElementById('api-key-input').value.trim();
+    if (apiKey) {
+        userData.deepseekApiKey = apiKey;
+        saveData();
+        showToast('API Key 保存成功！');
+    } else {
+        showToast('请输入有效的API Key');
+    }
+}
+
 function showSettings() {
-    var html = '<div style="padding:15px"><h3 style="margin-bottom:15px;color:var(--text-dark)">👤 账户信息</h3>';
-    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>积分余额</span><span style="color:var(--gold);font-weight:bold">' + (userData.points || 0) + '</span></div><div style="display:flex;justify-content:space-between;padding:10px 0"><span>数据同步</span><button onclick="syncData()" style="background:var(--blue);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">同步</button></div></div>';
-    html += '<h3 style="margin-bottom:15px;color:var(--text-dark)">🔔 通知设置</h3><div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>每日提醒</span><label style="position:relative;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:0.3s"></span><span style="position:absolute;cursor:pointer;left:3px;bottom:3px;width:18px;height:18px;background:white;border-radius:50%;transition:0.3s"></span></label></div><div style="display:flex;justify-content:space-between;padding:10px 0"><span>成就通知</span><label style="position:relative;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:0.3s"></span><span style="position:absolute;cursor:pointer;left:3px;bottom:3px;width:18px;height:18px;background:white;border-radius:50%;transition:0.3s"></span></label></div></div>';
-    html += '<h3 style="margin-bottom:15px;color:var(--text-dark)">🗑 数据管理</h3><div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>清除游戏记录</span><button onclick="clearGameData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">清除</button></div><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>清除错题本</span><button onclick="clearWrongData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">清除</button></div><div style="display:flex;justify-content:space-between;padding:10px 0"><span>重置所有数据</span><button onclick="resetAllData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">重置</button></div></div>';
-    html += '<h3 style="margin-bottom:15px;color:var(--text-dark)">ℹ️ 关于</h3><div style="background:#f8f9fa;padding:15px;border-radius:12px"><div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>版本</span><span style="color:var(--text-gray)">1.0.0</span></div><div style="display:flex;justify-content:space-between;padding:10px 0"><span>版权</span><span style="color:var(--text-gray)">认知训练门户</span></div></div></div>';
+    var html = '<div style="padding:15px">';
+    html += '<div style="background:linear-gradient(135deg,var(--blue),var(--purple));padding:20px;border-radius:16px;margin-bottom:20px;text-align:center;color:white">';
+    html += '<div style="font-size:40px;margin-bottom:10px">⚙️</div>';
+    html += '<div style="font-size:18px;font-weight:bold">设置中心</div>';
+    html += '<div style="font-size:12px;opacity:0.9;margin-top:5px">管理您的应用偏好</div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">💎 AI 服务</h3>';
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div onclick="showRecharge()" style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid #eee;cursor:pointer"><div style="flex:1"><div style="font-weight:500">充值中心</div><div style="font-size:11px;color:var(--text-gray)">DeepSeek额度充值</div></div><span style="color:var(--orange);font-size:18px">💎</span><span style="color:var(--text-light)">→</span></div>';
+    html += '<div onclick="showApiConfig()" style="display:flex;align-items:center;padding:12px 0;cursor:pointer"><div style="flex:1"><div style="font-weight:500">API Key 配置</div><div style="font-size:11px;color:var(--text-gray)">' + ((userData.deepseekApiKey) ? '已配置 ✓' : '未配置') + '</div></div><span style="color:var(--blue);font-size:18px">🔑</span><span style="color:var(--text-light)">→</span></div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">👤 账户信息</h3>';
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>积分余额</span><span style="color:var(--gold);font-weight:bold">' + (userData.points || 0) + '</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0"><span>AI额度</span><span style="color:var(--purple);font-weight:bold">' + (userData.deepseekQuota || 0) + ' tokens</span></div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">🔔 通知设置</h3>';
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>每日提醒</span><label style="position:relative;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:0.3s"></span><span style="position:absolute;cursor:pointer;left:3px;bottom:3px;width:18px;height:18px;background:white;border-radius:50%;transition:0.3s"></span></label></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0"><span>成就通知</span><label style="position:relative;width:44px;height:24px"><input type="checkbox" checked style="opacity:0;width:0;height:0"><span style="position:absolute;cursor:pointer;inset:0;background:#ccc;border-radius:24px;transition:0.3s"></span><span style="position:absolute;cursor:pointer;left:3px;bottom:3px;width:18px;height:18px;background:white;border-radius:50%;transition:0.3s"></span></label></div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">🗑 数据管理</h3>';
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:20px">';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>清除游戏记录</span><button onclick="clearGameData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">清除</button></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>清除错题本</span><button onclick="clearWrongData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">清除</button></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0"><span>重置所有数据</span><button onclick="resetAllData()" style="background:var(--red);color:white;border:none;padding:5px 12px;border-radius:5px;font-size:12px;cursor:pointer">重置</button></div>';
+    html += '</div>';
+    
+    html += '<h3 style="margin-bottom:12px;color:var(--text-dark)">ℹ️ 关于</h3>';
+    html += '<div style="background:#f8f9fa;padding:15px;border-radius:12px">';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee"><span>版本</span><span style="color:var(--text-gray)">1.0.0</span></div>';
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 0"><span>版权</span><span style="color:var(--text-gray)">认知训练门户</span></div>';
+    html += '</div></div>';
     document.getElementById('settings-content').innerHTML = html;
 }
 function syncData() { showToast('数据同步成功！'); }
