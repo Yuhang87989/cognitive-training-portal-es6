@@ -2237,6 +2237,19 @@ function switchPlanWeek(idx, btn) {
         return '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:white;border-radius:8px;margin-bottom:8px"><div style="width:20px;height:20px;border:2px solid ' + w.color + ';border-radius:50%"></div><span style="color:var(--text-dark);font-size:14px">' + t + '</span></div>';
     }).join('') + '</div>';
 }
+
+// 页面初始化入口
+function initApp() {
+    init();
+}
+
+// DOM加载完成后初始化
+document.addEventListener('DOMContentLoaded', initApp);
+
+// 首次加载时也要执行（以防DOMContentLoaded已触发）
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initApp();
+}
 </script>
 </body>
 </html>
