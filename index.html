@@ -632,6 +632,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
     </div>
 </div>
 
+<!-- 难度级别选择模态框 -->
+<div id="difficulty-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width:320px;">
+        <div class="modal-title">🎯 选择难度级别</div>
+        <div style="margin-bottom:16px;">
+            <div style="font-size:13px;color:#666;margin-bottom:12px;">难度越高，题目越难，积分奖励越多</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+                <button onclick="setDifficulty(1)" class="diff-btn" data-level="1" style="padding:14px;background:#f0f7ff;border:2px solid #1A6BFF;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+                    <span><strong>Lv.1</strong> 入门级</span>
+                    <span style="font-size:11px;color:#666;">基础题目</span>
+                </button>
+                <button onclick="setDifficulty(2)" class="diff-btn" data-level="2" style="padding:14px;background:#fff;border:2px solid #ddd;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+                    <span><strong>Lv.2</strong> 初级</span>
+                    <span style="font-size:11px;color:#666;">1.2倍积分</span>
+                </button>
+                <button onclick="setDifficulty(3)" class="diff-btn" data-level="3" style="padding:14px;background:#fff;border:2px solid #ddd;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+                    <span><strong>Lv.3</strong> 中级</span>
+                    <span style="font-size:11px;color:#666;">1.5倍积分</span>
+                </button>
+                <button onclick="setDifficulty(4)" class="diff-btn" data-level="4" style="padding:14px;background:#fff;border:2px solid #ddd;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+                    <span><strong>Lv.4</strong> 进阶</span>
+                    <span style="font-size:11px;color:#666;">2倍积分</span>
+                </button>
+                <button onclick="setDifficulty(5)" class="diff-btn" data-level="5" style="padding:14px;background:#fff;border:2px solid #ddd;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+                    <span><strong>Lv.5</strong> 挑战</span>
+                    <span style="font-size:11px;color:#666;">3倍积分</span>
+                </button>
+            </div>
+        </div>
+        <button onclick="closeDifficultyModal()" style="width:100%;padding:12px;background:#f0f0f0;border:none;border-radius:8px;cursor:pointer;font-size:14px;">取消</button>
+    </div>
+</div>
+
 <!-- 修改信息模态框 -->
 <div id="edit-profile-modal" class="modal-overlay">
     <div class="modal-content" style="max-width:350px;">
@@ -7691,10 +7724,10 @@ function openDifficultyModal() {
     const userData = getCurrentUserData();
     const currentLevel = userData ? userData.difficulty : 1;
     // 高亮当前选中的按钮
-    document.querySelectorAll('.level-btn').forEach(btn => {
-        btn.style.borderColor = btn.dataset.level == currentLevel ? '#3377FF' : '#ddd';
-        btn.style.background = btn.dataset.level == currentLevel ? '#E8F4FF' : 'white';
-        btn.style.color = btn.dataset.level == currentLevel ? '#3377FF' : '#333';
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+        const isSelected = btn.dataset.level == currentLevel;
+        btn.style.borderColor = isSelected ? '#1A6BFF' : '#ddd';
+        btn.style.background = isSelected ? '#E8F4FF' : 'white';
     });
     document.getElementById('difficulty-modal').classList.add('show');
 }
@@ -7709,17 +7742,21 @@ function setDifficulty(level) {
         userData.difficulty = level;
         syncUserData(userData);
         // 更新首页难度显示
-        document.getElementById('difficulty-text').textContent = 'Lv.' + level;
+        const diffText = document.getElementById('difficulty-text');
+        if (diffText) diffText.textContent = 'Lv.' + level;
+        // 更新设置面板难度显示
+        const settingsDiff = document.getElementById('settings-difficulty-display');
+        if (settingsDiff) settingsDiff.textContent = 'Lv.' + level;
         // 更新下拉菜单中的难度信息
         const dropInfoEl = document.getElementById('dropdown-info');
         if (dropInfoEl) {
             dropInfoEl.textContent = gradeNames[userData.grade] + ' · Lv.' + level;
         }
         // 高亮当前选中的按钮
-        document.querySelectorAll('.level-btn').forEach(btn => {
-            btn.style.borderColor = btn.dataset.level == level ? '#3377FF' : '#ddd';
-            btn.style.background = btn.dataset.level == level ? '#E8F4FF' : 'white';
-            btn.style.color = btn.dataset.level == level ? '#3377FF' : '#333';
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            const isSelected = btn.dataset.level == level;
+            btn.style.borderColor = isSelected ? '#1A6BFF' : '#ddd';
+            btn.style.background = isSelected ? '#E8F4FF' : 'white';
         });
         showToast('难度已调整为 Lv.' + level);
     }
