@@ -3476,21 +3476,29 @@ function renderGames(container) {
     const gameCounts = user?.gameCounts || {};
     const gameTimes = user?.gameTimes || {};
     
-    const games = [
-        {id:'schulte',icon:'👁',name:'舒尔特方格',desc:'注意力训练',color:'#3377FF',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
-        {id:'visual',icon:'🔍',name:'视觉搜索',desc:'观察力训练',color:'#FF6B6B',gradient:'linear-gradient(135deg,#f093fb,#f5576c)'},
-        {id:'digit',icon:'🔢',name:'数字记忆',desc:'记忆力训练',color:'#9B59B6',gradient:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
-        {id:'pattern',icon:'🎨',name:'图案匹配',desc:'思维训练',color:'#43E97B',gradient:'linear-gradient(135deg,#43e97b,#38f9d7)'},
-        {id:'tap',icon:'⚡',name:'快速点击',desc:'反应速度',color:'#FFD93D',gradient:'linear-gradient(135deg,#f6d365,#fda085)'},
-        {id:'color',icon:'🌈',name:'色彩识别',desc:'辨色能力',color:'#4ECDC4',gradient:'linear-gradient(135deg,#4facfe,#00f2fe)'},
-        {id:'diff',icon:'🔎',name:'找不同',desc:'细节观察',color:'#FA709A',gradient:'linear-gradient(135deg,#fa709a,#fee140)'},
-        {id:'reason',icon:'🧩',name:'逻辑推理',desc:'思维能力',color:'#667eea',gradient:'linear-gradient(135deg,#667eea,#764ba2)'}
-    ];
+	    const games = [
+	        {id:'schulte',icon:'👁',name:'舒尔特方格',desc:'注意力训练',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
+	        {id:'visual',icon:'🔍',name:'视觉搜索',desc:'观察力训练',gradient:'linear-gradient(135deg,#f093fb,#f5576c)'},
+	        {id:'digit',icon:'🔢',name:'数字记忆',desc:'记忆力训练',gradient:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
+	        {id:'pattern',icon:'🎨',name:'图案匹配',desc:'思维训练',gradient:'linear-gradient(135deg,#43e97b,#38f9d7)'},
+	        {id:'tap',icon:'⚡',name:'快速点击',desc:'反应速度',gradient:'linear-gradient(135deg,#f6d365,#fda085)'},
+	        {id:'color',icon:'🌈',name:'色彩识别',desc:'辨色能力',gradient:'linear-gradient(135deg,#4facfe,#00f2fe)'},
+	        {id:'diff',icon:'🔎',name:'找不同',desc:'细节观察',gradient:'linear-gradient(135deg,#fa709a,#fee140)'},
+	        {id:'reason',icon:'🧩',name:'逻辑推理',desc:'思维能力',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
+	        {id:'text',icon:'📝',name:'文字记忆',desc:'记忆训练',gradient:'linear-gradient(135deg,#e0c3fc,#8ec5fc)'},
+	        {id:'shape',icon:'🔷',name:'图形推理',desc:'逻辑训练',gradient:'linear-gradient(135deg,#ffecd2,#fcb69f)'},
+	        {id:'math',icon:'🔢',name:'数学速算',desc:'计算训练',gradient:'linear-gradient(135deg,#a1c4fd,#c2e9fb)'},
+	        {id:'space',icon:'🎲',name:'空间旋转',desc:'空间想象',gradient:'linear-gradient(135deg,#d299c2,#fef9d7)'},
+	        {id:'audio',icon:'🎧',name:'听音辨位',desc:'听觉训练',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'},
+	        {id:'word',icon:'💬',name:'词汇联想',desc:'语言训练',gradient:'linear-gradient(135deg,#fddb92,#d1fdff)'},
+	        {id:'classify',icon:'📂',name:'分类归纳',desc:'思维训练',gradient:'linear-gradient(135deg,#c1dfc4,#deecfd)'},
+	        {id:'attention',icon:'🎯',name:'注意力追踪',desc:'专注训练',gradient:'linear-gradient(135deg,#ff9a9e,#fecfef)'}
+	    ];
     
     container.innerHTML = `
         <div class="card">
             <h3 style="margin-bottom:12px;">🎮 认知训练游戏</h3>
-            <p style="color:#666;font-size:13px;margin-bottom:16px;">8大游戏全面提升认知能力！</p>
+            <p style="color:#666;font-size:13px;margin-bottom:16px;">16大游戏全面提升认知能力！</p>
             
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
                 ${games.map(g => `
@@ -4666,6 +4674,14 @@ function startGame(type) {
             case 'color': startColor(); break;
             case 'diff': startDiff(); break;
             case 'reason': startReason(); break;
+            case 'text': startTextMemory(); break;
+            case 'shape': startShapeReason(); break;
+            case 'math': startMathCalc(); break;
+            case 'space': startSpaceRotate(); break;
+            case 'audio': startAudioPosition(); break;
+            case 'word': startWordAssociation(); break;
+            case 'classify': startClassification(); break;
+            case 'attention': startAttentionTrack(); break;
         }
     }, 100);
 }
@@ -5009,11 +5025,405 @@ function endGame() {
 }
 
 function resetGame() { startGame(gameType); }
+
+function exitGame() {
+    if (gameTimer) clearInterval(gameTimer);
+    if (gameTimerDisplay) clearInterval(gameTimerDisplay);
+    const gameContainer = document.getElementById('game-fullscreen-container');
+    if (gameContainer) gameContainer.style.display = 'none';
+}
+
 function closeGame() { 
     if (gameTimer) clearInterval(gameTimer); 
     if (gameTimerDisplay) clearInterval(gameTimerDisplay);
     const gameContainer = document.getElementById('game-fullscreen-container');
     if (gameContainer) gameContainer.style.display = 'none';
+}
+
+
+// ====== 8大新游戏函数 ======
+
+// 文字记忆游戏
+let textMemoryWords = [];
+let textMemoryIndex = 0;
+
+function startTextMemory() {
+    document.getElementById('game-title').textContent = '📝 文字记忆';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const wordCounts = [4, 5, 6, 7, 8];
+    const count = wordCounts[Math.min(gameLevel - 1, 4)];
+    const allWords = ['苹果', '香蕉', '电脑', '书本', '桌子', '椅子', '窗户', '门', '天空', '大地', '海洋', '山峰', '河流', '森林', '沙漠', '草原', '城市', '乡村', '学校', '医院', '商店', '工厂', '车站', '机场'];
+    textMemoryWords = allWords.sort(() => Math.random() - 0.5).slice(0, count);
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">请记住以下词语：</div><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">' + textMemoryWords.map(w => '<span style="background:#667eea;color:white;padding:8px 14px;border-radius:8px;font-size:14px;">' + w + '</span>').join('') + '</div><button onclick="textMemoryStartTest()" style="width:100%;padding:14px;background:#667eea;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">我记住了，开始测试</button></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function textMemoryStartTest() {
+    const board = document.getElementById('game-board');
+    const allWords = ['苹果', '香蕉', '电脑', '书本', '桌子', '椅子', '窗户', '门', '天空', '大地', '海洋', '山峰', '河流', '森林', '沙漠', '草原', '城市', '乡村', '学校', '医院', '商店', '工厂', '车站', '机场'];
+    const distractors = allWords.filter(w => !textMemoryWords.includes(w)).sort(() => Math.random() - 0.5).slice(0, textMemoryWords.length);
+    const testWords = [...textMemoryWords, ...distractors].sort(() => Math.random() - 0.5);
+    textMemoryIndex = 0;
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">请判断这些词是否在刚才的记忆中：</div><div id="text-memory-word" style="font-size:24px;font-weight:bold;text-align:center;margin-bottom:20px;color:#333;">' + testWords[0] + '</div><div style="display:flex;gap:12px;"><button onclick="textMemoryCheck(true)" style="flex:1;padding:14px;background:#43E97B;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">✓ 见过</button><button onclick="textMemoryCheck(false)" style="flex:1;padding:14px;background:#FF6B6B;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">✗ 没见</button></div></div>';
+}
+
+function textMemoryCheck(answeredYes) {
+    const allWords = ['苹果', '香蕉', '电脑', '书本', '桌子', '椅子', '窗户', '门', '天空', '大地', '海洋', '山峰', '河流', '森林', '沙漠', '草原', '城市', '乡村', '学校', '医院', '商店', '工厂', '车站', '机场'];
+    const distractors = allWords.filter(w => !textMemoryWords.includes(w)).sort(() => Math.random() - 0.5).slice(0, textMemoryWords.length);
+    const testWords = [...textMemoryWords, ...distractors].sort(() => Math.random() - 0.5);
+    const currentWord = testWords[textMemoryIndex];
+    const wasInMemory = textMemoryWords.includes(currentWord);
+    if (answeredYes === wasInMemory) { gameScore++; document.getElementById('game-score').textContent = gameScore; SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    textMemoryIndex++;
+    if (textMemoryIndex >= testWords.length) {
+        const board = document.getElementById('game-board');
+        board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;text-align:center;"><div style="font-size:48px;margin-bottom:16px;">' + (gameScore >= testWords.length * 0.7 ? '🎉' : '👍') + '</div><div style="font-size:20px;font-weight:bold;margin-bottom:8px;">正确 ' + gameScore + '/' + testWords.length + '</div><button onclick="textMemoryNext()" style="padding:12px 24px;background:#667eea;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">再来一次</button></div>';
+    } else {
+        document.getElementById('text-memory-word').textContent = testWords[textMemoryIndex];
+    }
+}
+
+function textMemoryNext() { if (gameLevel < 5) { gameLevel++; updateGameLevelBadge(); } startTextMemory(); }
+
+// 图形推理游戏
+let shapePattern = [], shapeOptions = [], shapeCorrect = 0;
+
+function startShapeReason() {
+    document.getElementById('game-title').textContent = '🔷 图形推理';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const shapes = ['●', '■', '▲', '◆', '★'], colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#667eea', '#43E97B'];
+    const baseShapes = [];
+    for (let i = 0; i < 4; i++) baseShapes.push({ shape: shapes[Math.floor(Math.random() * shapes.length)], color: colors[Math.floor(Math.random() * colors.length)] });
+    shapePattern = [...baseShapes];
+    shapeCorrect = Math.floor(Math.random() * 4);
+    const correctAnswer = baseShapes[shapeCorrect];
+    shapeOptions = [correctAnswer];
+    for (let i = 0; i < 3; i++) shapeOptions.push({ shape: shapes[Math.floor(Math.random() * shapes.length)], color: colors[Math.floor(Math.random() * colors.length)] });
+    shapeOptions = shapeOptions.sort(() => Math.random() - 0.5);
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">找出规律，预测缺失的图形：</div><div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap;">' + shapePattern.map((s, i) => i === shapeCorrect ? '<div style="width:50px;height:50px;border:2px dashed #999;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;">?</div>' : '<div style="width:50px;height:50px;background:' + s.color + '20;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px;color:' + s.color + ';">' + s.shape + '</div>').join('') + '</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">' + shapeOptions.map((s, i) => '<div onclick="checkShapeReason(' + i + ')" style="width:60px;height:60px;background:' + s.color + '20;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;border:2px solid transparent;" id="shape-opt-' + i + '">' + s.shape + '</div>').join('') + '</div></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function checkShapeReason(index) {
+    const option = shapeOptions[index];
+    const correct = option.shape === shapePattern[shapeCorrect].shape && option.color === shapePattern[shapeCorrect].color;
+    shapeOptions.forEach((s, i) => {
+        const el = document.getElementById('shape-opt-' + i);
+        const isCorrectOption = s.shape === shapePattern[shapeCorrect].shape && s.color === shapePattern[shapeCorrect].color;
+        el.style.borderColor = isCorrectOption ? '#43E97B' : '#FF6B6B';
+        el.style.pointerEvents = 'none';
+    });
+    if (correct) { gameScore++; document.getElementById('game-score').textContent = gameScore; SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    setTimeout(() => { if (gameLevel < 5) { gameLevel++; updateGameLevelBadge(); } startShapeReason(); }, 1000);
+}
+
+// 数学速算游戏
+let mathCorrectAnswer = 0;
+
+function startMathCalc() {
+    document.getElementById('game-title').textContent = '🔢 数学速算';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const difficulties = [{ ops: ['+', '-'], max: 20 }, { ops: ['+', '-'], max: 50 }, { ops: ['+', '-', '×'], max: 12 }, { ops: ['+', '-', '×'], max: 20 }, { ops: ['+', '-', '×', '÷'], max: 20 }];
+    const diff = difficulties[Math.min(gameLevel - 1, 4)];
+    const op = diff.ops[Math.floor(Math.random() * diff.ops.length)];
+    let a, b, answer;
+    if (op === '+') { a = Math.floor(Math.random() * diff.max) + 1; b = Math.floor(Math.random() * diff.max) + 1; answer = a + b; }
+    else if (op === '-') { a = Math.floor(Math.random() * diff.max) + 5; b = Math.floor(Math.random() * Math.min(a, diff.max)) + 1; answer = a - b; }
+    else if (op === '×') { a = Math.floor(Math.random() * 12) + 1; b = Math.floor(Math.random() * 12) + 1; answer = a * b; }
+    else { b = Math.floor(Math.random() * 10) + 2; answer = Math.floor(Math.random() * 10) + 1; a = b * answer; }
+    mathCorrectAnswer = answer;
+    const options = [answer];
+    while (options.length < 4) { const wrong = answer + Math.floor(Math.random() * 11) - 5; if (wrong > 0 && wrong !== answer && !options.includes(wrong)) options.push(wrong); }
+    options.sort(() => Math.random() - 0.5);
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:16px;color:#666;margin-bottom:20px;">请快速计算：</div><div style="font-size:36px;font-weight:bold;text-align:center;margin-bottom:24px;color:#333;">' + a + ' ' + op + ' ' + b + ' = ?</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">' + options.map(o => '<button onclick="checkMathAnswer(' + o + ')" style="padding:20px;font-size:24px;background:#f5f7ff;border:2px solid #ddd;border-radius:12px;cursor:pointer;font-weight:bold;" id="math-opt-' + o + '">' + o + '</button>').join('') + '</div></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function checkMathAnswer(answer) {
+    const isCorrect = answer === mathCorrectAnswer;
+    document.querySelectorAll('[id^="math-opt-"]').forEach(el => {
+        const val = parseInt(el.textContent);
+        el.style.background = val === mathCorrectAnswer ? '#43E97B' : (val === answer ? '#FF6B6B' : '#f5f7ff');
+        el.style.color = (val === mathCorrectAnswer || val === answer) ? 'white' : '#333';
+    });
+    if (isCorrect) { gameScore++; document.getElementById('game-score').textContent = gameScore; SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    setTimeout(() => { startMathCalc(); }, 800);
+}
+
+// 空间旋转游戏
+function startSpaceRotate() {
+    document.getElementById('game-title').textContent = '🎲 空间旋转';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const shapes = ['↑', '→', '↓', '←'];
+    const original = shapes[Math.floor(Math.random() * shapes.length)];
+    const rotations = [0, 90, 180, 270];
+    const targetRotation = rotations[Math.floor(Math.random() * rotations.length)];
+    const degrees = { '↑': 0, '→': 90, '↓': 180, '←': 270 };
+    const getShape = (base, rot) => { const baseDeg = degrees[base]; const newDeg = (baseDeg + rot) % 360; return Object.entries(degrees).find(([_, d]) => d === newDeg)?.[0] || '↑'; };
+    const rotatedShape = getShape(original, targetRotation);
+    const options = [rotatedShape, ...shapes.filter(s => s !== rotatedShape)].slice(0, 4).sort(() => Math.random() - 0.5);
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">原图形旋转后是什么方向？</div><div style="display:flex;gap:24px;justify-content:center;margin-bottom:16px;align-items:center;"><div style="text-align:center;"><div style="font-size:12px;color:#999;margin-bottom:8px;">原图形</div><div style="width:70px;height:70px;background:#f5f7ff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;">' + original + '</div></div><div style="font-size:24px;color:#667eea;">→</div><div style="text-align:center;"><div style="font-size:12px;color:#999;margin-bottom:8px;">旋转' + targetRotation + '°</div><div style="width:70px;height:70px;background:#f5f7ff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;">？</div></div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">' + options.map((s, i) => '<div onclick="checkSpaceRotate(\'' + s + '\', \'' + rotatedShape + '\')" style="width:60px;height:60px;background:#f5f7ff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;border:2px solid transparent;" id="space-opt-' + i + '">' + s + '</div>').join('') + '</div></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function checkSpaceRotate(answer, correct) {
+    const isCorrect = answer === correct;
+    document.querySelectorAll('[id^="space-opt-"]').forEach(el => {
+        const val = el.textContent;
+        el.style.borderColor = val === correct ? '#43E97B' : (val === answer && !isCorrect ? '#FF6B6B' : 'transparent');
+    });
+    if (isCorrect) { gameScore++; document.getElementById('game-score').textContent = gameScore; SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    setTimeout(() => { startSpaceRotate(); }, 1000);
+}
+
+// 听音辨位游戏
+let audioSequence = [], audioIndex = 0;
+
+function startAudioPosition() {
+    document.getElementById('game-title').textContent = '🎧 听音辨位';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const lengths = [3, 4, 5, 6, 7];
+    const seqLength = lengths[Math.min(gameLevel - 1, 4)];
+    audioSequence = [];
+    for (let i = 0; i < seqLength; i++) audioSequence.push(Math.floor(Math.random() * 3));
+    audioIndex = 0;
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">仔细听，按顺序点击播放顺序：</div><div id="audio-sequence-display" style="display:flex;gap:8px;justify-content:center;margin-bottom:20px;">' + audioSequence.map((_, i) => '<div id="audio-seq-' + i + '" style="width:36px;height:36px;background:#f0f0f0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;">' + (i + 1) + '</div>').join('') + '</div><div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px;"><button onclick="playAudioPos(0)" style="width:80px;height:80px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:16px;color:white;font-size:14px;cursor:pointer;">👈 左</button><button onclick="playAudioPos(1)" style="width:80px;height:80px;background:linear-gradient(135deg,#4ECDC4,#38F9D7);border:none;border-radius:16px;color:white;font-size:14px;cursor:pointer;">👆 中</button><button onclick="playAudioPos(2)" style="width:80px;height:80px;background:linear-gradient(135deg,#FF6B6B,#FF4757);border:none;border-radius:16px;color:white;font-size:14px;cursor:pointer;">👉 右</button></div><button onclick="startAudioSeq()" style="margin-top:16px;padding:12px 24px;background:#43E97B;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">开始播放序列</button></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function playAudioTone3(freq) {
+    SoundEffects.init();
+    const osc = SoundEffects.audioContext.createOscillator();
+    const gain = SoundEffects.audioContext.createGain();
+    osc.connect(gain);
+    gain.connect(SoundEffects.audioContext.destination);
+    osc.frequency.value = freq;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.3, SoundEffects.audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, SoundEffects.audioContext.currentTime + 0.4);
+    osc.start();
+    osc.stop(SoundEffects.audioContext.currentTime + 0.4);
+}
+
+async function startAudioSeq() {
+    const freqs = [440, 554, 659];
+    for (let i = 0; i < audioSequence.length; i++) {
+        await new Promise(resolve => {
+            setTimeout(() => {
+                playAudioTone3(freqs[audioSequence[i]]);
+                const el = document.getElementById('audio-seq-' + i);
+                if (el) { el.style.background = '#667eea'; el.style.color = 'white'; }
+                setTimeout(resolve, 500);
+            }, 500);
+        });
+    }
+}
+
+function playAudioPos(pos) {
+    const freqs = [440, 554, 659];
+    playAudioTone3(freqs[pos]);
+    const isCorrect = pos === audioSequence[audioIndex];
+    if (isCorrect) {
+        const el = document.getElementById('audio-seq-' + audioIndex);
+        if (el) { el.style.background = '#43E97B'; el.style.color = 'white'; }
+        gameScore++;
+        document.getElementById('game-score').textContent = gameScore;
+        audioIndex++;
+        SoundEffects.playCorrect();
+        if (audioIndex >= audioSequence.length) setTimeout(() => { if (gameLevel < 5) { gameLevel++; updateGameLevelBadge(); } startAudioPosition(); }, 1000);
+    } else {
+        SoundEffects.playWrong();
+        const el = document.getElementById('audio-seq-' + audioIndex);
+        if (el) el.style.background = '#FF6B6B';
+        audioIndex = 0;
+        setTimeout(() => {
+            for (let i = 0; i < audioSequence.length; i++) {
+                const seqEl = document.getElementById('audio-seq-' + i);
+                if (seqEl) { seqEl.style.background = '#f0f0f0'; seqEl.style.color = '#333'; }
+            }
+        }, 500);
+    }
+}
+
+// 词汇联想游戏
+function startWordAssociation() {
+    document.getElementById('game-title').textContent = '💬 词汇联想';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const categories = [
+        { name: '水果', words: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓'] },
+        { name: '动物', words: ['狗', '猫', '鸟', '鱼', '兔子', '猴子'] },
+        { name: '颜色', words: ['红色', '蓝色', '绿色', '黄色', '紫色', '橙色'] },
+        { name: '职业', words: ['医生', '老师', '警察', '厨师', '司机', '护士'] }
+    ];
+    const cat = categories[Math.floor(Math.random() * categories.length)];
+    const target = cat.words[Math.floor(Math.random() * cat.words.length)];
+    const correct = cat.words.filter(w => w !== target);
+    const otherWords = categories.filter(c => c.name !== cat.name).flatMap(c => c.words).sort(() => Math.random() - 0.5).slice(0, 3);
+    const wordOptions = [...correct.slice(0, 3), ...otherWords].sort(() => Math.random() - 0.5);
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">哪个词与"' + target + '"属于同一类别？</div><div style="font-size:20px;font-weight:bold;text-align:center;margin-bottom:20px;color:#667eea;">' + target + '</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">' + wordOptions.map((w, i) => '<button onclick="checkWordAssoc(\'' + w + '\', \'' + cat.name + '\')" style="padding:16px;background:#f5f7ff;border:2px solid #ddd;border-radius:12px;cursor:pointer;font-size:14px;font-weight:500;">' + w + '</button>').join('') + '</div></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function checkWordAssoc(answer, catName) {
+    const cat = [
+        { name: '水果', words: ['苹果', '香蕉', '橙子', '葡萄', '西瓜', '草莓'] },
+        { name: '动物', words: ['狗', '猫', '鸟', '鱼', '兔子', '猴子'] },
+        { name: '颜色', words: ['红色', '蓝色', '绿色', '黄色', '紫色', '橙色'] },
+        { name: '职业', words: ['医生', '老师', '警察', '厨师', '司机', '护士'] }
+    ].find(c => c.name === catName);
+    const isCorrect = cat && cat.words.includes(answer);
+    if (isCorrect) { gameScore++; document.getElementById('game-score').textContent = gameScore; SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    setTimeout(() => { startWordAssociation(); }, 800);
+}
+
+// 分类归纳游戏
+let classifyBox0 = [], classifyBox1 = [], classifySet = null;
+
+function startClassification() {
+    document.getElementById('game-title').textContent = '📂 分类归纳';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const sets = [
+        { cat1: '学习用品', cat2: '生活用品', items1: ['铅笔', '橡皮', '尺子'], items2: ['毛巾', '牙刷', '杯子'] },
+        { cat1: '水果', cat2: '蔬菜', items1: ['苹果', '香蕉', '橙子'], items2: ['白菜', '萝卜', '黄瓜'] },
+        { cat1: '交通工具', cat2: '学习用品', items1: ['汽车', '火车', '飞机'], items2: ['课本', '作业', '文具盒'] }
+    ];
+    classifySet = sets[Math.floor(Math.random() * sets.length)];
+    const items = [...classifySet.items1, ...classifySet.items2].sort(() => Math.random() - 0.5);
+    classifyBox0 = [];
+    classifyBox1 = [];
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">请将物品分成两类：</div><div id="classify-items" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;">' + items.map((item, i) => '<div onclick="classifyItem(this, \'' + item + '\')" style="padding:10px 16px;background:#f5f7ff;border:2px solid #ddd;border-radius:10px;cursor:pointer;font-size:14px;">' + item + '</div>').join('') + '</div><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px;"><div style="padding:12px;background:rgba(102,126,234,0.1);border-radius:12px;text-align:center;border:2px dashed #667eea;"><div style="font-size:12px;color:#667eea;margin-bottom:8px;">第一类</div><div id="classify-box-0" style="min-height:60px;"></div></div><div style="padding:12px;background:rgba(255,107,107,0.1);border-radius:12px;text-align:center;border:2px dashed #FF6B6B;"><div style="font-size:12px;color:#FF6B6B;margin-bottom:8px;">第二类</div><div id="classify-box-1" style="min-height:60px;"></div></div></div><button onclick="checkClassification()" style="width:100%;padding:12px;background:#667eea;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">确认分类</button></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function classifyItem(el, item) {
+    el.remove();
+    if (classifyBox0.length <= classifyBox1.length) {
+        classifyBox0.push(item);
+        document.getElementById('classify-box-0').innerHTML += '<div onclick="unclassifyItem(this, \'' + item + '\', 0)" style="display:inline-block;padding:6px 10px;background:#667eea;color:white;border-radius:6px;font-size:12px;margin:4px;cursor:pointer;">' + item + '</div>';
+    } else {
+        classifyBox1.push(item);
+        document.getElementById('classify-box-1').innerHTML += '<div onclick="unclassifyItem(this, \'' + item + '\', 1)" style="display:inline-block;padding:6px 10px;background:#FF6B6B;color:white;border-radius:6px;font-size:12px;margin:4px;cursor:pointer;">' + item + '</div>';
+    }
+}
+
+function unclassifyItem(el, item, box) {
+    el.remove();
+    if (box === 0) classifyBox0 = classifyBox0.filter(i => i !== item);
+    else classifyBox1 = classifyBox1.filter(i => i !== item);
+    const itemsDiv = document.getElementById('classify-items');
+    if (itemsDiv) {
+        const newEl = document.createElement('div');
+        newEl.style.cssText = 'padding:10px 16px;background:#f5f7ff;border:2px solid #ddd;border-radius:10px;cursor:pointer;font-size:14px;';
+        newEl.textContent = item;
+        newEl.onclick = function() { classifyItem(this, item); };
+        itemsDiv.appendChild(newEl);
+    }
+}
+
+function checkClassification() {
+    if (!classifySet) return;
+    let correct0 = 0;
+    classifyBox0.forEach(item => { if (classifySet.items1.includes(item)) correct0++; });
+    let correct1 = 0;
+    classifyBox1.forEach(item => { if (classifySet.items2.includes(item)) correct1++; });
+    const total = classifyBox0.length + classifyBox1.length;
+    const correctTotal = correct0 + correct1;
+    const accuracy = total > 0 ? correctTotal / (classifySet.items1.length + classifySet.items2.length) : 0;
+    if (accuracy >= 0.7) { gameScore = Math.round(accuracy * 100); SoundEffects.playCorrect(); }
+    else { SoundEffects.playWrong(); }
+    document.getElementById('game-score').textContent = gameScore;
+    const board = document.getElementById('game-board');
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;text-align:center;"><div style="font-size:48px;margin-bottom:16px;">' + (accuracy >= 0.7 ? '🎉' : '👍') + '</div><div style="font-size:20px;font-weight:bold;margin-bottom:8px;">正确率 ' + Math.round(accuracy * 100) + '%</div><button onclick="startClassification()" style="padding:12px 24px;background:#667eea;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">再来一次</button></div>';
+}
+
+// 注意力追踪游戏
+let attentionSequence = [], attentionIndex = 0;
+
+function startAttentionTrack() {
+    document.getElementById('game-title').textContent = '🎯 注意力追踪';
+    const board = document.getElementById('game-board');
+    board.style.display = 'block';
+    board.style.textAlign = 'center';
+    const counts = [6, 9, 12, 16, 20];
+    const numCount = counts[Math.min(gameLevel - 1, 4)];
+    const gridSize = Math.ceil(Math.sqrt(numCount));
+    const colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#667eea', '#43E97B', '#FF9A9E'];
+    attentionSequence = [];
+    for (let i = 0; i < numCount; i++) attentionSequence.push({ color: colors[i % colors.length], number: i + 1 });
+    attentionSequence = attentionSequence.sort(() => Math.random() - 0.5);
+    attentionIndex = 0;
+    board.innerHTML = '<div style="background:white;border-radius:16px;padding:24px;max-width:320px;"><div style="font-size:14px;color:#666;margin-bottom:16px;">记住数字顺序，然后按顺序点击：</div><div id="attention-grid" style="display:grid;grid-template-columns:repeat(' + gridSize + ',1fr);gap:8px;margin-bottom:16px;">' + attentionSequence.map((item, i) => '<div id="att-item-' + i + '" style="aspect-ratio:1;background:' + item.color + ';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:white;opacity:0;transition:opacity 0.3s;cursor:pointer;" onclick="clickAttention(' + i + ')"></div>').join('') + '</div><button onclick="startAttentionSeq()" style="width:100%;padding:12px;background:#667eea;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">开始记忆</button></div>';
+    gameScore = 0;
+    document.getElementById('game-score').textContent = '0';
+}
+
+function startAttentionSeq() {
+    const sequence = attentionSequence.map((_, i) => i);
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i > 0) {
+            const prevEl = document.getElementById('att-item-' + sequence[i-1]);
+            if (prevEl) prevEl.textContent = '';
+        }
+        if (i < sequence.length) {
+            const el = document.getElementById('att-item-' + sequence[i]);
+            if (el) { el.textContent = attentionSequence[sequence[i]].number; el.style.opacity = '1'; }
+            playAudioTone3(400 + i * 50);
+            i++;
+        } else {
+            clearInterval(interval);
+            setTimeout(() => {
+                attentionSequence.forEach((_, idx) => {
+                    const el = document.getElementById('att-item-' + idx);
+                    if (el) { el.textContent = ''; el.style.opacity = '1'; }
+                });
+                attentionIndex = 0;
+            }, 500);
+        }
+    }, 600);
+}
+
+function clickAttention(index) {
+    const expectedIndex = attentionSequence[attentionIndex].number - 1;
+    const el = document.getElementById('att-item-' + index);
+    if (index === expectedIndex) {
+        gameScore++;
+        document.getElementById('game-score').textContent = gameScore;
+        if (el) { el.textContent = attentionSequence[index].number; el.style.background = '#43E97B'; }
+        SoundEffects.playCorrect();
+        attentionIndex++;
+        if (attentionIndex >= attentionSequence.length) setTimeout(() => { if (gameLevel < 5) { gameLevel++; updateGameLevelBadge(); } startAttentionTrack(); }, 1000);
+    } else {
+        if (el) el.style.background = '#FF6B6B';
+        SoundEffects.playWrong();
+        setTimeout(() => { startAttentionTrack(); }, 1000);
+    }
 }
 
 // ====== 初始化 ======
@@ -7877,5 +8287,33 @@ function submitTopicAnswer(topicId) {
 }
 
 </script>
+
+<!-- 游戏全屏容器 -->
+<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
+    <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
+        <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
+        <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
+        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
+    </div>
+    <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div>
+            <div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">最高分</div>
+            <div id="game-best-score" style="color:#FFD700;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div>
+            <div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div>
+        </div>
+    </div>
+    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;"></div>
+    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;">
+        <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
+        <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
+    </div>
+</div>
 </body>
 </html>
