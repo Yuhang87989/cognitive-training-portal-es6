@@ -3714,6 +3714,125 @@ function deleteLocalVideo(videoId) {
     showToast('视频已删除');
 }
 
+// ====== 音频上传功能 ======
+function handleAudioUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // 检查文件类型
+    const validExts = ['mp3', 'wav', 'm4a', 'aac', 'ogg', 'flac', 'wma'];
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    
+    if (!validExts.includes(fileExt) && !file.type.startsWith('audio/')) {
+        showToast('请上传音频文件（MP3、WAV、M4A等）');
+        return;
+    }
+    
+    // 检查文件大小（限制50MB）
+    if (file.size > 50 * 1024 * 1024) {
+        showToast('音频文件不能超过50MB');
+        return;
+    }
+    
+    const user = getCurrentUserData();
+    if (!user.localAudios) user.localAudios = [];
+    
+    const audioUrl = URL.createObjectURL(file);
+    
+    const audioData = {
+        id: 'local-audio-' + Date.now(),
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        url: audioUrl,
+        size: file.size,
+        type: file.type,
+        uploadTime: new Date().toLocaleString(),
+        duration: '未知'
+    };
+    
+    user.localAudios.push(audioData);
+    syncUserData(user);
+    
+    // 获取音频时长
+    const tempAudio = document.createElement('audio');
+    tempAudio.src = audioUrl;
+    tempAudio.onloadedmetadata = function() {
+        const mins = Math.floor(tempAudio.duration / 60);
+        const secs = Math.floor(tempAudio.duration % 60);
+        audioData.duration = mins + ':' + (secs < 10 ? '0' : '') + secs;
+        syncUserData(user);
+        renderLocalAudioList();
+    };
+    
+    showToast('音频上传成功！');
+    renderLocalAudioList();
+    input.value = '';
+}
+
+// 渲染本地音频列表
+function renderLocalAudioList() {
+    const user = getCurrentUserData();
+    const localAudios = user?.localAudios || [];
+    const listEl = document.getElementById('local-audio-list');
+    
+    if (!listEl) return;
+    
+    if (localAudios.length === 0) {
+        listEl.innerHTML = '<div style="font-size:12px;color:#999;text-align:center;padding:12px;">暂无本地音频</div>';
+        return;
+    }
+    
+    listEl.innerHTML = `
+        <div style="font-size:12px;color:#666;margin-bottom:8px;">📁 已上传 ${localAudios.length} 个音频</div>
+        ${localAudios.map(audio => `
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;">
+                <div style="font-size:24px;">🎵</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:500;">${audio.title}</div>
+                    <div style="font-size:11px;color:#999;">${audio.duration} · ${formatFileSize(audio.size)}</div>
+                </div>
+                <button onclick="playLocalAudio('${audio.id}')" style="background:#667eea;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">播放</button>
+                <button onclick="deleteLocalAudio('${audio.id}')" style="background:#ff6b6b;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>
+            </div>
+        `).join('')}
+    `;
+}
+
+// 播放本地音频
+function playLocalAudio(audioId) {
+    const user = getCurrentUserData();
+    const audio = user?.localAudios?.find(a => a.id === audioId);
+    if (!audio) return;
+    
+    const audioEl = document.getElementById('hidden-audio');
+    if (!audioEl) return;
+    
+    audioEl.src = audio.url;
+    audioEl.play().then(function() {
+        showMiniPlayer(audio.title, audio.duration);
+        showToast('正在播放: ' + audio.title);
+    }).catch(function(e) {
+        showToast('播放失败');
+    });
+}
+
+// 删除本地音频
+function deleteLocalAudio(audioId) {
+    if (!confirm('确定删除这个音频吗？')) return;
+    
+    const user = getCurrentUserData();
+    user.localAudios = user.localAudios.filter(a => a.id !== audioId);
+    syncUserData(user);
+    renderLocalAudioList();
+    showToast('音频已删除');
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
 // 打开增强版视频播放器
 function openEnhancedVideoPlayer(title, url, videoId) {
     const playerEl = document.getElementById('enhanced-video-player');
