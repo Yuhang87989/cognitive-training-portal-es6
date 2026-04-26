@@ -6574,70 +6574,98 @@ function closeGame() {
 
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('认知训练门户加载中...');
-    
-    // 加载用户数据
-    let data = loadData();
-    
-    // 如果没有用户数据，创建默认用户"邱宇菲"
-    if (!data.users || data.users.length === 0) {
-        const defaultUser = {
-            id: 'user_qiuyufei',
-            name: '邱宇菲',
-            grade: 7,
-            difficulty: 1,
-            points: 1142,
-            createdAt: new Date().toISOString(),
-            stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
-            weeklyProgress: {}, wrongNotes: [], completedTopics: []
-        };
-        data = { users: [defaultUser], currentUser: defaultUser.id };
-        saveData(data);
-        console.log('已创建默认用户: 邱宇菲');
-    }
-    
-    // 如果没有当前用户，设置为第一个用户
-    if (!data.currentUser && data.users.length > 0) {
-        data.currentUser = data.users[0].id;
-        saveData(data);
-    }
-    
-    // 获取当前用户
-    const currentUser = data.users.find(u => u.id === data.currentUser) || data.users[0];
-    
-    // 显示首页
-    showPage('home');
-    
-    // 更新用户名显示
-    if (currentUser) {
-        document.getElementById('greeting-name').textContent = currentUser.name;
-        document.getElementById('dropdown-name').textContent = currentUser.name;
-        document.getElementById('dropdown-info').textContent = (currentUser.grade ? ['五年级', '六年级', '初一', '初二', '初三'][currentUser.grade - 5] : '初一') + ' · Lv.' + (currentUser.difficulty || 1);
-        document.getElementById('difficulty-text').textContent = 'Lv.' + (currentUser.difficulty || 1);
-        document.getElementById('dropdown-difficulty').textContent = 'Lv.' + (currentUser.difficulty || 1);
-        document.getElementById('header-avatar').textContent = currentUser.name.charAt(0);
-        document.getElementById('header-avatar').style.background = 'linear-gradient(135deg, #FFD4B8, #FFB6C1)';
-        console.log('当前用户: ' + currentUser.name);
-    }
-    
-    console.log('初始化完成');
-    
-    // 点击外部关闭下拉菜单
-    document.addEventListener('click', (e) => {
-        try {
-            if (!e.target.closest('.user-select-wrapper')) { 
-                const dropdown = document.getElementById('user-select-dropdown');
-                if (dropdown) dropdown.classList.remove('show'); 
+    try {
+        console.log('认知训练门户 V117 加载中...');
+        
+        // 清除可能损坏的旧数据，强制重新初始化
+        const STORAGE_KEY = 'cognitive_training_v117';
+        const FORCE_RESET = false; // 设为true可强制重置数据
+        
+        if (FORCE_RESET) {
+            localStorage.removeItem(STORAGE_KEY);
+            console.log('已强制清除旧数据');
+        }
+        
+        // 加载用户数据
+        let data = loadData();
+        
+        // 如果没有用户数据，创建默认用户"邱宇菲"
+        if (!data.users || data.users.length === 0) {
+            const defaultUser = {
+                id: 'user_qiuyufei',
+                name: '邱宇菲',
+                grade: 7,
+                difficulty: 1,
+                points: 1142,
+                createdAt: new Date().toISOString(),
+                stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
+                weeklyProgress: {}, wrongNotes: [], completedTopics: []
+            };
+            data = { users: [defaultUser], currentUser: defaultUser.id };
+            saveData(data);
+            console.log('已创建默认用户: 邱宇菲');
+        }
+        
+        // 如果没有当前用户，设置为第一个用户
+        if (!data.currentUser && data.users.length > 0) {
+            data.currentUser = data.users[0].id;
+            saveData(data);
+        }
+        
+        // 获取当前用户
+        const currentUser = data.users.find(u => u.id === data.currentUser) || data.users[0];
+        
+        // 显示首页
+        showPage('home');
+        
+        // 安全更新用户名显示
+        if (currentUser) {
+            const greetingName = document.getElementById('greeting-name');
+            const dropdownName = document.getElementById('dropdown-name');
+            const dropdownInfo = document.getElementById('dropdown-info');
+            const difficultyText = document.getElementById('difficulty-text');
+            const dropdownDiff = document.getElementById('dropdown-difficulty');
+            const headerAvatar = document.getElementById('header-avatar');
+            
+            if (greetingName) greetingName.textContent = currentUser.name;
+            if (dropdownName) dropdownName.textContent = currentUser.name;
+            if (dropdownInfo) {
+                const gradeText = currentUser.grade ? ['五年级', '六年级', '初一', '初二', '初三'][currentUser.grade - 5] : '初一';
+                dropdownInfo.textContent = gradeText + ' · Lv.' + (currentUser.difficulty || 1);
             }
-            if (!e.target.closest('.user-menu-wrapper')) { 
-                const userDropdown = document.getElementById('user-dropdown');
-                if (userDropdown) userDropdown.classList.remove('show'); 
+            if (difficultyText) difficultyText.textContent = 'Lv.' + (currentUser.difficulty || 1);
+            if (dropdownDiff) dropdownDiff.textContent = 'Lv.' + (currentUser.difficulty || 1);
+            if (headerAvatar) {
+                headerAvatar.textContent = currentUser.name.charAt(0);
+                headerAvatar.style.background = 'linear-gradient(135deg, #FFD4B8, #FFB6C1)';
             }
-        } catch(err) {}
-    });
-    
-    // 同步数据
-    syncTodayStats();
+            console.log('当前用户: ' + currentUser.name);
+        }
+        
+        console.log('V117 初始化完成');
+        
+        // 点击外部关闭下拉菜单
+        document.addEventListener('click', (e) => {
+            try {
+                if (!e.target.closest('.user-select-wrapper')) { 
+                    const dropdown = document.getElementById('user-select-dropdown');
+                    if (dropdown) dropdown.classList.remove('show'); 
+                }
+                if (!e.target.closest('.user-menu-wrapper')) { 
+                    const userDropdown = document.getElementById('user-dropdown');
+                    if (userDropdown) userDropdown.classList.remove('show'); 
+                }
+            } catch(err) {}
+        });
+        
+        // 同步数据
+        try { syncTodayStats(); } catch(e) { console.log('同步跳过'); }
+        
+    } catch(error) {
+        console.error('初始化错误:', error);
+        // 显示首页，即使初始化失败
+        showPage('home');
+    }
 });
 
 // ====== 播客音频播放 ======
