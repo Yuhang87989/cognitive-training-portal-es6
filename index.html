@@ -2119,6 +2119,75 @@ function openFullscreenPage(module) {
 
 // ====== 模块渲染函数 ======
 
+function renderPractice(container) {
+    const user = getCurrentUserData();
+    const stats = user?.practiceStats || {total: 0, correct: 0, weakPoints: 0};
+    const wrongNotes = user?.wrongNotes || [];
+    
+    container.innerHTML = `
+        <div class="card">
+            <h3 style="margin-bottom:12px;">🎯 AI精准练</h3>
+            <p style="color:#666;font-size:13px;margin-bottom:16px;">智能诊断薄弱点，针对性练习提升</p>
+            
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
+                <div style="text-align:center;padding:16px;background:#f5f7ff;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#3377FF;">${stats.total}</div>
+                    <div style="font-size:12px;color:#666;">总题数</div>
+                </div>
+                <div style="text-align:center;padding:16px;background:#f0fff4;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#43E97B;">${stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0}%</div>
+                    <div style="font-size:12px;color:#666;">正确率</div>
+                </div>
+                <div style="text-align:center;padding:16px;background:#fff5f5;border-radius:12px;">
+                    <div style="font-size:24px;font-weight:bold;color:#FF6B6B;">${wrongNotes.length}</div>
+                    <div style="font-size:12px;color:#666;">薄弱点</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h4 style="margin-bottom:12px;">📷 拍照上传题目</h4>
+            <p style="font-size:12px;color:#666;margin-bottom:12px;">拍下你不会的题目，AI帮你分析讲解</p>
+            <input type="file" id="practice-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePracticePhoto(this)"/>
+            <button class="camera-btn" onclick="document.getElementById('practice-photo-input').click()">📷 拍照识别</button>
+        </div>
+        
+        <div class="card">
+            <h4 style="margin-bottom:12px;">✏️ 手动输入题目</h4>
+            <textarea id="practice-input" placeholder="输入你的问题..." style="width:100%;height:80px;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:14px;resize:none;"></textarea>
+            <button onclick="submitPracticeQuestion()" style="margin-top:12px;width:100%;padding:14px;background:linear-gradient(135deg,#3377FF,#4A90E2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">🔍 AI解答</button>
+        </div>
+        
+        <div class="card">
+            <h4 style="margin-bottom:12px;">📒 错题本</h4>
+            <button onclick="openFullscreenPage('wrongbook')" style="width:100%;padding:14px;background:linear-gradient(135deg,#FF6B6B,#FF9A63);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">查看错题 (${wrongNotes.length})</button>
+        </div>
+    `;
+}
+
+function handlePracticePhoto(input) {
+    if (!input.files[0]) return;
+    showToast('正在识别题目...');
+    // TODO: 调用AI识别图片
+    setTimeout(() => {
+        showToast('AI识别功能开发中');
+    }, 1000);
+}
+
+async function submitPracticeQuestion() {
+    const input = document.getElementById('practice-input');
+    if (!input || !input.value.trim()) {
+        showToast('请输入问题');
+        return;
+    }
+    
+    showToast('AI正在思考...');
+    // TODO: 调用DeepSeek API
+    setTimeout(() => {
+        showToast('AI解答功能开发中');
+    }, 1000);
+}
+
 
 function renderMap(container) {
     container.innerHTML = `
