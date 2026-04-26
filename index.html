@@ -371,13 +371,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 
     <div class="module-section">
         <div class="module-grid">
-            <button class="module-btn gradient-purple" onclick="openFullscreenPage('avatar')">
-                <div class="module-icon">🎓</div>
-                <div class="module-name">AI数字分身</div>
-                <div class="module-desc">5位AI老师</div>
-            </button>
-                <div class="module-desc">100人互动</div>
-            </button>
             <button class="module-btn gradient-orange" onclick="openFullscreenPage('practice')">
                 <span class="module-tag" style="background:#667eea;">AI</span>
                 <div class="module-icon">🎯</div>
@@ -410,10 +403,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="module-name">思维训练</div>
                 <div class="module-desc">四维能力提升</div>
             </button>
-            <button class="module-btn gradient-blue" onclick="showToast('播客功能已禁用')">
+            <button class="module-btn gradient-blue" onclick="openFullscreenPage('podcast')">
                 <div class="module-icon">🎧</div>
                 <div class="module-name">播客课堂</div>
-                <div class="module-desc">音频学习</div>
+                <div class="module-desc">21个音频课程</div>
             </button>
             <button class="module-btn gradient-orange" onclick="openFullscreenPage('video')">
                 <div class="module-icon">📺</div>
@@ -2078,7 +2071,6 @@ function openFullscreenPage(module) {
     if (!container || !titleEl || !contentEl) return;
     
     const moduleTitles = {
-        'avatar': '🎓 AI数字分身',
         'practice': '🎯 AI精准练',
         'map': '🧠 认知地图',
         'plan': '📅 学习计划',
@@ -2095,7 +2087,6 @@ function openFullscreenPage(module) {
     titleEl.textContent = moduleTitles[module] || '模块';
     
     switch(module) {
-        case 'avatar': renderAvatar(contentEl); break;
         case 'practice': renderPractice(contentEl); break;
         case 'map': renderMap(contentEl); break;
         case 'plan': renderPlan(contentEl); break;
@@ -2114,295 +2105,6 @@ function openFullscreenPage(module) {
 
 // ====== 模块渲染函数 ======
 
-// AI数字分身数据
-const aiTeachers = [
-    {id:'math',name:'数学老师',icon:'📐',desc:'专注初中数学，善于总结解题技巧',subject:'数学'},
-    {id:'chinese',name:'语文老师',icon:'📝',desc:'精通古诗文阅读与写作',subject:'语文'},
-    {id:'english',name:'英语老师',icon:'📖',desc:'语法精讲，口语练习',subject:'英语'},
-    {id:'physics',name:'物理老师',icon:'⚡',desc:'物理解题模型建构',subject:'物理'},
-    {id:'chemistry',name:'化学老师',icon:'🧪',desc:'化学反应原理与实验',subject:'化学'},
-];
-
-// AI数字分身对话历史
-let avatarConversationHistory = [];
-let currentTeacherId = 'math';
-
-function renderAvatar(container) {
-    // 获取当前选中的老师
-    const teacher = aiTeachers.find(t => t.id === currentTeacherId) || aiTeachers[0];
-    
-    container.innerHTML = `
-        <div class="card">
-            <h3 style="margin-bottom:12px;">🎓 AI数字分身</h3>
-            <p style="color:#666;font-size:13px;margin-bottom:16px;">选择你的AI导师，开始智能学习之旅！</p>
-        </div>
-        <div class="teacher-list">
-            ${aiTeachers.map(t => `
-            <div class="teacher-item ${t.id === currentTeacherId ? 'active' : ''}" onclick="selectTeacher('${t.id}', this)">
-                <div class="teacher-avatar" style="background:${getTeacherGradient(t.id)};">${t.icon}</div>
-                <div class="teacher-name">${t.name}</div>
-                <div class="teacher-subject">${t.subject}</div>
-            </div>
-            `).join('')}
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <h4 style="margin-bottom:12px;">🚀 在线课堂</h4>
-            <p style="color:#666;font-size:13px;margin-bottom:16px;">实时互动课堂，支持100人同时在线</p>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;">
-                <div style="text-align:center;padding:12px 6px;background:#f5f7ff;border-radius:8px;">
-                    <div style="font-size:18px;">👥</div>
-                    <div style="font-size:11px;color:#666;margin-top:4px;">100人</div>
-                </div>
-                <div style="text-align:center;padding:12px 6px;background:#f5f7ff;border-radius:8px;">
-                    <div style="font-size:18px;">📹</div>
-                    <div style="font-size:11px;color:#666;margin-top:4px;">实时互动</div>
-                </div>
-                <div style="text-align:center;padding:12px 6px;background:#f5f7ff;border-radius:8px;">
-                    <div style="font-size:18px;">📋</div>
-                    <div style="font-size:11px;color:#666;margin-top:4px;">白板</div>
-                </div>
-            </div>
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div style="width:48px;height:48px;border-radius:50%;background:${getTeacherGradient(teacher.id)};display:flex;align-items:center;justify-content:center;font-size:24px;">${teacher.icon}</div>
-                <div>
-                    <div style="font-weight:600;">${teacher.name}</div>
-                    <div style="font-size:12px;color:#666;">${teacher.desc}</div>
-                </div>
-            </div>
-        </div>
-        <div class="chat-container" style="height:350px;margin-top:12px;">
-            <div class="chat-messages" id="avatar-messages">
-                <div class="chat-msg"><div class="chat-avatar">${teacher.icon}</div><div class="chat-bubble">你好！我是${teacher.name}，有什么学习上的问题可以问我哦！</div></div>
-            </div>
-            <div class="chat-input-area">
-                <button class="chat-voice-btn" id="avatar-voice-btn" onclick="toggleAvatarVoice()" title="语音输入">🎤</button>
-                <input type="text" class="chat-input" id="avatar-input" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendToAvatar()">
-                <button class="chat-send" onclick="sendToAvatar()">发送</button>
-            </div>
-        </div>
-        <div class="template-btns" style="margin-top:12px;">
-            <button class="template-btn" onclick="askAvatarTemplate('帮我出一道${teacher.subject}练习题')">出题</button>
-            <button class="template-btn" onclick="askAvatarTemplate('解释一个学习技巧')">技巧</button>
-            <button class="template-btn" onclick="askAvatarTemplate('制定本周学习计划')">计划</button>
-        </div>
-    `;
-    
-    // 初始化对话历史
-    initAvatarHistory();
-}
-
-function getTeacherGradient(id) {
-    const gradients = {
-        'math': 'linear-gradient(135deg,#667eea,#764ba2)',
-        'chinese': 'linear-gradient(135deg,#FF9A63,#E87A4E)',
-        'english': 'linear-gradient(135deg,#43E97B,#38F9D7)',
-        'physics': 'linear-gradient(135deg,#4facfe,#00f2fe)',
-        'chemistry': 'linear-gradient(135deg,#FFB6C1,#FF9A63)'
-    };
-    return gradients[id] || gradients['math'];
-}
-
-function selectTeacher(subject, el) {
-    currentTeacherId = subject;
-    document.querySelectorAll('.teacher-item').forEach(item => item.classList.remove('active'));
-    if (el) el.classList.add('active');
-    
-    const teacher = aiTeachers.find(t => t.id === subject);
-    showToast('已切换到' + (teacher ? teacher.name : '老师'));
-    
-    // 重新渲染AI数字分身界面
-    const container = document.getElementById('fullscreen-content');
-    if (container) renderAvatar(container);
-}
-
-function initAvatarHistory() {
-    const teacher = aiTeachers.find(t => t.id === currentTeacherId) || aiTeachers[0];
-    avatarConversationHistory = [
-        {role: 'system', content: `你是一个友好的AI学习助手，扮演${teacher.name}的角色，专门帮助青少年解答${teacher.subject}学习问题。请用简洁、易懂的语言回答，保持积极鼓励的态度。你擅长讲解${teacher.subject}知识，解题技巧和学习方法。`}
-    ];
-}
-
-async function sendToAvatar() {
-    const input = document.getElementById('avatar-input');
-    if (!input) return;
-    const msg = input.value.trim();
-    if (!msg) return;
-    
-    const messages = document.getElementById('avatar-messages');
-    if (!messages) return;
-    
-    const teacher = aiTeachers.find(t => t.id === currentTeacherId) || aiTeachers[0];
-    
-    // 添加用户消息
-    messages.innerHTML += '<div class="chat-msg user"><div class="chat-avatar">👤</div><div class="chat-bubble">' + escapeHtml(msg) + '</div></div>';
-    input.value = '';
-    messages.innerHTML += '<div class="chat-msg"><div class="chat-avatar">' + teacher.icon + '</div><div class="chat-bubble ai-loading">思考中<span class="loading-dots"><span></span><span></span><span></span></span></div></div>';
-    messages.scrollTop = messages.scrollHeight;
-    
-    // 添加用户消息到历史
-    avatarConversationHistory.push({role: 'user', content: msg});
-    
-    try {
-        const result = await callDeepSeekAPI(avatarConversationHistory, 0.7);
-        const bubbles = messages.querySelectorAll('.chat-bubble');
-        
-        if (result.error) {
-            if (bubbles.length > 0) {
-                bubbles[bubbles.length - 1].innerHTML = '❌ ' + result.message;
-            }
-        } else {
-            const responseContent = result.content;
-            if (bubbles.length > 0) {
-                bubbles[bubbles.length - 1].innerHTML = formatAIResponse(responseContent);
-            }
-            // 添加AI回复到历史
-            avatarConversationHistory.push({role: 'assistant', content: responseContent});
-            // 自动朗读AI回复
-            speakText(responseContent);
-        }
-    } catch (error) {
-        const bubbles = messages.querySelectorAll('.chat-bubble');
-        if (bubbles.length > 0) {
-            bubbles[bubbles.length - 1].innerHTML = '❌ 发生错误，请稍后重试。';
-        }
-    }
-    
-    messages.scrollTop = messages.scrollHeight;
-}
-
-function askAvatarTemplate(question) {
-    const input = document.getElementById('avatar-input');
-    if (input) { input.value = question; sendToAvatar(); }
-}
-
-// 语音输入功能
-let avatarRecognition = null;
-let isAvatarRecording = false;
-
-function toggleAvatarVoice() {
-    const btn = document.getElementById('avatar-voice-btn');
-    const input = document.getElementById('avatar-input');
-    if (!input) return;
-    
-    if (!avatarRecognition) {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            showToast('您的浏览器不支持语音输入');
-            return;
-        }
-        
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        avatarRecognition = new SpeechRecognition();
-        avatarRecognition.lang = 'zh-CN';
-        avatarRecognition.continuous = false;
-        avatarRecognition.interimResults = false;
-    }
-    
-    if (isAvatarRecording) {
-        avatarRecognition.stop();
-        isAvatarRecording = false;
-        if (btn) {
-            btn.classList.remove('recording');
-            btn.textContent = '🎤';
-        }
-    } else {
-        isAvatarRecording = true;
-        if (btn) {
-            btn.classList.add('recording');
-            btn.textContent = '🔴';
-        }
-        avatarRecognition.start();
-        
-        avatarRecognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            input.value = transcript;
-            isAvatarRecording = false;
-            if (btn) {
-                btn.classList.remove('recording');
-                btn.textContent = '🎤';
-            }
-        };
-        
-        avatarRecognition.onerror = function(event) {
-            isAvatarRecording = false;
-            if (btn) {
-                btn.classList.remove('recording');
-                btn.textContent = '🎤';
-            }
-            if (event.error !== 'no-speech') {
-                showToast('语音识别错误: ' + event.error);
-            }
-        };
-        
-        avatarRecognition.onend = function() {
-            isAvatarRecording = false;
-            if (btn) {
-                btn.classList.remove('recording');
-                btn.textContent = '🎤';
-            }
-        };
-    }
-}
-
-function renderPractice(container) {
-    container.innerHTML = `
-        <div class="stats-bar">
-            <div class="stats-bar-item">
-                <div class="stats-bar-value" id="practice-total">0</div>
-                <div class="stats-bar-label">总题数</div>
-            </div>
-            <div class="stats-bar-item">
-                <div class="stats-bar-value" id="practice-correct">0%</div>
-                <div class="stats-bar-label">正确率</div>
-            </div>
-            <div class="stats-bar-item">
-                <div class="stats-bar-value" id="practice-weak">0</div>
-                <div class="stats-bar-label">薄弱点</div>
-            </div>
-        </div>
-        <div class="card" style="margin-top:12px;">
-            <h4 style="margin-bottom:12px;">📸 拍照上传题目</h4>
-            <p style="color:#666;font-size:13px;margin-bottom:12px;">拍下你不会的题目，AI帮你分析讲解</p>
-            <button class="camera-btn" onclick="openWrongPhotoCapture()">📷 拍照识别</button>
-            <div class="image-list" id="practice-images"></div>
-        </div>
-        <div class="card">
-            <h4 style="margin-bottom:12px;">✏️ 手动输入题目</h4>
-            <div class="practice-input">
-                <input type="text" id="practice-question" placeholder="输入你的问题...">
-                <button onclick="submitPracticeQuestion()">提问</button>
-            </div>
-            <div id="practice-result"></div>
-        </div>
-        <div class="card">
-            <h4 style="margin-bottom:12px;">📝 错题本</h4>
-            <button class="game-btn btn-orange" style="width:100%;" onclick="showWrongNotes()">查看错题</button>
-        </div>
-    `;
-    updatePracticeStats();
-}
-
-function updatePracticeStats() {
-    const total = document.getElementById('practice-total');
-    const correct = document.getElementById('practice-correct');
-    const weak = document.getElementById('practice-weak');
-    if (total) total.textContent = '126';
-    if (correct) correct.textContent = '78%';
-    if (weak) weak.textContent = '8';
-}
-
-function submitPracticeQuestion() {
-    const q = document.getElementById('practice-question');
-    if (!q || !q.value.trim()) { showToast('请输入问题'); return; }
-    showToast('正在分析题目...');
-}
-
-function selectTeacher(el, subject) {
-    document.querySelectorAll('.teacher-item').forEach(item => item.classList.remove('active'));
-    el.classList.add('active');
-    showToast('已选择' + subject + '老师');
-}
 
 function renderMap(container) {
     container.innerHTML = `
