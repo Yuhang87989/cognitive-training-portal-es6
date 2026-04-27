@@ -4564,11 +4564,6 @@ function startMethodTraining(methodId) {
 
 // ====== 学霸方法训练题库（V99新增）======
 
-function getMethodTraining(methodId) {
-    return methodTraining[methodId] || [];
-}
-
-
 function playPodcast(title) {
     showToast('播放：' + title);
 }
@@ -4620,16 +4615,6 @@ function toggleWeekTask(taskId) {
 
 
 
-function toggleWeekTask(taskId) {
-    const user = getCurrentUserData();
-    if (!user) return;
-    user.weekTasks = user.weekTasks || {};
-    user.weekTasks[taskId] = !user.weekTasks[taskId];
-    syncUserData(user);
-    showToast('任务状态已更新');
-}
-
-// ====== 视频 ======
 let vpVideo = null, vpPlaying = false;
 
 function playVideo(title, url) {
@@ -4655,14 +4640,6 @@ function closeVideoPlayer() { if (vpVideo) { vpVideo.pause(); vpVideo.src = ''; 
 function formatTime(s) { if (!s||isNaN(s)) return '0:00'; return Math.floor(s/60)+':'+(Math.floor(s%60)+'').padStart(2,'0'); }
 
 
-function handlePracticePhoto(input) {
-    if (!input.files[0]) return;
-    showToast('正在分析错题...');
-    setTimeout(() => { showToast('AI分析功能开发中，请先练习母题'); }, 1500);
-    input.value = '';
-}
-
-// ====== 游戏 ======
 let gameScore = 0, gameType = '', gameLevel = 1, gameTimer = null, gameStartTime = 0, schulteNext = 1;
 
 // 游戏配置
@@ -6070,17 +6047,6 @@ function playPodcastCourse(courseId) {
 
 function onAudioLoaded() { var totalEl = document.getElementById('ap-total-time'); if (totalEl) totalEl.textContent = formatTimeFull(currentAudio.duration); }
 
-function updateAudioProgress() {
-    if (!currentAudio || !currentAudio.duration) return;
-    var progress = (currentAudio.currentTime / currentAudio.duration) * 100;
-    var fillEl = document.getElementById('ap-progress-fill');
-    var currentTimeEl = document.getElementById('ap-current-time');
-    var miniBarEl = document.getElementById('mini-player-progress-bar');
-    if (fillEl) fillEl.style.width = progress + '%';
-    if (currentTimeEl) currentTimeEl.textContent = formatTimeFull(currentAudio.currentTime);
-    if (miniBarEl) miniBarEl.style.width = progress + '%';
-    if (audioCtx.currentTrack) { savedPositions[audioCtx.currentTrack.id] = currentAudio.currentTime; try { localStorage.setItem('podcastPositions', JSON.stringify(savedPositions)); } catch(e) {} }
-}
 
 function onAudioEnded() { playNextTrack(); }
 function toggleAudioPlay() { if (!currentAudio) return; if (audioCtx.isPlaying) currentAudio.pause(); else currentAudio.play(); }
@@ -6928,20 +6894,6 @@ function getDefaultCognitiveData() {
     };
 }
 
-function calculateStreakDays(user) {
-    if (!user.studyDays) return 0;
-    const today = new Date();
-    let streak = 0;
-    for (let i = 0; i < 30; i++) {
-        const d = new Date(today);
-        d.setDate(d.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-        if (user.studyDays[dateStr] && user.studyDays[dateStr] > 0) {
-            streak++;
-        } else if (i > 0) break;
-    }
-    return streak;
-}
 
 // 渲染能力详情卡片
 function renderCognitiveDetails(data) {
