@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V133</title>
+<title>认知训练 V134</title>
 <link rel="icon" type="image/x-icon" href="https://yuhang87989.github.io/cognitive-training-portal/favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="https://yuhang87989.github.io/cognitive-training-portal/icon-192.png"/>
 <link rel="apple-touch-icon" href="https://yuhang87989.github.io/cognitive-training-portal/apple-touch-icon.png"/>
@@ -687,7 +687,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="settings-group-inner">
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;" onclick="openAbout()">
                         <div style="font-size:14px;color:#333;">版本信息</div>
-                        <div style="font-size:13px;color:#1A6BFF;">V133 →</div>
+                        <div style="font-size:13px;color:#1A6BFF;">V134 →</div>
                     </div>
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;">
                         <div style="font-size:14px;color:#333;">反馈建议</div>
@@ -952,7 +952,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
-const STORAGE_KEY = 'cognitive_training_v133';
+const STORAGE_KEY = 'cognitive_training_v134';
 
 // ====== 播放器全局变量 ======
 let currentAudio = null; // 音频播放器元素引用
@@ -1211,7 +1211,7 @@ const videoList = [
     {id: 4, title: "青少年高效复习策略指南", shareUrl: "https://www.coze.cn/s/-FFxXRTedN0/", backupUrl: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_07040e43-b7ad-46d4-9713-21a6c6042b74.mp3?sign=1808822280-ffd1dd4d3b-0-6431d1416b2b2a3b1f95d5f6f9e83aaef2d488610c77c115f7821dfa2f28f0d6", duration: "5:41", category: "物理思维"},
     {id: 5, title: "三招提升青少年专注力", shareUrl: "https://www.coze.cn/s/ymrXMhQcvNY/", backupUrl: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_de865d7b-5968-40eb-ab49-1c2c8267b91a.mp3?sign=1808822299-57d9bb9b64-0-3ea6ff42e8b9c864cf4cd90b0ffb7d65cb7b7b751cb41db81e82e6eb62cdd9db", duration: "3:27", category: "思维训练"}
 ];
-const OLD_KEYS = ['cognitive_training_v132', 'cognitive_training_v131', 'cognitive_training_v130', 'cognitive_training_v127', 'cognitive_training_v126', 'cognitive_training_v125', 'cognitive_training_v124', 'cognitive_training_v123', 'cognitive_training_v122', 'cognitive_training_v121', 'cognitive_training_v120', 'cognitive_training_v119', 'cognitive_training_v118', 'cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
+const OLD_KEYS = ['cognitive_training_v133', 'cognitive_training_v132', 'cognitive_training_v131', 'cognitive_training_v130', 'cognitive_training_v127', 'cognitive_training_v126', 'cognitive_training_v125', 'cognitive_training_v124', 'cognitive_training_v123', 'cognitive_training_v122', 'cognitive_training_v121', 'cognitive_training_v120', 'cognitive_training_v119', 'cognitive_training_v118', 'cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
 
 // 播放播客音频（优先shareUrl签名URL，备用backupUrl）
 async function playPodcastAudio(id) {
@@ -2530,97 +2530,6 @@ function renderPractice(container) {
 }
 
 
-// ====== AI精准练 - 拍照识别 ======
-async function handlePracticePhoto(input) {
-    const file = input.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        const base64 = e.target.result;
-        showToast('AI正在识别中...');
-        
-        try {
-            const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
-                },
-                body: JSON.stringify({
-                    model: 'deepseek-chat',
-                    messages: [
-                        { role: 'system', content: '你是一位专业的初中教育辅导老师，擅长识别题目并详细讲解。请识别图片中的题目，给出详细解答过程。' },
-                        { role: 'user', content: [
-                            { type: 'text', text: '请识别这道题目并给出详细解答：' },
-                            { type: 'image_url', image_url: { url: base64 } }
-                        ]}
-                    ]
-                })
-            });
-            
-            const data = await response.json();
-            const aiContent = data.choices?.[0]?.message?.content || 'AI识别失败，请稍后重试';
-            showPracticeResult(aiContent);
-        } catch (err) {
-            showToast('AI识别失败，请检查网络');
-        }
-    };
-    reader.readAsDataURL(file);
-}
-
-// ====== AI精准练 - 手动输入解答 ======
-async function submitPracticeQuestion() {
-    const input = document.getElementById('practice-input');
-    if (!input || !input.value.trim()) {
-        showToast('请输入问题');
-        return;
-    }
-    
-    const question = input.value.trim();
-    showToast('AI正在解答中...');
-    
-    try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
-            },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages: [
-                    { role: 'system', content: '你是一位专业的初中教育辅导老师，擅长解答各科题目。请给出详细的解题步骤和思路分析。' },
-                    { role: 'user', content: question }
-                ]
-            })
-        });
-        
-        const data = await response.json();
-        const aiContent = data.choices?.[0]?.message?.content || 'AI解答失败，请稍后重试';
-        showPracticeResult(aiContent);
-    } catch (err) {
-        showToast('AI解答失败，请检查网络');
-    }
-}
-
-// ====== AI精准练 - 显示结果 ======
-function showPracticeResult(content) {
-    const modal = document.getElementById('detail-modal');
-    const detailContent = document.getElementById('detail-content');
-    if (!modal || !detailContent) return;
-    
-    modal.classList.add('show');
-    detailContent.innerHTML = `
-        <div class="modal-title">🤖 AI解答</div>
-        <div style="padding:16px;background:#f5f7ff;border-radius:12px;max-height:60vh;overflow-y:auto;line-height:1.8;font-size:14px;">
-            ${content.replace(/\n/g, '<br/>')}
-        </div>
-        <button class="login-btn login-btn-primary" onclick="closeDetail()" style="margin-top:12px;">关闭</button>
-    `;
-}
-
-
 
 function renderMap(container) {
     container.innerHTML = `
@@ -2710,6 +2619,16 @@ function renderTopics(container) {
     const userGrade = currentUser ? currentUser.grade : 7;
     
     container.innerHTML = `
+        <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;margin-bottom:12px;cursor:pointer;" onclick="openTopicsAIModal()">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div style="font-size:32px;">🤖</div>
+                <div style="flex:1;">
+                    <div style="font-size:15px;font-weight:600;margin-bottom:4px;">AI智能分析</div>
+                    <div style="font-size:12px;opacity:0.9;">输入任何问题，AI帮你解答</div>
+                </div>
+                <div style="font-size:20px;">→</div>
+            </div>
+        </div>
         <div class="card">
             <h3 style="margin-bottom:12px;">📚 母题训练</h3>
             <p style="color:#666;font-size:13px;margin-bottom:16px;">精选母题，举一反三，掌握核心知识点</p>
@@ -2848,6 +2767,7 @@ function openTopicQuestion(topicId) {
             <div class="practice-input">
                 <input type="text" id="topic-answer-input" placeholder="输入你的答案..." style="flex:1;" />
                 <button onclick="checkTopicAnswer(${topicId})" style="padding:10px 16px;background:#3377FF;color:white;border:none;border-radius:8px;cursor:pointer;">提交</button>
+                <button onclick="analyzeTopicWithAI(${topicId})" style="padding:8px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">AI分析</button>
             </div>
             <div id="topic-result-area"></div>
         </div>
@@ -2968,6 +2888,208 @@ async function analyzeTopicWithAI(topicId) {
         `;
     } catch (err) {
         resultArea.innerHTML = '<div style="margin-top:12px;color:#ff6b6b;">AI分析失败，请检查网络</div>';
+    }
+}
+
+// 学霸方法AI分析函数
+async function analyzeMethodWithAI(methodId, questionIdx) {
+    const questions = methodTrainingQuestions[methodId];
+    const q = questions[questionIdx];
+    if (!q) return;
+    
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    content.innerHTML = `
+        <div class="modal-title">🤖 AI分析</div>
+        <div style="font-size:13px;color:#666;margin-bottom:12px;text-align:center;">第${questionIdx + 1}题</div>
+        <div class="card" style="margin-bottom:12px;">
+            <div style="font-size:13px;color:#1A6BFF;font-weight:600;margin-bottom:8px;">题目</div>
+            <div style="font-size:14px;color:#333;line-height:1.6;margin-bottom:12px;">${q.q}</div>
+            <div style="font-size:13px;color:#4CAF50;font-weight:600;margin-bottom:8px;">参考答案</div>
+            <div style="font-size:14px;color:#333;line-height:1.6;">${q.a}</div>
+        </div>
+        <div class="card">
+            <div id="method-ai-result" style="min-height:100px;">
+                <div class="ai-loading" style="text-align:center;padding:20px;">🤖 AI正在分析中...</div>
+            </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">关闭</button>
+    `;
+    
+    const prompt = `请详细讲解这道题目：
+题目：${q.q}
+参考答案：${q.a}
+
+请提供：
+1. 知识点分析
+2. 详细解题步骤
+3. 易错点提示
+4. 举一反三的类似题目`;
+
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { role: 'system', content: '你是一位专业的青少年教育辅导老师，擅长详细讲解题目，帮助学生理解知识点，举一反三。' },
+                    { role: 'user', content: prompt }
+                ]
+            })
+        });
+        
+        const data = await response.json();
+        const aiContent = data.choices?.[0]?.message?.content || 'AI分析失败，请稍后重试';
+        
+        document.getElementById('method-ai-result').innerHTML = `
+            <div style="padding:12px;background:#f5f7ff;border-radius:12px;max-height:300px;overflow-y:auto;">
+                <div style="font-size:14px;line-height:1.8;">${aiContent.replace(/\n/g, '<br/>')}</div>
+            </div>
+        `;
+    } catch (err) {
+        document.getElementById('method-ai-result').innerHTML = '<div style="color:#ff6b6b;text-align:center;padding:20px;">AI分析失败，请检查网络</div>';
+    }
+}
+
+// 思维训练AI分析函数
+async function analyzeThinkingWithAI(type, questionIdx) {
+    const questions = thinkingQuestions[type];
+    const q = questions[questionIdx];
+    if (!q) return;
+    
+    const typeNames = {
+        logic: '逻辑思维', creative: '创意思维', critical: '批判思维', system: '系统思维',
+        reverse: '逆向思维', divergent: '发散思维', converge: '收敛思维', spatial: '空间思维',
+        abstract: '抽象思维'
+    };
+    
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    const answerText = q.opts ? q.opts[q.a] : q.a;
+    
+    content.innerHTML = `
+        <div class="modal-title">🤖 AI分析</div>
+        <div style="font-size:13px;color:#666;margin-bottom:12px;text-align:center;">${typeNames[type]} - 第${questionIdx + 1}题</div>
+        <div class="card" style="margin-bottom:12px;">
+            <div style="font-size:13px;color:#1A6BFF;font-weight:600;margin-bottom:8px;">题目</div>
+            <div style="font-size:14px;color:#333;line-height:1.6;margin-bottom:12px;">${q.q}</div>
+            ${answerText ? `
+            <div style="font-size:13px;color:#4CAF50;font-weight:600;margin-bottom:8px;">参考答案</div>
+            <div style="font-size:14px;color:#333;line-height:1.6;">${answerText}</div>
+            ` : ''}
+        </div>
+        <div class="card">
+            <div id="thinking-ai-result" style="min-height:100px;">
+                <div class="ai-loading" style="text-align:center;padding:20px;">🤖 AI正在分析中...</div>
+            </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">关闭</button>
+    `;
+    
+    const prompt = `请详细讲解这道题目：
+题目：${q.q}
+${answerText ? '参考答案：' + answerText : ''}
+
+请提供：
+1. 知识点分析
+2. 详细解题思路
+3. 易错点提示
+4. 举一反三的类似题目`;
+
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { role: 'system', content: '你是一位专业的青少年教育辅导老师，擅长详细讲解题目，帮助学生理解知识点，举一反三。' },
+                    { role: 'user', content: prompt }
+                ]
+            })
+        });
+        
+        const data = await response.json();
+        const aiContent = data.choices?.[0]?.message?.content || 'AI分析失败，请稍后重试';
+        
+        document.getElementById('thinking-ai-result').innerHTML = `
+            <div style="padding:12px;background:#f5f7ff;border-radius:12px;max-height:300px;overflow-y:auto;">
+                <div style="font-size:14px;line-height:1.8;">${aiContent.replace(/\n/g, '<br/>')}</div>
+            </div>
+        `;
+    } catch (err) {
+        document.getElementById('thinking-ai-result').innerHTML = '<div style="color:#ff6b6b;text-align:center;padding:20px;">AI分析失败，请检查网络</div>';
+    }
+}
+
+// 母题训练AI问答弹窗
+function openTopicsAIModal() {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    content.innerHTML = `
+        <div class="modal-title">🤖 AI智能分析</div>
+        <p style="text-align:center;color:#666;font-size:13px;margin-bottom:16px;">输入你的问题，AI帮你解答</p>
+        <textarea id="topics-ai-question" placeholder="例如：帮我讲解一元二次方程的解法..." style="width:100%;height:100px;padding:12px;border:2px solid #ddd;border-radius:12px;font-size:14px;resize:none;box-sizing:border-box;"></textarea>
+        <div class="card" style="margin-top:16px;">
+            <div id="topics-ai-result" style="min-height:80px;">
+                <div style="text-align:center;color:#999;font-size:13px;">AI分析结果将显示在这里</div>
+            </div>
+        </div>
+        <button onclick="submitTopicsAIQuestion()" style="width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px;">🔍 提问</button>
+        <button class="modal-close" onclick="closeModal()">关闭</button>
+    `;
+}
+
+// 提交母题训练AI问题
+async function submitTopicsAIQuestion() {
+    const question = document.getElementById('topics-ai-question').value.trim();
+    if (!question) {
+        showToast('请输入问题');
+        return;
+    }
+    
+    const resultDiv = document.getElementById('topics-ai-result');
+    resultDiv.innerHTML = '<div class="ai-loading" style="text-align:center;padding:20px;">🤖 AI正在分析中...</div>';
+    
+    try {
+        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
+            },
+            body: JSON.stringify({
+                model: 'deepseek-chat',
+                messages: [
+                    { role: 'system', content: '你是一位专业的青少年教育辅导老师，擅长详细讲解题目，帮助学生理解知识点，举一反三。' },
+                    { role: 'user', content: question }
+                ]
+            })
+        });
+        
+        const data = await response.json();
+        const aiContent = data.choices?.[0]?.message?.content || 'AI分析失败，请稍后重试';
+        
+        resultDiv.innerHTML = `
+            <div style="padding:12px;background:#f5f7ff;border-radius:12px;max-height:300px;overflow-y:auto;">
+                <div style="font-size:14px;line-height:1.8;">${aiContent.replace(/\n/g, '<br/>')}</div>
+            </div>
+        `;
+    } catch (err) {
+        resultDiv.innerHTML = '<div style="color:#ff6b6b;text-align:center;padding:20px;">AI分析失败，请检查网络</div>';
     }
 }
 
@@ -3199,6 +3321,7 @@ function submitMethodAnswers(methodId, page) {
                     <div style="display:flex;gap:8px;">
                         <button onclick="rateMethodAnswer('${methodId}', true, ${startIndex + idx})" style="flex:1;padding:8px;background:#4CAF50;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✓ 正确</button>
                         <button onclick="rateMethodAnswer('${methodId}', false, ${startIndex + idx})" style="flex:1;padding:8px;background:#ff6b6b;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✗ 改进</button>
+                        <button onclick="analyzeMethodWithAI('${methodId}', ${startIndex + idx})" style="padding:8px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">AI分析</button>
                     </div>
                 </div>
             `).join('')}
@@ -4750,6 +4873,7 @@ function submitThinkingAnswers(type, page) {
                         <div style="display:flex;gap:8px;">
                             <button onclick="rateThinkingAnswer('${type}', true, ${startIndex + idx})" style="flex:1;padding:8px;background:#4CAF50;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✓ 正确</button>
                             <button onclick="rateThinkingAnswer('${type}', false, ${startIndex + idx})" style="flex:1;padding:8px;background:#ff6b6b;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✗ 改进</button>
+                            <button onclick="analyzeThinkingWithAI('${type}', ${startIndex + idx})" style="padding:8px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">AI分析</button>
                         </div>
                     </div>
                 `;
@@ -9237,7 +9361,7 @@ function exportData() {
     
     // 添加导出元信息
     const exportData = {
-        version: 'V133',
+        version: 'V134',
         exportTime: new Date().toISOString(),
         appName: '认知训练门户',
         data: data
@@ -9549,7 +9673,7 @@ function openAbout() {
         <div style="text-align:center;padding:20px 0;">
             <div style="font-size:48px;margin-bottom:12px;">🧠</div>
             <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V133</div>
+            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V134</div>
         </div>
         <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
             <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
