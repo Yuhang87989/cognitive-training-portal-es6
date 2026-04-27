@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V107</title>
+<title>认知训练 V118</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -851,7 +851,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
-const STORAGE_KEY = 'cognitive_training_v117';
+const STORAGE_KEY = 'cognitive_training_v118';
 
 // ====== Toast提示系统 ======
 function showToast(message, duration = 2000) {
@@ -1197,29 +1197,79 @@ function migrateData() {
     }
 }
 
+// ====== 默认用户配置 ======
+const DEFAULT_USER = {
+    id: 'user_default_qiuyufei',
+    name: '邱宇菲',
+    grade: 7, // 初一
+    difficulty: 1, // 难度级别1
+    points: 1142, // 初始积分
+    createdAt: new Date().toISOString(),
+    stats: {
+        totalQuestions: 0,
+        correctAnswers: 0,
+        totalMinutes: 0,
+        streakDays: 0,
+        lastActiveDate: null
+    },
+    weeklyProgress: {},
+    wrongNotes: [],
+    completedTopics: [],
+    studyDays: {},
+    todayStats: { date: new Date().toDateString(), questions: 0, correct: 0, minutes: 0 }
+};
+
 // ====== 数据存储 ======
 function loadData() {
     try {
         // 尝试迁移旧数据
         migrateData();
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { users: [], currentUser: null };
+        if (!raw) {
+            // 首次访问，创建默认用户
+            const defaultData = {
+                users: [{ ...DEFAULT_USER }],
+                currentUser: DEFAULT_USER.id
+            };
+            saveData(defaultData);
+            console.log('已创建默认用户:', DEFAULT_USER.name);
+            return defaultData;
+        }
         const data = JSON.parse(raw);
         // 验证数据格式
         if (!data || typeof data !== 'object') {
-            console.log('数据格式错误，重置');
-            return { users: [], currentUser: null };
+            console.log('数据格式错误，创建默认用户');
+            const defaultData = {
+                users: [{ ...DEFAULT_USER }],
+                currentUser: DEFAULT_USER.id
+            };
+            saveData(defaultData);
+            return defaultData;
         }
         if (!Array.isArray(data.users)) data.users = [];
+        
+        // 如果没有用户，创建默认用户
+        if (data.users.length === 0) {
+            data.users = [{ ...DEFAULT_USER }];
+            data.currentUser = DEFAULT_USER.id;
+            saveData(data);
+            console.log('用户列表为空，已创建默认用户:', DEFAULT_USER.name);
+        }
+        
         if (!data.currentUser && data.users.length > 0) {
             data.currentUser = data.users[0].id;
         }
         return data;
     } catch(e) {
-        console.log('数据加载错误，重置:', e.message);
-        // 清除损坏的数据
+        console.log('数据加载错误，创建默认用户:', e.message);
+        // 清除损坏的数据并创建默认用户
         try { localStorage.removeItem(STORAGE_KEY); } catch(e2) {}
-        return { users: [], currentUser: null };
+        const defaultData = {
+            users: [{ ...DEFAULT_USER }],
+            currentUser: DEFAULT_USER.id
+        };
+        saveData(defaultData);
+        return defaultData;
     }
 }
 
@@ -7459,7 +7509,7 @@ function exportData() {
     
     // 添加导出元信息
     const exportData = {
-        version: 'V117',
+        version: 'V118',
         exportTime: new Date().toISOString(),
         appName: '认知训练门户',
         data: data
@@ -7771,7 +7821,7 @@ function openAbout() {
         <div style="text-align:center;padding:20px 0;">
             <div style="font-size:48px;margin-bottom:12px;">🧠</div>
             <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V117</div>
+            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V118</div>
         </div>
         <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
             <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
