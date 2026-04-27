@@ -218,7 +218,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto}
 .modal-title{font-size:18px;font-weight:bold;text-align:center;margin-bottom:20px}
 .modal-close{width:100%;padding:14px;background:var(--gradient-blue);border:none;border-radius:12px;color:white;font-size:15px;font-weight:600;cursor:pointer;margin-top:12px}
-.settings-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;padding-top:60px;z-index:300}
+.settings-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:flex-start;justify-content:center;padding-top:60px;z-index:2100}
 .settings-panel.show{display:flex}
 .settings-content{background:white;width:100%;max-width:400px;border-radius:0 0 20px 20px;padding:20px;max-height:70vh;overflow-y:auto}
 .settings-balance{background:linear-gradient(135deg,#667eea,#764ba2);color:white;border-radius:16px;padding:16px;margin-bottom:16px}
@@ -485,7 +485,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 
 <!-- 设置面板 -->
-<div id="settings-panel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;overflow-y:auto;" onclick="closeSettingsPanel(event)">
+<div id="settings-panel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2100;overflow-y:auto;" onclick="closeSettingsPanel(event)">
     <div style="background:white;width:100%;max-width:400px;border-radius:0 0 20px 20px;padding:20px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <div style="font-size:18px;font-weight:bold;">⚙️ 设置</div>
@@ -5547,32 +5547,30 @@ function clickAttention(index) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('认知训练门户加载中...');
     
-    // 清除旧版本数据（只清除旧版本的key，保留当前版本数据）
-    try {
-        const OLD_KEYS = ['cognitive_training_v119','cognitive_training_v118','cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
-        OLD_KEYS.forEach(k => localStorage.removeItem(k));
-    } catch(e) {}
+    // 先执行数据迁移
+    migrateData();
     
-    // 创建默认用户
-    const defaultUser = {
-        id: 'user_default',
-        name: '邱宇菲',
-        grade: 7,
-        difficulty: 1,
-        points: 1142,
-        stats: { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null },
-        weeklyProgress: {}, wrongNotes: [], completedTopics: []
-    };
+    // 加载数据（loadData内部会自动创建默认用户如果不存在）
+    const appData = loadData();
     
-    saveData({ users: [defaultUser], currentUser: defaultUser.id });
+    // 获取当前用户并更新UI
+    const currentUser = getCurrentUserData();
+    if (currentUser) {
+        // 更新用户名显示
+        const greetingEl = document.getElementById('greeting-name');
+        const dropdownNameEl = document.getElementById('dropdown-name');
+        const headerAvatarEl = document.getElementById('header-avatar');
+        if (greetingEl) greetingEl.textContent = currentUser.name;
+        if (dropdownNameEl) dropdownNameEl.textContent = currentUser.name;
+        if (headerAvatarEl) headerAvatarEl.textContent = currentUser.name.charAt(0);
+    }
+    
+    // 初始化UI
+    updateUI();
+    syncTodayStats();
     
     // 显示首页
     showPage('home');
-    
-    // 更新用户名显示
-    document.getElementById('greeting-name').textContent = '邱宇菲';
-    document.getElementById('dropdown-name').textContent = '邱宇菲';
-    document.getElementById('header-avatar').textContent = '邱';
     
     console.log('初始化完成');
     
