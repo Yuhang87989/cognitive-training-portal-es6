@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V135</title>
+<title>认知训练 V136</title>
 <link rel="icon" type="image/x-icon" href="https://yuhang87989.github.io/cognitive-training-portal/favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="https://yuhang87989.github.io/cognitive-training-portal/icon-192.png"/>
 <link rel="apple-touch-icon" href="https://yuhang87989.github.io/cognitive-training-portal/apple-touch-icon.png"/><style>
@@ -705,7 +705,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="settings-group-inner">
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;" onclick="openAbout()">
                         <div style="font-size:14px;color:#333;">版本信息</div>
-                        <div style="font-size:13px;color:#1A6BFF;">V135 →</div>
+                        <div style="font-size:13px;color:#1A6BFF;">V136 →</div>
                     </div>
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;">
                         <div style="font-size:14px;color:#333;">反馈建议</div>
@@ -940,16 +940,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 
 <script>
+// ==================== 1. 全局变量与配置 ====================
 // ====== 全局配置 ======
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
-const STORAGE_KEY = 'cognitive_training_v135';
+const STORAGE_KEY = 'cognitive_training_v136';
 
+// ==================== 1. 全局变量与配置 ====================
 // ====== 播放器全局变量 ======
 let currentAudio = null; // 音频播放器元素引用
 let evpVideo = null; // 视频播放器元素引用
 
+// ==================== 3. 音效系统 ====================
 // ====== Toast提示系统 ======
 function showToast(message, duration = 2000) {
     const existing = document.getElementById('custom-toast');
@@ -981,6 +984,7 @@ function showToast(message, duration = 2000) {
     }, duration);
 }
 
+// ==================== 3. 音效系统 ====================
 // ====== 音效系统 ======
 const SoundEffects = {
     audioContext: null,
@@ -1170,7 +1174,8 @@ function closeAboutModal() {
     if (modal) modal.classList.remove('show');
 }
 
-// ====== 播客音频数据 - 21个真实音频 ======
+// ==================== 2. 数据定义 ====================
+// ====== 播客音频数据 ======
 const podcastList = [
     {id: 1, title: "青少年高效记忆法全攻略", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_b2ff66a9-c071-4912-84a7-51f174fd69a2.mp3?sign=1808822218-8a2b090761-0-db0b581cf15d5b549a623ffb6c882f7614bd5a52476bb36c7923398ca409fa2e", duration: "6:14", category: "学霸方法"},
     {id: 2, title: "青少年高效笔记法大揭秘", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_2fd6258b-4ebd-49a9-b1a8-20e8a3bfc750.mp3?sign=1808822237-742cb735e5-0-7c9279fb8f5480d82654cddd5352da5266e2f317c6d5b82d9ba9d0b0ad27e949", duration: "8:10", category: "学霸方法"},
@@ -1264,6 +1269,7 @@ function migrateData() {
     }
 }
 
+// ==================== 4. 初始化与数据管理 ====================
 // ====== 默认用户配置 ======
 const DEFAULT_USER = {
     id: 'user_default_qiuyufei',
@@ -1286,6 +1292,7 @@ const DEFAULT_USER = {
     todayStats: { date: new Date().toDateString(), questions: 0, correct: 0, minutes: 0 }
 };
 
+// ==================== 4. 初始化与数据管理 ====================
 // ====== 数据存储 ======
 function loadData() {
     try {
@@ -2193,6 +2200,7 @@ function clearAllData() {
     localStorage.removeItem(STORAGE_KEY); location.reload();
 }
 
+// ==================== 5. 用户管理 ====================
 // ====== UI更新 ======
 function updateUI() {
     updateAllAvatarDisplays();
@@ -2240,6 +2248,7 @@ function syncTodayStats() {
     if (streakEl) streakEl.textContent = streak;
 }
 
+// ==================== 6. 页面导航与模块切换 ====================
 // ====== 页面切换 ======
 function showPage(pageId) {
     // 隐藏所有页面
@@ -2375,6 +2384,7 @@ function cleanupModuleState() {
     
     console.log('模块状态已清理');
 }
+// ==================== 6. 页面导航与模块切换 ====================
 // ====== 全屏页面切换 ======
 function openFullscreenPage(module) {
     cleanupModuleState(); // 清理上一个模块的状态
@@ -2421,6 +2431,7 @@ function openFullscreenPage(module) {
     container.classList.add('active');
 }
 
+// ==================== 6. 页面导航与模块切换 ====================
 // ====== 模块渲染函数 ======
 
 function renderPractice(container) {
@@ -2642,6 +2653,8 @@ function toggleTask(el) {
     el.classList.toggle('completed');
 }
 
+
+// ==================== 8. 母题训练模块 ====================
 function renderTopics(container) {
     // 获取当前用户年级
     const currentUser = getCurrentUserData();
@@ -4448,6 +4461,7 @@ function handleWrongNoteClick(source, wrongKey, topicId) {
 
 function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
 
+// ==================== 10. 思维训练模块 ====================
 // ====== 思维训练 ======
 const thinkingQuestions = {
     logic: [
@@ -4849,6 +4863,7 @@ function deleteThinkingNote(noteId) {
     showToast('笔记已删除');
 }
 
+// ==================== 9. 学霸方法模块 ====================
 // ====== 学霸方法详情 ======
 const methodDetails = {
     feyman: {title:'🧠 费曼学习法',desc:'把学到的知识用自己的话讲给别人听，如果别人能听懂，说明你真正掌握了。',steps:['选择一个你想要理解的概念','想象你要把这个概念教给一个完全不懂的人','如果讲解过程中卡住了，就回顾原始材料','用自己的话重新组织，确保通俗易懂'],tip:'💡 最佳实践：每天用费曼学习法复习一个知识点，坚持21天形成习惯。'},
@@ -4883,7 +4898,8 @@ function showMethodDetail(id) {
 
 
 
-// ====== 学霸方法训练题库（V99新增）======
+// ==================== 9. 学霸方法模块 ====================
+// ====== 学霸方法训练题库 ======
 const methodTraining = methodTrainingQuestions;
 
 function getMethodTraining(methodId) {
@@ -4919,7 +4935,8 @@ function startMethodTraining(methodId) {
 
 
 
-// ====== Week5-6训练计划（V99新增）======
+// ==================== 18. 学习计划模块 ====================
+// ====== Week5-6训练计划 ======
 const weekPlans = {week5: week5Plan, week6: week6Plan};
 
 function getWeekPlan(weekId) { return weekPlans[weekId] || null; }
@@ -6388,6 +6405,7 @@ function closeGame() {
 }
 
 
+// ==================== 13. 训练游戏模块 ====================
 // ====== 8大新游戏函数 ======
 
 // 文字记忆游戏
@@ -6773,6 +6791,7 @@ function clickAttention(index) {
     }
 }
 
+// ==================== 20. 设置与系统 ====================
 // ====== 初始化 ======
 document.addEventListener('DOMContentLoaded', () => {
     console.log('认知训练门户加载中...');
@@ -6823,6 +6842,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ==================== 11. 播客课堂模块 ====================
 // ====== 播客音频播放 ======
 const audioResources = {
     'audio1': { url: '', title: '英语听力训练技巧' },
@@ -6897,6 +6917,7 @@ function formatTime(seconds) {
     return mins + ':' + (secs < 10 ? '0' : '') + secs;
 }
 
+// ==================== 9. 学霸方法模块 ====================
 // ====== 学霸方法训练 ======
 const methodPractices = {
     feyman: { title: '🧠 费曼学习法训练', tasks: ['选择一个你学过的知识点', '用最简单的语言解释给"小白"听', '找出讲解中不清楚的地方', '重新组织语言，简化解释', '用比喻或类比让解释更生动'] },
@@ -6921,6 +6942,7 @@ function startMethodPractice(method) {
     content.innerHTML = html;
 }
 
+// ==================== 14. DeepSeek AI模块 ====================
 // ====== DeepSeek充值 ======
 // DeepSeek 充值中心
 async function openDeepSeekRecharge() {
@@ -7086,7 +7108,8 @@ function selectRechargePackage(amount) {
 
 
 
-// ====== DeepSeek API V50 ======
+// ==================== 14. DeepSeek AI模块 ====================
+// ====== DeepSeek API ======
 
 async function callDeepSeekAPI(messages, temperature) {
     try {
@@ -7124,6 +7147,7 @@ function showDeepSeekBalanceAlert() {
     }
 }
 
+// ==================== 14. DeepSeek AI模块 ====================
 // ====== 语音输入功能 ======
 function initVoiceInput(inputField) {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -7455,7 +7479,9 @@ function closeMiniPlayer() { if (currentAudio) { currentAudio.pause(); currentAu
 
 function updatePodcastListState(courseId) { document.querySelectorAll('.podcast-item-enhanced').forEach(function(item) { var id = item.getAttribute('data-id'); if (id === courseId) { item.classList.add('playing'); var indicator = item.querySelector('.podcast-playing-indicator'); if (indicator) indicator.style.display = 'flex'; } else { item.classList.remove('playing'); var indicator = item.querySelector('.podcast-playing-indicator'); if (indicator) indicator.style.display = 'none'; } }); }
 
+// ==================== 19. 播放器系统 ====================
 // ====== 统一媒体播放器代码 ======
+// ==================== 19. 播放器系统 ====================
 // ====== 统一媒体播放器核心代码 ======
 var mediaPlayer = {
     savedPositions: {},
@@ -7728,6 +7754,7 @@ function updateMediaListState(courseId) {
 }
 
 
+// ==================== 12. 视频课堂模块 ====================
 // ====== 增强视频播放器 ======
 
 function initEnhancedVideoPlayer() {
@@ -8003,6 +8030,7 @@ function deleteWrongPhoto(photoId) {
 }
 
 
+// ==================== 14. DeepSeek AI模块 ====================
 // ====== AI导师对话功能 ======
 let currentMentor = null;
 let mentorChatHistory = [];
@@ -8084,6 +8112,7 @@ function getMentorResponse(question, mentor) {
 }
 
 
+// ==================== 17. 认知地图模块 ====================
 // ====== 认知地图六维雷达图 ======
 function renderCognitiveRadar(container) {
     // 获取用户认知数据（基于真实训练数据计算）
@@ -8428,6 +8457,7 @@ function renderStatItems(data) {
 
 
 
+// ==================== 13. 训练游戏模块 ====================
 // ====== 补充训练游戏 ======
 
 // 视觉追踪游戏
@@ -8713,7 +8743,8 @@ function startFocusChallenge() {
     }, 1000);
 }
 
-// ====== V81修复：添加缺失的函数 ======
+// ==================== 20. 设置与系统 ====================
+// ====== V81修复 ======
 
 // 设置面板功能
 function openSettingsPanel() {
@@ -8868,6 +8899,7 @@ function viewWrongNotes() {
     openFullscreenPage('wrongNotes');
 }
 
+// ==================== 5. 用户管理 ====================
 // ====== API配置功能 ======
 
 // API配置数据存储
@@ -8960,6 +8992,7 @@ function updateApiStatusDisplay() {
     }
 }
 
+// ==================== 5. 用户管理 ====================
 // ====== 头像选择功能 ======
 
 // 头像列表
@@ -9063,6 +9096,7 @@ function clearWrongNotes() {
     }
 }
 
+// ==================== 20. 设置与系统 ====================
 // ====== 数据同步与管理 ======
 
 // 数据同步
@@ -9120,7 +9154,7 @@ function exportData() {
     
     // 添加导出元信息
     const exportData = {
-        version: 'V135',
+        version: 'V136',
         exportTime: new Date().toISOString(),
         appName: '认知训练门户',
         data: data
@@ -9432,7 +9466,7 @@ function openAbout() {
         <div style="text-align:center;padding:20px 0;">
             <div style="font-size:48px;margin-bottom:12px;">🧠</div>
             <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V135</div>
+            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V136</div>
         </div>
         <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
             <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
@@ -9872,6 +9906,7 @@ function submitTopicAnswer(topicId) {
     }
 }
 
+// ==================== 15. 错题本模块 ====================
 // ====== 错题本模块 ======
 function renderWrongbook(container) {
     const user = getCurrentUserData();
@@ -9928,6 +9963,7 @@ function removeWrongNote(index) {
     }
 }
 
+// ==================== 16. 番茄钟模块 ====================
 // ====== 番茄闹钟模块 ======
 let pomodoroTimer = null;
 let pomodoroTime = 25 * 60; // 25分钟
