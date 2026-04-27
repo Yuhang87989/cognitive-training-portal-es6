@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V132</title>
+<title>认知训练 V133</title>
 <link rel="icon" type="image/x-icon" href="https://yuhang87989.github.io/cognitive-training-portal/favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="https://yuhang87989.github.io/cognitive-training-portal/icon-192.png"/>
 <link rel="apple-touch-icon" href="https://yuhang87989.github.io/cognitive-training-portal/apple-touch-icon.png"/><style>
@@ -809,7 +809,7 @@ function downloadPodcastFromCoze(courseId) {
                 <div class="settings-group-inner">
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;cursor:pointer;" onclick="openAbout()">
                         <div style="font-size:14px;color:#333;">版本信息</div>
-                        <div style="font-size:13px;color:#1A6BFF;">V132 →</div>
+                        <div style="font-size:13px;color:#1A6BFF;">V133 →</div>
                     </div>
                     <div class="settings-item" style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0;">
                         <div style="font-size:14px;color:#333;">反馈建议</div>
@@ -1048,7 +1048,7 @@ function downloadPodcastFromCoze(courseId) {
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
-const STORAGE_KEY = 'cognitive_training_v132';
+const STORAGE_KEY = 'cognitive_training_v133';
 
 // ====== 播放器全局变量 ======
 let currentAudio = null; // 音频播放器元素引用
@@ -7342,11 +7342,7 @@ var podcastCourses = [
 
 // ====== 视频课程数据（已清理无效视频，仅保留w3schools有效测试视频）=======
 var videoCourses = [
-    {id:'video1',title:'专注力训练',teacher:'心理学专家',duration:'5:23',durationSec:323,category:'学霸方法',gradient:'linear-gradient(135deg,#667eea,#764ba2)',icon:'🎯',url:'videos/专注力训练.mp4',views:25000},
-    {id:'video2',title:'学霸深度理解法',teacher:'特级教师',duration:'6:18',durationSec:378,category:'学霸方法',gradient:'linear-gradient(135deg,#FF9A63,#E87A4E)',icon:'🧠',url:'videos/学霸深度理解法_第1集.mp4',views:18000},
-    {id:'video3',title:'数学抽象推理',teacher:'数学特级教师',duration:'5:06',durationSec:306,category:'数学思维',gradient:'linear-gradient(135deg,#43E97B,#38F9D7)',icon:'📐',url:'videos/数学抽象推理.mp4',views:22000},
-    {id:'video4',title:'物理因果守恒',teacher:'物理特级教师',duration:'5:41',durationSec:341,category:'物理思维',gradient:'linear-gradient(135deg,#4facfe,#00f2fe)',icon:'⚡',url:'videos/物理因果守恒_第1集.mp4',views:15600},
-    {id:'video5',title:'逆向思维训练',teacher:'思维训练专家',duration:'3:27',durationSec:207,category:'思维训练',gradient:'linear-gradient(135deg,#fa709a,#fee140)',icon:'💡',url:'videos/逆向思维训练_第1集.mp4',views:12800}
+    {id:'video1',title:'测试视频 - Big Buck Bunny',teacher:'系统测试',duration:'0:10',durationSec:10,category:'测试',gradient:'linear-gradient(135deg,#667eea,#764ba2)',icon:'🎬',url:'https://www.w3schools.com/html/mov_bbb.mp4',views:1000}
 ];
 
 
@@ -9237,7 +9233,7 @@ function exportData() {
     
     // 添加导出元信息
     const exportData = {
-        version: 'V132',
+        version: 'V133',
         exportTime: new Date().toISOString(),
         appName: '认知训练门户',
         data: data
@@ -9549,7 +9545,7 @@ function openAbout() {
         <div style="text-align:center;padding:20px 0;">
             <div style="font-size:48px;margin-bottom:12px;">🧠</div>
             <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V132</div>
+            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V133</div>
         </div>
         <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
             <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
