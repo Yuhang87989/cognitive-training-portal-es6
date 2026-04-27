@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
-<title>认知训练 V124</title>
+<title>认知训练 V127</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
@@ -2156,7 +2156,10 @@ function createNewUser() {
         wrongNotes: [],
         completedTopics: [],
         methodStats: {},
-        thinkingStats: {}
+        thinkingStats: {},
+        gameScores: {},
+        gameCounts: {},
+        gameTimes: {}
     };
     
     data.users.push(newUser);
@@ -2294,10 +2297,41 @@ function cleanupModuleState() {
         gameTimerDisplay = null;
     }
     
+    // 停止贪吃蛇计时器
+    if (snakeGame) {
+        clearInterval(snakeGame);
+        snakeGame = null;
+    }
+    
+    // 停止俄罗斯方块计时器
+    if (tetrisGame) {
+        clearInterval(tetrisGame);
+        tetrisGame = null;
+    }
+    
+    // 停止打地鼠计时器
+    if (whackTimer) {
+        clearInterval(whackTimer);
+        whackTimer = null;
+    }
+    
+    // 停止消消乐计时器
+    if (elimTimer) {
+        clearInterval(elimTimer);
+        elimTimer = null;
+    }
+    
     // 停止番茄钟计时器
     if (pomodoroTimer) {
         clearInterval(pomodoroTimer);
         pomodoroTimer = null;
+    }
+    
+    // 清理游戏Canvas
+    const board = document.getElementById('game-board');
+    if (board) {
+        board.innerHTML = '';
+        board.style.cssText = '';
     }
     
     // 停止音频播放
@@ -5268,8 +5302,21 @@ function checkReason(selected, correct) {
 }
 
 function endGame() {
+    // 清理所有游戏计时器
     if (gameTimer) clearInterval(gameTimer);
     if (gameTimerDisplay) clearInterval(gameTimerDisplay);
+    if (snakeGame) clearInterval(snakeGame);
+    if (tetrisGame) clearInterval(tetrisGame);
+    if (whackTimer) clearInterval(whackTimer);
+    if (elimTimer) clearInterval(elimTimer);
+    
+    // 清理游戏变量
+    snakeGame = null;
+    tetrisGame = null;
+    whackTimer = null;
+    elimTimer = null;
+    gameTimer = null;
+    gameTimerDisplay = null;
     
     // 播放游戏结束音效
     SoundEffects.playComplete();
@@ -5406,6 +5453,7 @@ function startSnake() {
         if(head.x<0||head.x>=gridCount||head.y<0||head.y>=gridCount||snake.some(s=>s.x===head.x&&s.y===head.y)) {
             gameOver = true;
             clearInterval(snakeGame);
+            snakeGame = null;
             gameScore = score;
             document.getElementById('game-score').textContent = score;
             endGame();
@@ -5481,8 +5529,12 @@ function startTetris() {
     const nextCtx = nextCanvas.getContext('2d');
     
     const cols = 10, rows = 16, cellSize = 20;
-    canvas.width = cols * cellSize;
-    canvas.height = rows * cellSize;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = cols * cellSize * dpr;
+    canvas.height = rows * cellSize * dpr;
+    canvas.style.width = (cols * cellSize) + 'px';
+    canvas.style.height = (rows * cellSize) + 'px';
+    ctx.scale(dpr, dpr);
     
     const pieces = [
         {shape:[[1,1,1,1]],color:'#3498db'},
@@ -5931,6 +5983,7 @@ function startWhack() {
         
         if(whackTimeLeft<=0) {
             clearInterval(whackTimer);
+            whackTimer = null;
             endGame();
         } else {
             showMole();
@@ -6104,6 +6157,7 @@ function startEliminate() {
         document.getElementById('elim-timer').textContent = elimTime;
         if(elimTime<=0) {
             clearInterval(elimTimer);
+            elimTimer = null;
             endGame();
         }
     },1000);
@@ -6203,17 +6257,61 @@ function processMatches(matches) {
 
 
 function exitGame() {
+    // 清理所有游戏计时器
     if (gameTimer) clearInterval(gameTimer);
     if (gameTimerDisplay) clearInterval(gameTimerDisplay);
+    if (snakeGame) clearInterval(snakeGame);
+    if (tetrisGame) clearInterval(tetrisGame);
+    if (whackTimer) clearInterval(whackTimer);
+    if (elimTimer) clearInterval(elimTimer);
+    
+    // 清理游戏变量
+    snakeGame = null;
+    tetrisGame = null;
+    whackTimer = null;
+    elimTimer = null;
+    gameTimer = null;
+    gameTimerDisplay = null;
+    
+    // 隐藏游戏容器
     const gameContainer = document.getElementById('game-fullscreen-container');
     if (gameContainer) gameContainer.style.display = 'none';
+    
+    // 清理游戏板
+    const board = document.getElementById('game-board');
+    if (board) {
+        board.innerHTML = '';
+        board.style.cssText = '';
+    }
 }
 
 function closeGame() { 
-    if (gameTimer) clearInterval(gameTimer); 
+    // 清理所有游戏计时器
+    if (gameTimer) clearInterval(gameTimer);
     if (gameTimerDisplay) clearInterval(gameTimerDisplay);
+    if (snakeGame) clearInterval(snakeGame);
+    if (tetrisGame) clearInterval(tetrisGame);
+    if (whackTimer) clearInterval(whackTimer);
+    if (elimTimer) clearInterval(elimTimer);
+    
+    // 清理游戏变量
+    snakeGame = null;
+    tetrisGame = null;
+    whackTimer = null;
+    elimTimer = null;
+    gameTimer = null;
+    gameTimerDisplay = null;
+    
+    // 隐藏游戏容器
     const gameContainer = document.getElementById('game-fullscreen-container');
     if (gameContainer) gameContainer.style.display = 'none';
+    
+    // 清理游戏板
+    const board = document.getElementById('game-board');
+    if (board) {
+        board.innerHTML = '';
+        board.style.cssText = '';
+    }
 }
 
 
@@ -9407,6 +9505,9 @@ function registerNewUser() {
         wrongNotes: [],
         completedTopics: [],
         weeklyProgress: {},
+        gameScores: {},
+        gameCounts: {},
+        gameTimes: {},
         createTime: new Date().toISOString(),
         lastLoginTime: new Date().toISOString()
     };
