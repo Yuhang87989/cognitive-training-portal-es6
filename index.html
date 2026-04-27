@@ -4654,15 +4654,6 @@ function seekVideo(e) { if (!vpVideo || !vpVideo.duration) return; const rect = 
 function closeVideoPlayer() { if (vpVideo) { vpVideo.pause(); vpVideo.src = ''; } document.getElementById('video-player-modal').classList.remove('show'); }
 function formatTime(s) { if (!s||isNaN(s)) return '0:00'; return Math.floor(s/60)+':'+(Math.floor(s%60)+'').padStart(2,'0'); }
 
-function handleVideoUpload(input) {
-    if (!input.files[0]) return;
-    const url = URL.createObjectURL(input.files[0]);
-    const user = getCurrentUserData();
-    if (user) { user.userVideos = user.userVideos||[]; user.userVideos.push({id:Date.now(),title:input.files[0].name,url,time:Date.now()}); syncUserData(user); }
-    playVideo(input.files[0].name, url);
-    showToast('视频上传成功！');
-    input.value = '';
-}
 
 function handlePracticePhoto(input) {
     if (!input.files[0]) return;
