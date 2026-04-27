@@ -1107,7 +1107,7 @@ const videoList = [
     {id: 4, title: "物理因果守恒_第1集", url: "https://yuhang87989.github.io/cognitive-training-portal/videos/物理因果守恒_第1集.mp4", duration: "5:41", category: "物理思维"},
     {id: 5, title: "逆向思维训练_第1集", url: "https://yuhang87989.github.io/cognitive-training-portal/videos/逆向思维训练_第1集.mp4", duration: "3:27", category: "思维训练"}
 ];
-const OLD_KEYS = ['cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
+const OLD_KEYS = ['cognitive_training_v118','cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
 
 // 播放播客音频
 function playPodcastAudio(id) {
@@ -5515,7 +5515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 清除旧版本数据（只清除旧版本的key，保留当前版本数据）
     try {
-        const OLD_KEYS = ['cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
+        const OLD_KEYS = ['cognitive_training_v118','cognitive_training_v43', 'cognitive_training_v42', 'cognitive_training_v41', 'cognitive_training_v40', 'cognitive_training_v33', 'cognitive_training_v32'];
         OLD_KEYS.forEach(k => localStorage.removeItem(k));
     } catch(e) {}
     
