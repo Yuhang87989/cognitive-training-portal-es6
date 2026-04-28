@@ -166,6 +166,90 @@ const topicsChinese6 = [
     {id:324,title:'段落大意',diff:3,q:'概括段落主要内容的常用方法是？',a:'找中心句',e:'中心句通常在段首或段尾'}
 ];
 
+const topicsMath7 = [
+    {id:101,title:'有理数加法',diff:2,q:'计算：(-3)+(+7)+(-5)=?',a:'-1',e:'去括号：-3+7-5=-1'},
+    {id:102,title:'有理数乘法',diff:2,q:'计算：(-2)×(-3)×(+4)=?',a:'24',e:'负负得正：(-2)×(-3)=6, 6×4=24'},
+    {id:103,title:'绝对值',diff:1,q:'|-5|+|+3|=?',a:'8',e:'|-5|=5, |+3|=3, 5+3=8'},
+    {id:104,title:'相反数',diff:1,q:'-7的相反数是？',a:'7',e:'只有符号不同的两数互为相反数'},
+    {id:105,title:'数轴',diff:2,q:'在数轴上表示：大于-3且小于4的整数有哪些？',a:'-2,-1,0,1,2,3',e:'从-2到3共6个整数'},
+    {id:106,title:'整式加减',diff:2,q:'化简：3x+2y-x+5y',a:'2x+7y',e:'合并同类项：3x-x=2x, 2y+5y=7y'},
+    {id:107,title:'幂的运算',diff:3,q:'计算：2³×2⁴÷2⁵',a:'4',e:'同底数幂：指数相加减'},
+    {id:108,title:'一元一次方程',diff:2,q:'解方程：2x+5=13',a:'x=4',e:'移项：2x=8, x=4'},
+    {id:109,title:'方程应用',diff:3,q:'小明有x本书，小红比他多3本，两人共有15本，求x',a:'x=6',e:'x+(x+3)=15, 2x=12, x=6'},
+    {id:110,title:'线段计算',diff:2,q:'点A在-2，B在5，AB距离是？',a:'7',e:'|5-(-2)|=7'},
+    {id:111,title:'角度计算',diff:2,q:'一个角的余角是35°，这个角是多少度？',a:'55°',e:'余角之和为90°，90-35=55'},
+    {id:112,title:'平行线判定',diff:3,q:'直线a、b被c所截，若∠1=∠2，a∥b吗？',a:'能',e:'同位角相等，两直线平行'},
+    {id:113,title:'三角形内角和',diff:2,q:'三角形的三个内角和是？',a:'180°',e:'三角形内角和定理'},
+    {id:114,title:'方程组',diff:3,q:'解方程组：x+y=7, x-y=3',a:'x=5, y=2',e:'相加得2x=10，相减得2y=4'},
+    {id:115,title:'乘法公式',diff:3,q:'计算：(a+2)(a-2)',a:'a²-4',e:'平方差公式'},
+    {id:116,title:'因式分解',diff:3,q:'分解因式：x²-9',a:'(x+3)(x-3)',e:'平方差公式逆用'},
+    {id:117,title:'分式运算',diff:3,q:'计算：1/2+1/3',a:'5/6',e:'通分：分母6，分子3+2=5'},
+    {id:118,title:'统计初步',diff:2,q:'数据2,3,3,4,5,5,5的众数是？',a:'5',e:'出现次数最多的数'},
+    {id:119,title:'概率初步',diff:2,q:'抛硬币，正面朝上的概率是？',a:'1/2',e:'等可能性事件'},
+    {id:120,title:'几何证明',diff:4,q:'证明：等腰三角形两底角相等',a:'通过作高可证',e:'利用等腰三角形三线合一'},
+    {id:121,title:'绝对值方程',diff:3,q:'解方程：|x-3|=5',a:'x=8或x=-2',e:'x-3=5或x-3=-5'},
+
+    {id:122,title:'有理数比较',diff:2,q:'比较大小：-3 ○ -5',a:'-3 > -5',e:'负数比较，绝对值大的反而小'},
+    {id:123,title:'整式加减',diff:3,q:'化简：3x + 2y - x + 3y = ?',a:'2x + 5y',e:'合并同类项'},
+    {id:124,title:'一元一次方程',diff:3,q:'解方程：2(x+3)=10',a:'x=2',e:'去括号，移项'}
+];
+
+const topicsEnglish7 = [
+    {id:201,title:'一般现在时',diff:2,q:'He ____ (go) to school every day.',a:'goes',e:'第三人称单数动词加s'},
+    {id:202,title:'现在进行时',diff:2,q:'Look! The children ____ (play) in the park.',a:'are playing',e:'look提示进行时，be+ing'},
+    {id:203,title:'一般过去时',diff:2,q:'Yesterday, I ____ (visit) my grandmother.',a:'visited',e:'过去时间用过去式'},
+    {id:204,title:'一般将来时',diff:2,q:'We ____ (go) to Beijing next week.',a:'will go',e:'next week提示将来时'},
+    {id:205,title:'现在完成时',diff:3,q:'I ____ (read) this book three times.',a:'have read',e:'现在完成时：have/has+过去分词'},
+    {id:206,title:'名词所有格',diff:2,q:'____ (Tom) books are on the desk.',a:"Tom's",e:'名词所有格加\'s'},
+    {id:207,title:'人称代词',diff:1,q:'____ is my teacher. ____ name is Mrs. Li.',a:'She / Her',e:'主格作主语，所有格作定语'},
+    {id:208,title:'形容词比较级',diff:2,q:'Tom is ____ (tall) than Jack.',a:'taller',e:'than提示比较级，加er'},
+    {id:209,title:'形容词最高级',diff:2,q:'Lucy is the ____ (beautiful) girl in our class.',a:'most beautiful',e:'最高级前加the'},
+    {id:210,title:'副词位置',diff:2,q:'She speaks English ____ (fluent).',a:'fluently',e:'修饰动词用副词'},
+    {id:211,title:'情态动词',diff:2,q:'You ____ (must) finish your homework first.',a:'must',e:'must必须，表示必要性'},
+    {id:212,title:'祈使句',diff:1,q:'____ (not be) late for class again!',a:"Don't be",e:'否定祈使句用Don\'t+动词原形'},
+    {id:213,title:'there be句型',diff:2,q:'____ a book and two pens on the desk.',a:'There is',e:'就近原则'},
+    {id:214,title:'宾语从句',diff:3,q:'I think ____ she ____ (be) a good student.',a:'that / is',e:'that可省略，陈述语序'},
+    {id:215,title:'被动语态',diff:3,q:'The letter ____ (send) yesterday.',a:'was sent',e:'一般过去时的被动语态'},
+    {id:216,title:'if条件句',diff:3,q:'If it ____ (rain), I will stay at home.',a:'rains',e:'主将从现原则'},
+    {id:217,title:'疑问词',diff:2,q:'____ is your name?',a:'What',e:'问姓名用what'},
+    {id:218,title:'连词用法',diff:2,q:'I like English ____ my sister likes math.',a:'but',e:'转折对比关系'},
+    {id:219,title:'介词填空',diff:2,q:'We have classes ____ Monday ____ Friday.',a:'from / to',e:'from...to...表示从...到...'},
+    {id:220,title:'时态综合',diff:3,q:'My father ____ (work) here since 2010.',a:'has worked',e:'since+过去时间点，现在完成时'},
+    {id:221,title:'动词短语',diff:2,q:'Please turn ____ the radio. It\'s too noisy.',a:'down/off',e:'turn down关小/off关掉'},
+    {id:222,title:'现在进行时',diff:2,q:'Look! The students ___ their homework.',a:'are doing',e:'Look提示进行时'},
+    {id:223,title:'可数不可数',diff:2,q:'There is some ___ on the table.',a:'water',e:'water是不可数名词'},
+    {id:224,title:'特殊疑问词',diff:2,q:'___ is your birthday?',a:'When',e:'When问时间'}
+];
+
+const topicsChinese7 = [
+    {id:301,title:'拼音拼读',diff:1,q:'"兴奋"的读音是？',a:'xīng fèn',e:'兴读xīng时表示精神旺盛'},
+    {id:302,title:'字形辨析',diff:2,q:'下列词语中没有错别字的一项：A辩论 B辨论 C辩沦 D辨论',a:'A',e:'辩论的"辩"是言字旁'},
+    {id:303,title:'词语搭配',diff:2,q:'依次填入：我对未来充满____的信心。',a:'无限',e:'信心搭配"无限"'},
+    {id:304,title:'成语运用',diff:2,q:'使用成语"千姿百态"正确的一项是？',a:'花园里百花盛开，千姿百态',e:'形容姿态多种多样'},
+    {id:305,title:'病句修改',diff:3,q:'修改：春天的杭州是一年中最美的季节。',a:'杭州的春天是一年中最美的季节',e:'主语和宾语搭配不当'},
+    {id:306,title:'仿写句子',diff:2,q:'仿写：书籍是人类进步的阶梯。',a:'知识是通向成功的桥梁',e:'抓住比喻修辞'},
+    {id:307,title:'记叙文阅读',diff:3,q:'概括本文的主要内容（不超过30字）',a:'见文章',e:'抓住时间、地点、人物、事件'},
+    {id:308,title:'说明方法',diff:2,q:'文中画线句使用了什么说明方法？',a:'举例子/列数字/打比方',e:'常见说明方法'},
+    {id:309,title:'文言实词',diff:3,q:'解释"温故而知新"中"故"的意思',a:'旧的、旧的知识',e:'故：旧也'},
+    {id:310,title:'文言虚词',diff:3,q:'"之"在"学而时习之"中的用法是？',a:'代词，指代所学知识',e:'之：代词'},
+    {id:311,title:'翻译句子',diff:3,q:'翻译：学而不思则罔，思而不学则殆',a:'只学习不思考会迷惑，只思考不学习会有危害',e:'孔子学习方法论'},
+    {id:312,title:'文学常识',diff:2,q:'《论语》是____的经典著作',a:'儒家',e:'《论语》是儒家经典'},
+    {id:313,title:'修辞手法',diff:2,q:'"春天像小姑娘"使用了什么修辞？',a:'比喻',e:'把春天比作小姑娘'},
+    {id:314,title:'标点符号',diff:2,q:'下列句子中冒号使用正确的是？',a:'总说后用冒号',e:'冒号用在总说后'},
+    {id:315,title:'综合性学习',diff:2,q:'开展"少年正是读书时"活动，设计两个形式',a:'读书分享会、好书推荐卡',e:'设计要有可操作性'},
+    {id:316,title:'名著阅读',diff:2,q:'《西游记》中"大闹天宫"的主人公是谁？',a:'孙悟空',e:'齐天大圣孙悟空'},
+    {id:317,title:'语言表达',diff:3,q:'对"开卷有益"和"开卷未必有益"进行评述',a:'见观点',e:'要有自己的思考'},
+    {id:318,title:'信息提取',diff:2,q:'从新闻中提取五个W',a:'When Where Who What Why',e:'新闻要素提取'},
+    {id:319,title:'口语交际',diff:2,q:'当同学向你借书时，如何礼貌拒绝？',a:'使用礼貌用语',e:'表达原因'},
+    {id:320,title:'写作训练',diff:4,q:'以"我的成长故事"为题，写一篇记叙文',a:'见作文',e:'要素完整，感情真挚'},
+    {id:321,title:'古诗默写',diff:2,q:'默写《静夜思》全诗',a:'床前明月光，疑是地上霜。举头望明月，低头思故乡。',e:'李白名篇'},
+
+    {id:322,title:'文言实词',diff:2,q:'温故而知新中故的意思是？',a:'学过的知识',e:'故：旧的、以前的'},
+    {id:323,title:'说明方法',diff:2,q:'赵州桥是一座石拱桥，长约50米用了什么说明方法？',a:'列数字',e:'用具体数据说明'},
+    {id:324,title:'病句修改',diff:3,q:'修改病句：同学们基本都到齐了。',a:'去掉基本或都',e:'前后矛盾'}
+];
+
+
 const topicsMath8 = [{id:401,title:'全等三角形',diff:3,q:'AB=DE，AC=DF，BC=EF，能判定△ABC≌△DEF吗？',a:'能，SSS',e:'三边对应相等全等'},{id:402,title:'等腰三角形',diff:3,q:'等腰三角形一个底角为50°，顶角为？',a:'80°',e:'底角×2+顶角=180°'},{id:403,title:'勾股定理',diff:3,q:'直角三角形两直角边为5和12，斜边为？',a:'13',e:'5²+12²=25+144=169=13²'},{id:404,title:'一次函数',diff:3,q:'函数y=2x-3，x=4时，y=？',a:'5',e:'代入计算：2×4-3=5'},{id:405,title:'一次函数图像',diff:3,q:'y=kx+b，k>0，b<0，图像经过哪些象限？',a:'一、三、四象限',e:'k>0过一三，b<0与y轴负半轴相交'},{id:406,title:'二元一次方程组',diff:3,q:'解方程组：3x+2y=13, x-y=3',a:'x=19/5, y=4/5',e:'代入法或加减消元法'},{id:407,title:'分式方程',diff:3,q:'解方程：1/(x-1)=2/x',a:'x=2',e:'去分母，检验增根'},{id:408,title:'反比例函数',diff:3,q:'反比例函数y=6/x，当x=3时，y=？',a:'2',e:'代入：6÷3=2'},{id:409,title:'四边形',diff:3,q:'平行四边形的对角线具有什么性质？',a:'互相平分',e:'平行四边形对角线互相平分'},{id:410,title:'菱形判定',diff:4,q:'对角线互相垂直平分的四边形是什么？',a:'菱形',e:'菱形的判定定理'},{id:411,title:'矩形性质',diff:3,q:'矩形的对角线长度相等吗？',a:'相等',e:'矩形对角线相等'},{id:412,title:'梯形中位线',diff:3,q:'梯形上底2，下底4，中位线长为？',a:'3',e:'中位线=(上底+下底)÷2'},{id:413,title:'数据分析',diff:3,q:'数据2,3,4,5,6的方差是？',a:'2',e:'先求平均数，再求方差'},{id:414,title:'概率计算',diff:3,q:'袋中有3红2白球，摸到红球的概率是？',a:'3/5',e:'概率=红球数÷总球数'},{id:415,title:'相似三角形',diff:4,q:'两个相似三角形相似比3:2，面积比是？',a:'9:4',e:'面积比=相似比的平方'},{id:416,title:'黄金分割',diff:3,q:'点C把线段AB分成AC/AB=BC/AC，则AC/AB=？',a:'(√5-1)/2≈0.618',e:'黄金分割比'},{id:417,title:'三角函数',diff:3,q:'在Rt△ABC中，∠C=90°，AC=3，BC=4，sinA=？',a:'4/5',e:'sinA=对边/斜边'},{id:418,title:'圆的基本性质',diff:3,q:'圆的半径为5，圆上一点到圆心的距离是？',a:'5',e:'圆上点到圆心距离等于半径'},{id:419,title:'一次函数与方程',diff:3,q:'直线y=2x-5与x轴的交点坐标是？',a:'(2.5,0)',e:'令y=0，解2x-5=0'},{id:420,title:'一次函数综合',diff:4,q:'已知一次函数y=kx+b，经过(1,3)和(2,5)，求k和b',a:'k=2,b=1',e:'代入两点求方程组'},{id:421,title:'四边形判定',diff:4,q:'一组邻边相等的平行四边形是什么？',a:'菱形',e:'菱形的定义'},{id:422,title:'正方形性质',diff:3,q:'正方形的对角线具有哪些性质？',a:'相等、垂直、平分',e:'正方形具有矩形和菱形的全部性质'},{id:423,title:'数据分析综合',diff:3,q:'数据3,5,7,9,11的中位数是？',a:'7',e:'中位数是排序后的中间值'},{id:424,title:'概率应用',diff:3,q:'同时抛两枚硬币，至少有一枚正面朝上的概率是？',a:'3/4',e:'总情况4种，至少一正有3种'}];
 
 const topicsEnglish8 = [{id:501,title:'现在完成时',diff:3,q:'I ____ (study) English for 3 years.',a:'have studied',e:'for+时间段，现在完成时'},{id:502,title:'被动语态',diff:3,q:'The book ____ (write) by Lu Xun.',a:'was written',e:'过去写的，一般过去时被动'},{id:503,title:'宾语从句',diff:3,q:'Do you know if he ____ (come) tomorrow?',a:'will come',e:'if引导宾语从句，表将来'},{id:504,title:'定语从句',diff:4,q:'The book ____ (that/who) I bought is interesting.',a:'that / which',e:'指物用that/which'},{id:505,title:'状语从句',diff:3,q:'____ you work harder, you won\'t pass.',a:'Unless',e:'unless除非=if...not'},{id:506,title:'情态动词',diff:2,q:'You ____ (must) have seen the movie.',a:'must',e:'must have done表示对过去的肯定推测'},{id:507,title:'非谓语动词',diff:4,q:'I saw him ____ (play) basketball.',a:'playing',e:'see sb doing看到...正在做'},{id:508,title:'形容词顺序',diff:3,q:'排列：a, beautiful, red, small, flower',a:'a beautiful small red flower',e:'限定词+大小+颜色+名词'},{id:509,title:'倒装句',diff:3,q:'Only then ____ (did he realize) the importance.',a:'did he realize',e:'Only+状语置于句首，主谓倒装'},{id:510,title:'主谓一致',diff:3,q:'Neither the teacher nor the students ____ happy.',a:'are',e:'就近一致原则'},{id:511,title:'虚拟语气',diff:4,q:'If I ____ (be) a bird, I would fly.',a:'were',e:'与现在事实相反，用were'},{id:512,title:'时态综合',diff:3,q:'By the time he came, I ____ (finish) my homework.',a:'had finished',e:'by the time+过去，主句过去完成时'},{id:513,title:'短语动词',diff:2,q:'Please look ____ the new words in the dictionary.',a:'up',e:'look up查字典'},{id:514,title:'词性转换',diff:2,q:'The news was very ____ (excite). We were all ____ (excite).',a:'exciting / excited',e:'-ing令人.../-ed感到...'},{id:515,title:'复合句',diff:3,q:'Make a sentence with "although...but..."',a:'Although he is young, he is tall.',e:'although和but不连用'},{id:516,title:'阅读理解',diff:3,q:'The main idea of paragraph 2 is...',a:'见短文',e:'找段落主题句'},{id:517,title:'完形填空',diff:3,q:'从A、B、C、D中选择最佳答案...',a:'见上下文',e:'上下文语境分析'},{id:518,title:'书面表达',diff:4,q:'写一篇关于"环保"的英语短文，80词左右',a:'见作文',e:'包含环保建议'},{id:519,title:'现在完成时深入',diff:3,q:'I have lived here since 2010. 对划线部分提问',a:'How long have you lived here?',e:'since+时间点，问段时间'},{id:520,title:'被动语态综合',diff:3,q:'改写：They will finish the work tomorrow.',a:'The work will be finished tomorrow.',e:'一般将来时的被动'},{id:521,title:'过去完成时',diff:4,q:'When I arrived, he ____ (leave).',a:'had left',e:'过去的过去，用过去完成时'},{id:522,title:'介词用法',diff:2,q:'He arrived ____ a rainy morning.',a:'on',e:'具体某天早上用on'},{id:523,title:'动词辨析',diff:3,q:'Choose the right word: Please _____ down your name.',a:'write',e:'write down写下'},{id:524,title:'阅读策略',diff:3,q:'阅读时，如何处理不认识的单词？',a:'根据上下文猜词义',e:'阅读技巧'}];
