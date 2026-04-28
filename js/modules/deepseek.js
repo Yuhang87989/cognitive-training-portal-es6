@@ -822,6 +822,11 @@ window.openDeepSeekRecharge = openDeepSeekRecharge;
 // Window Exports
 // ============================================================
 window.renderDeepseek = renderDeepseek;
+window.analyzeTopicWithAI = analyzeTopicWithAI;
+window.analyzeMethodWithAI = analyzeMethodWithAI;
+window.analyzeThinkingWithAI = analyzeThinkingWithAI;
+window.analyzePhotoWithAI = analyzePhotoWithAI;
+window.showPhotoPreview = showPhotoPreview;
 window.sendToDeepSeek = sendToDeepSeek;
 window.clearDeepSeekImage = clearDeepSeekImage;
 window.askTemplate = askTemplate;
