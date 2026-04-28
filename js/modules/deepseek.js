@@ -101,16 +101,13 @@ async function sendToDeepSeek() {
         } else {
             // 视觉API失败，提示用户配置API或提供文字描述
             if (msg) {
-                userContent = '[用户上传了一张图片（图片分析API未配置），已附上文字问题]
-
-' + msg;
+                userContent = '[用户上传了一张图片（图片分析API未配置），已附上文字问题]\n\n' + msg;
                 showToast('💡 提示：图片分析需要配置VISION_API_KEY');
             } else {
-                userContent = '[用户上传了一张图片]
-
-请描述图片内容或配置图片理解API';
+                userContent = '[用户上传了一张图片]\n请描述图片内容，我来帮你分析';
                 showToast('⚠️ 图片分析API未配置，请输入文字描述图片内容');
             }
+        }
         }
     } else {
         userContent = msg;

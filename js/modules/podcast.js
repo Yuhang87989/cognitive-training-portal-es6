@@ -1389,6 +1389,7 @@ window.deleteLocalAudio = deleteLocalAudio;
 window.deleteLocalVideo = deleteLocalVideo;
 window.downloadPodcastFromCoze = downloadPodcastFromCoze;
 window.loginCozePlatform = loginCozePlatform;
+window.uploadPodcastFile = uploadPodcastFile;
 window.checkCozeLogin = checkCozeLogin;
 window.analyzeTopicWithAI = analyzeTopicWithAI;
 window.checkTopicAnswer = checkTopicAnswer;
