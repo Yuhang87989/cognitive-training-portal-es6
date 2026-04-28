@@ -1,6 +1,6 @@
 // 版本: V140
 
-var videoCourses = [
+window.videoCourses = [
     {id:"video1",title:"测试视频 - Big Buck Bunny",teacher:"系统测试",duration:"0:10",durationSec:10,category:"测试",gradient:"linear-gradient(135deg,#667eea,#764ba2)",icon:"🎬",url:"https://www.w3schools.com/html/mov_bbb.mp4",views:1000}
 ];
 
@@ -22,7 +22,7 @@ function renderVideo(container) {
     
     container.innerHTML = `
         <div class="card">
-            <h3 style="margin-bottom:16px;">📺 视频课堂 <span style="font-size:12px;color:#999;">共${videoCourses.length}个课程</span></h3>
+            <h3 style="margin-bottom:16px;">📺 视频课堂 <span style="font-size:12px;color:#999;">共${window.videoCourses.length}个课程</span></h3>
             <div class="subject-tab" style="flex-wrap:wrap;">
                 <button class="subject-tab-btn active" onclick="filterVideoCourse('all', this)">全部</button>
                 <button class="subject-tab-btn" onclick="filterVideoCourse('学习方法', this)">学习方法</button>
@@ -97,7 +97,7 @@ function filterVideoCourse(category, btn) {
     document.querySelectorAll('.subject-tab-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
     
-    var videos = videoCourses.filter(function(v) { return category === 'all' || v.category === category; });
+    var videos = window.videoCourses.filter(function(v) { return category === 'all' || v.category === category; });
     var videoHtml = videos.map(function(v) {
         return '<div class="video-item" onclick="playVideoFromList(\'' + v.id + '\')">' +
                '<div class="video-thumb"><span class="play-icon">▶</span></div>' +
@@ -110,7 +110,7 @@ function filterVideoCourse(category, btn) {
 }
 
 function playVideoFromList(id) {
-    var course = videoCourses.find(function(v) { return v.id === id; });
+    var course = window.videoCourses.find(function(v) { return v.id === id; });
     if (course) {
         // 使用增强版视频播放器，传入videoId用于记录观看进度
         openEnhancedVideoPlayer(course.title, course.url, course.id);
@@ -124,4 +124,4 @@ window.filterVideoCourse = filterVideoCourse;
 window.playVideoFromList = playVideoFromList;
 window.playLocalVideo = playLocalVideo;
 window.deleteLocalVideo = deleteLocalVideo;
-window.videoCourses = videoCourses;
+

@@ -164,3 +164,4 @@ window.renderStatItems = renderStatItems;
 // ============================================================
 // Plan - 训练计划
 // ============================================================
+window.calculateCognitiveData = calculateCognitiveData;

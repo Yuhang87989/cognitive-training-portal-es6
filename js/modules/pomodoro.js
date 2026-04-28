@@ -3,13 +3,13 @@
 // 番茄钟模块
 // ============================================================
 
-let pomodoroTime = 25 * 60;
-let pomodoroTimer = null;
+window.window.pomodoroTime = 25 * 60;
+window.window.pomodoroTimer = null;
 let pomodoroRunning = false;
 let pomodoroMode = 'work'; // work, break
 
 function renderPomodoro(container) {
-    const minutes = Math.floor(pomodoroTime / 60);
+    const minutes = Math.floor(window.pomodoroTime / 60);
     const seconds = pomodoroTime % 60;
     
     container.innerHTML = `
@@ -52,14 +52,14 @@ function renderPomodoro(container) {
 }
 
 function resetPomodoro() {
-    clearInterval(pomodoroTimer);
+    clearInterval(window.pomodoroTimer);
     pomodoroRunning = false;
-    pomodoroTime = 25 * 60;
+    window.pomodoroTime = 25 * 60;
     renderPomodoro(document.getElementById('fullscreen-content'));
 }
 
 function setPomodoroTime(minutes) {
-    pomodoroTime = minutes * 60;
+    window.pomodoroTime = minutes * 60;
     pomodoroMode = minutes >= 15 ? 'work' : 'break';
     const display = document.getElementById('pomodoro-display');
     if (display) {
@@ -69,14 +69,14 @@ function setPomodoroTime(minutes) {
 
 function togglePomodoro() {
     if (pomodoroRunning) {
-        clearInterval(pomodoroTimer);
+        clearInterval(window.pomodoroTimer);
         pomodoroRunning = false;
     } else {
         pomodoroRunning = true;
-        pomodoroTimer = setInterval(() => {
-            pomodoroTime--;
-            if (pomodoroTime <= 0) {
-                clearInterval(pomodoroTimer);
+        window.pomodoroTimer = setInterval(() => {
+            window.pomodoroTime--;
+            if (window.window.pomodoroTime <= 0) {
+                clearInterval(window.pomodoroTimer);
                 pomodoroRunning = false;
                 // 播放提示音
                 if (typeof SoundEffects !== 'undefined' && SoundEffects.playComplete) {
@@ -91,12 +91,12 @@ function togglePomodoro() {
                     syncUserData(user);
                 }
                 // 重置
-                pomodoroTime = 25 * 60;
+                window.pomodoroTime = 25 * 60;
                 renderPomodoro(document.getElementById('fullscreen-content'));
             }
             const display = document.getElementById('pomodoro-display');
             if (display) {
-                const m = Math.floor(pomodoroTime / 60);
+                const m = Math.floor(window.pomodoroTime / 60);
                 const s = pomodoroTime % 60;
                 display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             }
@@ -111,5 +111,5 @@ window.renderPomodoro = renderPomodoro;
 window.resetPomodoro = resetPomodoro;
 window.setPomodoroTime = setPomodoroTime;
 window.togglePomodoro = togglePomodoro;
-window.pomodoroTime = pomodoroTime;
-window.pomodoroTimer = pomodoroTimer;
+window.
+window.window.pomodoroTimer = window.pomodoroTimer;
