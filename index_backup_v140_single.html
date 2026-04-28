@@ -314,6 +314,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <body>
 
 
+
 <!-- 首页 -->
 <div id="page-home" class="page active" style="display:block;">
     <div class="home-header">
@@ -936,11 +937,53 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 
 
-<!-- 加载模块化JS文件 -->
+<script>
+// ====== 初始化脚本 ======
+// 版本: V140
 
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+});
 
+function initApp() {
+    // 默认用户创建
+    let data = loadData();
+    if (!data.users || data.users.length === 0) {
+        // 创建默认用户邱宇菲
+        const defaultUser = {
+            id: 'user_' + Date.now(),
+            name: '邱宇菲',
+            grade: 7,
+            difficulty: 1,
+            avatar: '👧',
+            createdAt: Date.now(),
+            lastLogin: Date.now(),
+            stats: {
+                totalQuestions: 0,
+                correctAnswers: 0,
+                totalMinutes: 0,
+                streak: 0
+            }
+        };
+        data.users = [defaultUser];
+        data.currentUser = defaultUser.id;
+        saveData(data);
+    }
+    
+    // 更新UI
+    renderHomePage();
+}
+
+// 页面可见性变化时更新统计
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        syncTodayStats();
+    }
+});
 </script>
 
+<!-- 加载模块化JS文件 -->
 <script>
 // ============================================================
 // Config - 全局配置
@@ -15260,5 +15303,53 @@ function toggleTask(el) {
 
 
 </script>
+<script>
+<script>
+// ====== 初始化脚本 ======
+// 版本: V140
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initApp();
+});
+
+function initApp() {
+    // 默认用户创建
+    let data = loadData();
+    if (!data.users || data.users.length === 0) {
+        // 创建默认用户邱宇菲
+        const defaultUser = {
+            id: 'user_' + Date.now(),
+            name: '邱宇菲',
+            grade: 7,
+            difficulty: 1,
+            avatar: '👧',
+            createdAt: Date.now(),
+            lastLogin: Date.now(),
+            stats: {
+                totalQuestions: 0,
+                correctAnswers: 0,
+                totalMinutes: 0,
+                streak: 0
+            }
+        };
+        data.users = [defaultUser];
+        data.currentUser = defaultUser.id;
+        saveData(data);
+    }
+    
+    // 更新UI
+    renderHomePage();
+}
+
+// 页面可见性变化时更新统计
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        syncTodayStats();
+    }
+});
+</script>
+</script>
+
 </body>
 </html>

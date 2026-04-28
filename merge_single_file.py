@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""合并所有模块到单文件index.html"""
+"""合并所有模块到单文件index.html - V140 单文件版"""
 import os
+import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -76,96 +77,138 @@ def get_module_comment(path):
     return f"// {'='*60}\n// {name}\n// {'='*60}\n\n"
 
 def main():
-    # 读取CSS
-    css_content = read_file('css/style.css')
+    # 从模块化版本开始
+    source_path = os.path.join(BASE_DIR, 'index_modular_temp.html')
+    with open(source_path, 'r', encoding='utf-8') as f:
+        content = f.read()
     
-    # 读取HTML模板
-    html_path = os.path.join(BASE_DIR, 'index.html')
-    with open(html_path, 'r', encoding='utf-8') as f:
-        html_content = f.read()
+    # 1. 找到</head>位置
+    head_end_pos = content.find('</head>') + len('</head>')
     
-    # 提取HTML头部和尾部
-    head_end = html_content.find('</head>')
-    body_end = html_content.find('</body>')
+    # 2. 找到body开始和所有<script src>标签
+    body_start = content.find('<body>')
+    all_script_tags = list(re.finditer(r'<script src="[^"]+"></script>', content))
     
-    html_head = html_content[:head_end]
-    html_tail = html_content[body_end:]  # includes </body> and </html>
+    # 3. 分类script标签
+    head_scripts = []  # 在</head>之前的（保留PeerJS）
+    body_scripts = []   # 在</head>之后的（要移除）
     
-    # 修改图标路径为GitHub Pages绝对URL
-    html_head = html_head.replace(
+    for m in all_script_tags:
+        if m.start() < head_end_pos:
+            head_scripts.append(m)
+        else:
+            body_scripts.append(m)
+    
+    print(f"head中外链script: {len(head_scripts)}")
+    print(f"body中外链script: {len(body_scripts)}")
+    
+    # 4. 构建HTML头部（保留PeerJS，移除CSS外链，更新图标路径）
+    head_content = re.sub(r'<link\s+rel="stylesheet"\s+href="css/style\.css"\s*/?>', '', content[:head_end_pos])
+    
+    # 更新图标路径
+    head_content = head_content.replace(
         'href="favicon.ico"',
         'href="https://yuhang87989.github.io/cognitive-training-portal/favicon.ico"'
     )
-    html_head = html_head.replace(
+    head_content = head_content.replace(
         'href="icon-192.png"',
         'href="https://yuhang87989.github.io/cognitive-training-portal/icon-192.png"'
     )
+    head_content = head_content.replace(
+        'href="apple-touch-icon.png"',
+        'href="https://yuhang87989.github.io/cognitive-training-portal/apple-touch-icon.png"'
+    )
     
-    # 构建CSS标签
-    css_style = f'<style>\n{css_content}\n</style>'
+    # 5. 读取CSS内容并构建<style>标签
+    css_content = read_file('css/style.css')
+    css_style = f'\n<style>\n{css_content}\n</style>\n'
     
-    # 移除旧的外链CSS引用
-    html_head = html_head.replace('<link rel="stylesheet" href="css/style.css"/>', '')
+    # 6. 提取body内容
+    # 从<body>到第一个body中外链<script>之前
+    if body_scripts:
+        body_end = body_scripts[0].start()
+    else:
+        body_end = content.find('<script>\n// ======', body_start)
     
-    # 提取initApp脚本
-    init_app_start = html_content.find('<script>\n// ====== 初始化脚本 ======')
-    init_app_end = html_content.find('</script>', init_app_start) + len('</script>')
-    init_app_script = html_content[init_app_start:init_app_end]
+    body_content = content[body_start:body_end]
     
-    # 移除旧的外链JS标签和initApp脚本
-    script_pattern = r'<script src="[^"]+"></script>'
-    html_head = html_head.split('<script>')[0] + html_head.split('<script>')[-1]
+    # 7. 提取initApp脚本（只提取一次）
+    init_start = content.find('<script>\n// ====== 初始化脚本')
+    init_end = content.find('</script>', init_start) + len('</script>')
+    init_script = content[init_start:init_end]
+    print(f"✓ 提取initApp脚本: 位置{init_start}-{init_end}")
     
-    # 重新构建HTML头部（去掉所有script标签和样式）
-    lines = html_content.split('\n')
-    new_lines = []
-    in_script_block = False
-    skip_to_end = False
-    
-    for i, line in enumerate(lines):
-        if '<script src=' in line:
-            continue  # 跳过外链script标签
-        if line.strip() == '<script>' and i > 600:  # initApp脚本开始
-            break  # 停止收集，跳过后面的内容
-        new_lines.append(line)
-    
-    html_head = '\n'.join(new_lines)
-    
-    # 找到</body>的位置
-    body_end_pos = html_head.rfind('</body>')
-    html_head = html_head[:body_end_pos]
-    
-    # 构建合并后的JS内容
+    # 8. 构建合并后的JS内容（不含initApp，让它单独在最后）
     js_parts = []
     for js_file in JS_FILES:
         try:
-            content = read_file(js_file)
+            file_content = read_file(js_file)
             js_parts.append(get_module_comment(js_file))
-            js_parts.append(content)
+            js_parts.append(file_content)
             js_parts.append('\n\n')
             print(f"✓ {js_file}")
         except Exception as e:
             print(f"✗ {js_file}: {e}")
     
-    # 添加initApp脚本
-    js_parts.append('\n// ============================================================\n// Init - 应用初始化\n// ============================================================\n\n')
-    js_parts.append(init_app_script)
-    
     combined_js = ''.join(js_parts)
     
-    # 构建完整JS标签
-    js_script = f'<script>\n{combined_js}\n</script>'
+    # 构建模块JS标签
+    js_modules_script = f'<script>\n{combined_js}\n</script>\n'
     
-    # 组装最终HTML
-    final_html = html_head + '\n' + css_style + '\n' + js_script + '\n</body>\n</html>\n'
+    # initApp单独一个标签
+    js_init_script = f'<script>\n{init_script}\n</script>\n'
+    
+    # 9. 组装最终HTML
+    final_html = head_content + css_style + body_content + js_modules_script + js_init_script + '\n</body>\n</html>\n'
     
     # 写入文件
     output_path = os.path.join(BASE_DIR, 'index.html')
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write(final_html)
     
+    # 验证
+    print(f"\n--- 验证 ---")
+    if 'yuhang87989.github.io' in final_html:
+        print("✓ 图标路径已更新为GitHub Pages URL")
+    else:
+        print("✗ 图标路径未更新")
+    
+    style_count = final_html.count('<style>')
+    script_count = final_html.count('<script>')
+    print(f"✓ <style>标签数量: {style_count} (应为2: 全局 + 内联)")
+    print(f"✓ <script>标签数量: {script_count} (应为3: PeerJS + 模块 + initApp)")
+    
+    if 'href="css/style.css"' in final_html:
+        print("✗ 仍有外链CSS引用")
+    else:
+        print("✓ 无外链CSS引用")
+
+    if 'src="js/' in final_html:
+        print("✗ 仍有外链JS引用")
+    else:
+        print("✓ 无外链JS引用")
+    
+    # 验证HTML结构
+    if '</head>' in final_html:
+        print("✓ </head>存在")
+    if '</body>' in final_html:
+        print("✓ </body>存在")
+    if '</html>' in final_html:
+        print("✓ </html>存在")
+    
+    # 验证所有模块
+    print("\n--- 模块检查 ---")
+    for name in MODULE_NAMES.values():
+        if name in final_html:
+            print(f"  ✓ {name}")
+        else:
+            print(f"  ✗ {name} 未找到")
+    
     print(f"\n✓ 合并完成！文件大小: {len(final_html):,} bytes")
-    print(f"✓ 输出路径: {output_path}")
+    
+    # 清理临时文件
+    os.remove(source_path)
+    print(f"✓ 已清理临时文件")
 
 if __name__ == '__main__':
     main()
