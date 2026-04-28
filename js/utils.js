@@ -95,13 +95,13 @@ function cleanupModuleState() {
     stopTTSSpeech();
     
     // 停止语音识别
-    if (isRecording && deepseekRecognition) {
+    if (typeof isRecording !== 'undefined' && isRecording && typeof deepseekRecognition !== 'undefined' && deepseekRecognition) {
         deepseekRecognition.stop();
         isRecording = false;
     }
     
     // 清理DeepSeek图片
-    if (currentDeepSeekImage) {
+    if (typeof currentDeepSeekImage !== 'undefined' && currentDeepSeekImage) {
         currentDeepSeekImage = null;
     }
     
@@ -197,7 +197,7 @@ function toggleSettingsGroup(groupId) {
 function exitSystem() {
     // 停止所有媒体
     if (typeof currentAudio !== 'undefined' && currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio.src = ''; }
-    if (evpVideo) { evpVideo.pause(); evpVideo.src = ''; }
+    if (typeof evpVideo !== 'undefined' && evpVideo) { evpVideo.pause(); evpVideo.src = ''; }
     stopTTSSpeech();
     
     // 隐藏所有播放器
