@@ -1,5 +1,9 @@
 // 版本: V140
 
+var videoCourses = [
+    {id:"video1",title:"测试视频 - Big Buck Bunny",teacher:"系统测试",duration:"0:10",durationSec:10,category:"测试",gradient:"linear-gradient(135deg,#667eea,#764ba2)",icon:"🎬",url:"https://www.w3schools.com/html/mov_bbb.mp4",views:1000}
+];
+
 CTM.registerModule('video', {
     name: 'video',
     icon: '🎯',

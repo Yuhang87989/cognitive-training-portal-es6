@@ -1,5 +1,7 @@
 // 版本: V140
 
+
+let currentTopicsSubject = 'math';
 CTM.registerModule('topics', {
     name: 'topics',
     icon: '🎯',
