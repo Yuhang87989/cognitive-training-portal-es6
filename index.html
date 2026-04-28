@@ -9962,17 +9962,18 @@ function showGoodbyeModal(user) {
         speakText(voiceMsg);
     }, 300);
     
-    // 5秒后自动关闭
-    setTimeout(() => {
-        closeGoodbyeModal();
-    }, 6000);
+    // 3秒后自动关闭并退出
+    setTimeout(function() {
+        var modal = document.getElementById('goodbye-modal');
+        if (modal) { modal.style.animation = 'fadeOut 0.3s ease'; setTimeout(function() { modal.remove(); doExitSystem(); }, 300); }
+    }, 3000);
 }
 
 function closeGoodbyeModal() {
-    const modal = document.getElementById('goodbye-modal');
+    var modal = document.getElementById('goodbye-modal');
     if (modal) {
         modal.style.animation = 'fadeOut 0.3s ease';
-        setTimeout(() => modal.remove(), 300);
+        setTimeout(function() { modal.remove(); doExitSystem(); }, 300);
     }
 }
 
@@ -10214,9 +10215,63 @@ function resetPomodoro() {
 
 
 function exitSystem() {
-    if (confirm('确定要退出吗？')) {
-        localStorage.clear();
-        location.reload();
+    // 停止所有媒体
+    if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio.src = ''; }
+    if (evpVideo) { evpVideo.pause(); evpVideo.src = ''; }
+    stopTTSSpeech();
+    
+    // 隐藏所有播放器
+    var miniEl = document.getElementById('mini-player');
+    var audioEl = document.getElementById('audio-player-fullscreen');
+    var videoEl = document.getElementById('enhanced-video-player');
+    if (miniEl) miniEl.classList.remove('show');
+    if (audioEl) audioEl.classList.remove('show');
+    if (videoEl) videoEl.style.display = 'none';
+    
+    // 关闭设置面板
+    closeSettingsPanel();
+    
+    // 显示告别弹窗
+    var user = getCurrentUserData();
+    if (user) {
+        showGoodbyeModal(user);
+        // 延迟后执行退出
+        setTimeout(function() { doExitSystem(); }, 3000);
+    } else {
+        doExitSystem();
+    }
+}
+
+function doExitSystem() {
+    // 清除当前用户
+    var data = loadData();
+    data.currentUser = null;
+    saveData(data);
+    
+    // 重置播放状态
+    audioCtx.isPlaying = false;
+    audioCtx.currentTrack = null;
+    videoCtx.isPlaying = false;
+    videoCtx.currentVideo = null;
+    
+    // 关闭告别弹窗
+    var goodbyeModal = document.getElementById('goodbye-modal');
+    if (goodbyeModal) goodbyeModal.remove();
+    
+    // 关闭所有全屏页面
+    var fullscreenEl = document.getElementById('fullscreen-container');
+    if (fullscreenEl) fullscreenEl.classList.remove('active');
+    
+    // 跳转到登录页
+    showPage('login');
+    
+    // 如果是PWA模式，尝试关闭窗口
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+        setTimeout(function() {
+            window.close();
+            // 如果close()被浏览器阻止，尝试后退
+            setTimeout(function() { window.history.go(-999); }, 500);
+        }, 1000);
     }
 }
 
