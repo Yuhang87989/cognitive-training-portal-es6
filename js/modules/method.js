@@ -1,6 +1,6 @@
 // 版本: V140
 
-const methodTrainingQuestions = {
+window.methodTrainingQuestions = {
     feyman: [
         {q:'用费曼学习法解释"光合作用"',a:'把植物比作工厂，叶绿素是工人，阳光是能量，产出葡萄糖和O₂'},
         {q:'用费曼学习法解释"欧姆定律"',a:'把电流比作水流，电压比作水压，电阻比作管道粗细'},
@@ -66,7 +66,7 @@ const methodTrainingQuestions = {
     ]
 };
 
-const methodDetails = {
+window.methodDetails = {
     feyman: {title:'🧠 费曼学习法',desc:'把学到的知识用自己的话讲给别人听，如果别人能听懂，说明你真正掌握了。',steps:['选择一个你想要理解的概念','想象你要把这个概念教给一个完全不懂的人','如果讲解过程中卡住了，就回顾原始材料','用自己的话重新组织，确保通俗易懂'],tip:'💡 最佳实践：每天用费曼学习法复习一个知识点，坚持21天形成习惯。'},
     pomodoro: {title:'⏰ 番茄工作法',desc:'25分钟专注学习，5分钟休息，循环进行，提高效率。',steps:['选择一个待完成的任务','设定25分钟倒计时（一个番茄钟）','专注工作，中途不做其他事','计时结束后休息5分钟','每4个番茄钟后休息15-30分钟'],tip:'💡 建议：使用手机闹钟或专门的番茄钟APP来计时。'},
     ebbinghaus: {title:'🔄 艾宾浩斯记忆法',desc:'学习后1天、3天、7天、14天、30天分别复习，加深长期记忆。',steps:['初次学习新知识','24小时后进行第一次复习','3天后再复习一次','7天后第三次复习','14天后第四次复习','30天后最后一次复习'],tip:'💡 关键：严格按照时间节点复习，不要偷懒！'},
@@ -107,7 +107,7 @@ function showConserveQuestion() {
 }
 
 function showMethodDetail(id) {
-    const m = methodDetails[id];
+    const m = window.methodDetails[id];
     if (!m) return;
     const content = document.getElementById('detail-content');
     content.innerHTML = `
@@ -176,7 +176,7 @@ function submitMethodAnswers(methodId, page) {
     // 播放提交音效
     SoundEffects.playSubmit();
     
-    const questions = methodTrainingQuestions[methodId];
+    const questions = window.methodTrainingQuestions[methodId];
     const startIndex = page * QUESTIONS_PER_PAGE;
     const pageQuestions = questions.slice(startIndex, startIndex + QUESTIONS_PER_PAGE);
     
@@ -431,7 +431,7 @@ function openMethodQuestions(methodId) {
         timeManagement: '⏰', noteTaking: '📝', testStrategy: '✍️'
     };
     
-    const questions = methodTrainingQuestions[methodId];
+    const questions = window.methodTrainingQuestions[methodId];
     if (!questions || questions.length === 0) {
         showToast('该学习方法暂无练习题');
         return;
@@ -461,7 +461,7 @@ function openMethodQuestions(methodId) {
 function submitMethodAnswers(methodId, page) {
     SoundEffects.playSubmit();
     
-    const questions = methodTrainingQuestions[methodId];
+    const questions = window.methodTrainingQuestions[methodId];
     if (!questions) return;
     
     const answers = [];
@@ -612,7 +612,7 @@ window.showMethodNote = showMethodNote;
 // ============================================================
 
 function startMethodQuiz(methodId, page = 0) {
-    const questions = methodTrainingQuestions[methodId];
+    const questions = window.methodTrainingQuestions[methodId];
     if (!questions || questions.length === 0) {
         showToast('暂无练习题');
         return;
@@ -689,7 +689,7 @@ function rateMethodAnswer(methodId, isCorrect, questionIndex) {
     
     // 如果答错，自动加入错题本
     if (!isCorrect) {
-        const questions = methodTrainingQuestions[methodId];
+        const questions = window.methodTrainingQuestions[methodId];
         const question = questions[questionIndex];
         if (question) {
             const wrongKey = 'method-' + methodId + '-' + questionIndex;
@@ -745,5 +745,3 @@ window.analyzeMethodWithAI = analyzeMethodWithAI;
 window.conserveAnswer = conserveAnswer;
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
-window.methodTrainingQuestions = methodTrainingQuestions;
-window.methodDetails = methodDetails;

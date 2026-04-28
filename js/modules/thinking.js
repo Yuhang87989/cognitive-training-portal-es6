@@ -34,7 +34,7 @@ function renderThinking(container) {
                         <div style="font-size:18px;margin-bottom:6px;">${t.icon}</div>
                         <div style="font-size:13px;font-weight:600;">${t.name}</div>
                         <div style="font-size:10px;opacity:0.9;margin-top:3px;">${t.desc}</div>
-                        <div style="font-size:11px;margin-top:6px;opacity:0.8;">${thinkingQuestions[t.id].length}题</div>
+                        <div style="font-size:11px;margin-top:6px;opacity:0.8;">${window.window.thinkingQuestions[t.id].length}题</div>
                     </div>
                 `).join('')}
             </div>
@@ -72,7 +72,7 @@ function renderThinking(container) {
 }
 
 
-const thinkingQuestions = {
+window.thinkingQuestions = {
     logic: [
         {q:'如果A>B，B>C，那么A和C的关系是？',opts:['A>C','A<C','A=C','无法确定'],a:0},
         {q:'找规律：2, 4, 8, 16, ?',opts:['20','24','32','30'],a:2},
@@ -170,7 +170,7 @@ function showThinkingType(type) {
         abstract: '学会透过现象看本质，提取事物核心特征。'
     };
     
-    const questions = thinkingQuestions[type];
+    const questions = window.thinkingQuestions[type];
     
     const modal = document.getElementById('detail-modal');
     const content = document.getElementById('detail-content');
@@ -192,7 +192,7 @@ function showThinkingType(type) {
 
 // 开始做题（每页5题）
 function startThinkingQuiz(type, page = 0) {
-    const questions = thinkingQuestions[type];
+    const questions = window.thinkingQuestions[type];
     if (!questions || questions.length === 0) {
         showToast('暂无练习题');
         return;
@@ -264,7 +264,7 @@ function submitThinkingAnswers(type, page) {
     // 播放提交音效
     SoundEffects.playSubmit();
     
-    const questions = thinkingQuestions[type];
+    const questions = window.thinkingQuestions[type];
     const startIndex = page * QUESTIONS_PER_PAGE;
     const pageQuestions = questions.slice(startIndex, startIndex + QUESTIONS_PER_PAGE);
     
@@ -349,7 +349,7 @@ function rateThinkingAnswer(type, isCorrect, questionIdx) {
     
     // 如果答错，自动加入错题本
     if (!isCorrect) {
-        const questions = thinkingQuestions[type];
+        const questions = window.thinkingQuestions[type];
         const question = questions[questionIdx];
         const typeNames = {
             logic: '逻辑思维', creative: '创意思维', critical: '批判思维', system: '系统思维',
@@ -511,4 +511,3 @@ window.viewThinkingNote = viewThinkingNote;
 
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
-window.thinkingQuestions = thinkingQuestions;
