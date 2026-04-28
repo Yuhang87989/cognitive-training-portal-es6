@@ -3048,7 +3048,7 @@ function renderDayTasks(dayNum) {
         const completed = user.weekTasks[task.id];
         const icon = typeIcons[task.type] || '📌';
         const typeName = typeNames[task.type] || task.type;
-        return '<div class="plan-task ' + (completed ? 'completed' : '') + '" onclick="toggleWeekTask('' + task.id + '', this)">' +
+        return '<div class="plan-task ' + (completed ? 'completed' : '') + '" onclick="toggleWeekTask(\'' + task.id + '\', this)">' +
             '<div class="task-checkbox ' + (completed ? 'checked' : '') + '">' + (completed ? '✓' : '') + '</div>' +
             '<div class="task-text">' + task.title + '</div>' +
             '<div class="task-time" style="font-size:10px;color:#999;">' + icon + ' ' + task.duration + '分钟</div>' +
@@ -3147,7 +3147,7 @@ function expandAllDays() {
                 '<div style="font-weight:600;margin-bottom:8px;color:#333;">Day' + day.day + '：' + day.title + ' <span style="font-size:11px;color:#666;">(' + dayCompleted + '/' + day.tasks.length + ')</span></div>' +
                 day.tasks.map(task => {
                     const completed = user.weekTasks[task.id];
-                    return '<div class="plan-task ' + (completed ? 'completed' : '') + '" onclick="toggleWeekTask('' + task.id + '', this)">' +
+                    return '<div class="plan-task ' + (completed ? 'completed' : '') + '" onclick="toggleWeekTask(\'' + task.id + '\', this)">' +
                         '<div class="task-checkbox ' + (completed ? 'checked' : '') + '">' + (completed ? '✓' : '') + '</div>' +
                         '<div class="task-text" style="font-size:13px;">' + task.title + '</div>' +
                         '<div class="task-time">' + (typeIcons[task.type] || '📌') + ' ' + task.duration + '分钟</div>' +
@@ -3160,7 +3160,9 @@ function expandAllDays() {
     }
 }
 
-// 切换周次);
+// 切换周次
+function changeWeek(dir) {
+    CTM.triggerHook('beforeWeekChange', {from: window._planWeek, dir});
     window._planWeek = Math.max(1, Math.min(7, (window._planWeek || 1) + dir));
     CTM.triggerHook('afterWeekChange', {to: window._planWeek});
     
@@ -3185,30 +3187,6 @@ function generateCalendar() {
     }).join('');
 }
 
-
- { {
-    const now = new Date();
-    const start = new Date(now.getFullYear(), 0, 1);
-    return Math.ceil(((now - start) / 86400000 + start.getDay() + 1) / 7);
-}
-
-function generateCalendar() {
-    const days = ['一', '二', '三', '四', '五', '六', '日'];
-    let html = '';
-    days.forEach((d, i) => {
-        const isToday = i === new Date().getDay() - 1;
-        const checked = Math.random() > 0.5;
-        html += '<div class="calendar-day ' + (isToday ? 'today' : '') + ' ' + (checked ? 'checked' : '') + '">' + d + '</div>';
-    });
-    return html;
-}
-
-
-function toggleTask(el) {
-    const checkbox = el.querySelector('.task-checkbox');
-    checkbox.classList.toggle('checked');
-    el.classList.toggle('completed');
-}
 
 
 // ==================== 8. 母题训练模块 ====================
