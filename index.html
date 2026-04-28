@@ -943,6 +943,100 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
     <div id="evp-big-play" onclick="toggleEnhancedVideoPlay()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;">▶</div>
 </div>
 
+<!-- 播客全屏播放器 -->
+<div id="audio-player-fullscreen" class="audio-player-modal">
+    <!-- 顶部导航栏 -->
+    <div style="display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,0.3);">
+        <div onclick="closeAudioPlayer()" style="color:white;font-size:20px;cursor:pointer;padding:8px;display:flex;align-items:center;gap:4px;">← 返回</div>
+        <div id="ap-title" style="flex:1;font-size:14px;font-weight:600;color:white;text-align:center;">音频课程</div>
+        <div onclick="closeMiniPlayer()" style="color:white;font-size:14px;cursor:pointer;padding:8px 12px;background:rgba(255,255,255,0.15);border-radius:8px;">停止</div>
+    </div>
+    
+    <!-- 封面区域 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;">
+        <div id="ap-cover" class="playing" style="width:200px;height:200px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,0.4);transition:all 0.3s;">
+            🎧
+        </div>
+        <div id="ap-course-title" style="color:white;font-size:18px;font-weight:600;text-align:center;margin-bottom:8px;">课程名称</div>
+        <div id="ap-course-teacher" style="color:rgba(255,255,255,0.7);font-size:14px;text-align:center;">讲师 · 分类</div>
+    </div>
+    
+    <!-- 进度条 -->
+    <div style="padding:0 20px 8px;">
+        <div id="ap-progress-bar" onclick="seekAudioPlayer(event)" style="width:100%;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;cursor:pointer;position:relative;">
+            <div id="ap-progress-fill" style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:0%;transition:width 0.1s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span id="ap-current-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
+            <span id="ap-total-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
+        </div>
+    </div>
+    
+    <!-- 播放控制按钮 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;padding:16px 20px;">
+        <button onclick="playPrevTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏮</button>
+        <button onclick="toggleAudioPlay()" id="ap-play-btn" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:white;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(102,126,234,0.4);">▶</button>
+        <button onclick="playNextTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏭</button>
+    </div>
+    
+    <!-- 倍速和音量控制 -->
+    <div style="display:flex;align-items:center;justify-content:space-around;padding:8px 20px 24px;">
+        <div style="position:relative;">
+            <button onclick="toggleSpeedDropdown()" id="ap-speed-btn" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:16px;font-size:14px;cursor:pointer;">1x</button>
+            <div id="ap-speed-dropdown" style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#2a2a4a;border-radius:12px;padding:8px;display:none;margin-bottom:8px;">
+                <div onclick="setPlaybackSpeed(0.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.5x</div>
+                <div onclick="setPlaybackSpeed(0.75)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.75x</div>
+                <div onclick="setPlaybackSpeed(1)" class="ap-speed-option active" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1x</div>
+                <div onclick="setPlaybackSpeed(1.25)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.25x</div>
+                <div onclick="setPlaybackSpeed(1.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.5x</div>
+                <div onclick="setPlaybackSpeed(2)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">2x</div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="toggleMute()" id="ap-volume-btn" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">🔊</button>
+            <input type="range" id="ap-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)" style="width:80px;height:4px;-webkit-appearance:none;background:rgba(255,255,255,0.3);border-radius:2px;">
+        </div>
+    </div>
+</div>
+
+<!-- 迷你播放器 -->
+<div id="mini-player" class="mini-player">
+    <div id="mini-player-thumb" style="width:44px;height:44px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎧</div>
+    <div style="flex:1;min-width:0;margin-left:10px;">
+        <div id="mini-player-title" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">课程名称</div>
+        <div id="mini-player-teacher" style="font-size:11px;color:#999;">讲师</div>
+    </div>
+    <button onclick="toggleMiniPlayer()" id="mini-player-btn" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:14px;cursor:pointer;margin-right:8px;">▶</button>
+    <button onclick="closeMiniPlayer()" style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:12px;cursor:pointer;">✕</button>
+</div>
+
+<!-- 游戏全屏容器 -->
+<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
+    <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
+        <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
+        <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
+        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
+    </div>
+    <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div>
+            <div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">最高分</div>
+            <div id="game-best-score" style="color:#FFD700;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div>
+            <div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div>
+        </div>
+    </div>
+    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;"></div>
+    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;">
+        <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
+        <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
+    </div>
+</div>
 <script>
 // ====== 全局配置 ======
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
@@ -1800,6 +1894,46 @@ const methodTrainingQuestions = {
 
 // ===== 4. Week5-6训练计划 =====
 const week5Plan = {
+    weekId:'week5',weekTitle:'Week5：系统性思维与守恒思维综合周',
+    weekDesc:'本周围绕系统性思维和守恒思维进行深度训练',
+    days:[
+        {day:1,title:'系统性思维入门',tasks:[
+            {id:'w5d1t1',title:'学习系统思维概念',type:'video',duration:15,completed:false},
+            {id:'w5d1t2',title:'完成系统性思维练习10题',type:'practice',duration:20,completed:false},
+            {id:'w5d1t3',title:'用思维导图分析学校系统',type:'creative',duration:15,completed:false}
+        ]},
+        {day:2,title:'守恒思维训练',tasks:[
+            {id:'w5d2t1',title:'学习守恒定律',type:'video',duration:15,completed:false},
+            {id:'w5d2t2',title:'完成守恒思维练习10题',type:'practice',duration:20,completed:false},
+            {id:'w5d2t3',title:'能量守恒案例分析',type:'creative',duration:15,completed:false}
+        ]},
+        {day:3,title:'综合应用',tasks:[
+            {id:'w5d3t1',title:'观看综合案例分析',type:'video',duration:20,completed:false},
+            {id:'w5d3t2',title:'完成综合练习15题',type:'practice',duration:25,completed:false},
+            {id:'w5d3t3',title:'撰写学习反思',type:'writing',duration:15,completed:false}
+        ]},
+        {day:4,title:'思维导图深度应用',tasks:[
+            {id:'w5d4t1',title:'学习高级思维导图技巧',type:'video',duration:15,completed:false},
+            {id:'w5d4t2',title:'制作学科知识思维导图',type:'creative',duration:30,completed:false},
+            {id:'w5d4t3',title:'同学互评思维导图',type:'social',duration:15,completed:false}
+        ]},
+        {day:5,title:'跨学科整合',tasks:[
+            {id:'w5d5t1',title:'分析跨学科问题',type:'video',duration:20,completed:false},
+            {id:'w5d5t2',title:'完成跨学科练习10题',type:'practice',duration:20,completed:false},
+            {id:'w5d5t3',title:'小组讨论跨学科案例',type:'social',duration:20,completed:false}
+        ]},
+        {day:6,title:'知识整合与输出',tasks:[
+            {id:'w5d6t1',title:'整理本周学习笔记',type:'review',duration:30,completed:false},
+            {id:'w5d6t2',title:'完成本周测试',type:'test',duration:30,completed:false},
+            {id:'w5d6t3',title:'制定下周学习计划',type:'planning',duration:15,completed:false}
+        ]},
+        {day:7,title:'周总结与复盘',tasks:[
+            {id:'w5d7t1',title:'收听周度复盘播客',type:'podcast',duration:15,completed:false},
+            {id:'w5d7t2',title:'完成Week5总结报告',type:'writing',duration:20,completed:false},
+            {id:'w5d7t3',title:'休息与调整',type:'rest',duration:0,completed:false}
+        ]}
+    ]
+};
 // ===== CTM模块管理器 (V139新增) =====
 const CTM = {
     version: 'V139',
@@ -2048,90 +2182,6 @@ const week7Plan = {
     ]
 };
 CTM.registerPlan('week7', week7Plan);
-    weekId:'week5',weekTitle:'Week5：系统性思维与守恒思维综合周',
-    weekDesc:'本周围绕系统性思维和守恒思维进行深度训练',
-    days:[
-        {day:1,title:'系统性思维入门',tasks:[
-            {id:'w5d1t1',title:'学习系统思维概念',type:'video',duration:15,completed:false},
-            {id:'w5d1t2',title:'完成系统性思维练习10题',type:'practice',duration:20,completed:false},
-            {id:'w5d1t3',title:'用思维导图分析学校系统',type:'creative',duration:15,completed:false}
-        ]},
-        {day:2,title:'守恒思维训练',tasks:[
-            {id:'w5d2t1',title:'学习守恒定律',type:'video',duration:15,completed:false},
-            {id:'w5d2t2',title:'完成守恒思维练习10题',type:'practice',duration:20,completed:false},
-            {id:'w5d2t3',title:'能量守恒案例分析',type:'creative',duration:15,completed:false}
-        ]},
-        {day:3,title:'综合应用',tasks:[
-            {id:'w5d3t1',title:'观看综合案例分析',type:'video',duration:20,completed:false},
-            {id:'w5d3t2',title:'完成综合练习15题',type:'practice',duration:25,completed:false},
-            {id:'w5d3t3',title:'撰写学习反思',type:'writing',duration:15,completed:false}
-        ]},
-        {day:4,title:'思维导图深度应用',tasks:[
-            {id:'w5d4t1',title:'学习高级思维导图技巧',type:'video',duration:15,completed:false},
-            {id:'w5d4t2',title:'制作学科知识思维导图',type:'creative',duration:30,completed:false},
-            {id:'w5d4t3',title:'同学互评思维导图',type:'social',duration:15,completed:false}
-        ]},
-        {day:5,title:'跨学科整合',tasks:[
-            {id:'w5d5t1',title:'分析跨学科问题',type:'video',duration:20,completed:false},
-            {id:'w5d5t2',title:'完成跨学科练习10题',type:'practice',duration:20,completed:false},
-            {id:'w5d5t3',title:'小组讨论跨学科案例',type:'social',duration:20,completed:false}
-        ]},
-        {day:6,title:'知识整合与输出',tasks:[
-            {id:'w5d6t1',title:'整理本周学习笔记',type:'review',duration:30,completed:false},
-            {id:'w5d6t2',title:'完成本周测试',type:'test',duration:30,completed:false},
-            {id:'w5d6t3',title:'制定下周学习计划',type:'planning',duration:15,completed:false}
-        ]},
-        {day:7,title:'周总结与复盘',tasks:[
-            {id:'w5d7t1',title:'收听周度复盘播客',type:'podcast',duration:15,completed:false},
-            {id:'w5d7t2',title:'完成Week5总结报告',type:'writing',duration:20,completed:false},
-            {id:'w5d7t3',title:'休息与调整',type:'rest',duration:0,completed:false}
-        ]}
-    ]
-};
-
-const week6Plan = {
-    weekId:'week6',weekTitle:'Week6：学科深度整合与自主学习能力培养',
-    weekDesc:'本周围绕学科整合和自主学习能力进行系统训练',
-    days:[
-        {day:1,title:'自主学习理念',tasks:[
-            {id:'w6d1t1',title:'学习自主学习策略',type:'video',duration:20,completed:false},
-            {id:'w6d1t2',title:'评估自己的学习风格',type:'quiz',duration:15,completed:false},
-            {id:'w6d1t3',title:'制定个人学习方案',type:'planning',duration:20,completed:false}
-        ]},
-        {day:2,title:'深度阅读技巧',tasks:[
-            {id:'w6d2t1',title:'学习SQ3R阅读法',type:'video',duration:15,completed:false},
-            {id:'w6d2t2',title:'用SQ3R阅读一篇文章',type:'practice',duration:30,completed:false},
-            {id:'w6d2t3',title:'分享阅读心得',type:'social',duration:15,completed:false}
-        ]},
-        {day:3,title:'笔记系统构建',tasks:[
-            {id:'w6d3t1',title:'学习康奈尔笔记法',type:'video',duration:15,completed:false},
-            {id:'w6d3t2',title:'用康奈尔法整理笔记',type:'practice',duration:30,completed:false},
-            {id:'w6d3t3',title:'建立个人笔记系统',type:'creative',duration:20,completed:false}
-        ]},
-        {day:4,title:'时间管理实战',tasks:[
-            {id:'w6d4t1',title:'学习番茄工作法',type:'video',duration:15,completed:false},
-            {id:'w6d4t2',title:'完成4个番茄钟',type:'practice',duration:120,completed:false},
-            {id:'w6d4t3',title:'总结番茄工作体验',type:'writing',duration:15,completed:false}
-        ]},
-        {day:5,title:'费曼学习法实践',tasks:[
-            {id:'w6d5t1',title:'学习费曼学习法',type:'video',duration:15,completed:false},
-            {id:'w6d5t2',title:'选择一个知识点讲解',type:'practice',duration:20,completed:false},
-            {id:'w6d5t3',title:'反思讲解过程',type:'writing',duration:15,completed:false}
-        ]},
-        {day:6,title:'学科整合训练',tasks:[
-            {id:'w6d6t1',title:'完成学科整合练习',type:'practice',duration:40,completed:false},
-            {id:'w6d6t2',title:'制作跨学科知识图谱',type:'creative',duration:30,completed:false},
-            {id:'w6d6t3',title:'参与学习讨论',type:'social',duration:20,completed:false}
-        ]},
-        {day:7,title:'Week6总结与展望',tasks:[
-            {id:'w6d7t1',title:'完成学习能力评估',type:'quiz',duration:20,completed:false},
-            {id:'w6d7t2',title:'撰写成长记录',type:'writing',duration:30,completed:false},
-            {id:'w6d7t3',title:'制定长期学习规划',type:'planning',duration:20,completed:false}
-        ]}
-    ]
-};
-
-
 
 
 function toggleUserSelect() {
@@ -4267,7 +4317,7 @@ function renderGames(container) {
 	        {id:'audio',icon:'🎧',name:'听音辨位',desc:'听觉训练',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'},
 	        {id:'word',icon:'💬',name:'词汇联想',desc:'语言训练',gradient:'linear-gradient(135deg,#fddb92,#d1fdff)'},
 	        {id:'classify',icon:'📂',name:'分类归纳',desc:'思维训练',gradient:'linear-gradient(135deg,#c1dfc4,#deecfd)'},
-	        {id:'attention',icon:'🎯',name:'注意力追踪',desc:'专注训练',gradient:'linear-gradient(135deg,#ff9a9e,#fecfef)'}
+	        {id:'attention',icon:'🎯',name:'注意力追踪',desc:'专注训练',gradient:'linear-gradient(135deg,#ff9a9e,#fecfef)'},
         {id:'palace',icon:'🏛️',name:'记忆宫殿',desc:'空间记忆法',gradient:'linear-gradient(135deg,#6a3093,#a044ff)'},
         {id:'stroop',icon:'🎯',name:'Stroop冲突',desc:'冲突抑制',gradient:'linear-gradient(135deg,#fa709a,#fee140)'},
         {id:'numshape',icon:'📐',name:'数形结合',desc:'数形转换',gradient:'linear-gradient(135deg,#43e97b,#38f9d7)'},
@@ -5476,7 +5526,7 @@ const gameConfig = {
     conserve: {name:'⚖️ 守恒推理',color:'#a18cd1',gradient:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
     network: {name:'🕸️ 知识网络',color:'#667eea',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
     reverse: {name:'🔄 逆向推理',color:'#f093fb',gradient:'linear-gradient(135deg,#f093fb,#f5576c)'},
-    experiment: {name:'🧪 实验设计',color:'#89f7fe',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'}
+    experiment: {name:'🧪 实验设计',color:'#89f7fe',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'},
     // 娱乐游戏配置
     snake: {name:'🐍 贪吃蛇',color:'#43A047',gradient:'linear-gradient(135deg,#43A047,#66BB6A)'},
     tetris: {name:'🧱 俄罗斯方块',color:'#E53935',gradient:'linear-gradient(135deg,#E53935,#EF5350)'},
@@ -11453,100 +11503,6 @@ function experimentSelect(idx) {
     }
 }
 
-<!-- 播客全屏播放器 -->
-<div id="audio-player-fullscreen" class="audio-player-modal">
-    <!-- 顶部导航栏 -->
-    <div style="display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,0.3);">
-        <div onclick="closeAudioPlayer()" style="color:white;font-size:20px;cursor:pointer;padding:8px;display:flex;align-items:center;gap:4px;">← 返回</div>
-        <div id="ap-title" style="flex:1;font-size:14px;font-weight:600;color:white;text-align:center;">音频课程</div>
-        <div onclick="closeMiniPlayer()" style="color:white;font-size:14px;cursor:pointer;padding:8px 12px;background:rgba(255,255,255,0.15);border-radius:8px;">停止</div>
-    </div>
-    
-    <!-- 封面区域 -->
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;">
-        <div id="ap-cover" class="playing" style="width:200px;height:200px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,0.4);transition:all 0.3s;">
-            🎧
-        </div>
-        <div id="ap-course-title" style="color:white;font-size:18px;font-weight:600;text-align:center;margin-bottom:8px;">课程名称</div>
-        <div id="ap-course-teacher" style="color:rgba(255,255,255,0.7);font-size:14px;text-align:center;">讲师 · 分类</div>
-    </div>
-    
-    <!-- 进度条 -->
-    <div style="padding:0 20px 8px;">
-        <div id="ap-progress-bar" onclick="seekAudioPlayer(event)" style="width:100%;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;cursor:pointer;position:relative;">
-            <div id="ap-progress-fill" style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:0%;transition:width 0.1s;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px;">
-            <span id="ap-current-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-            <span id="ap-total-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-        </div>
-    </div>
-    
-    <!-- 播放控制按钮 -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:24px;padding:16px 20px;">
-        <button onclick="playPrevTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏮</button>
-        <button onclick="toggleAudioPlay()" id="ap-play-btn" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:white;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(102,126,234,0.4);">▶</button>
-        <button onclick="playNextTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏭</button>
-    </div>
-    
-    <!-- 倍速和音量控制 -->
-    <div style="display:flex;align-items:center;justify-content:space-around;padding:8px 20px 24px;">
-        <div style="position:relative;">
-            <button onclick="toggleSpeedDropdown()" id="ap-speed-btn" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:16px;font-size:14px;cursor:pointer;">1x</button>
-            <div id="ap-speed-dropdown" style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#2a2a4a;border-radius:12px;padding:8px;display:none;margin-bottom:8px;">
-                <div onclick="setPlaybackSpeed(0.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.5x</div>
-                <div onclick="setPlaybackSpeed(0.75)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.75x</div>
-                <div onclick="setPlaybackSpeed(1)" class="ap-speed-option active" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1x</div>
-                <div onclick="setPlaybackSpeed(1.25)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.25x</div>
-                <div onclick="setPlaybackSpeed(1.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.5x</div>
-                <div onclick="setPlaybackSpeed(2)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">2x</div>
-            </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <button onclick="toggleMute()" id="ap-volume-btn" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">🔊</button>
-            <input type="range" id="ap-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)" style="width:80px;height:4px;-webkit-appearance:none;background:rgba(255,255,255,0.3);border-radius:2px;">
-        </div>
-    </div>
-</div>
-
-<!-- 迷你播放器 -->
-<div id="mini-player" class="mini-player">
-    <div id="mini-player-thumb" style="width:44px;height:44px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎧</div>
-    <div style="flex:1;min-width:0;margin-left:10px;">
-        <div id="mini-player-title" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">课程名称</div>
-        <div id="mini-player-teacher" style="font-size:11px;color:#999;">讲师</div>
-    </div>
-    <button onclick="toggleMiniPlayer()" id="mini-player-btn" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:14px;cursor:pointer;margin-right:8px;">▶</button>
-    <button onclick="closeMiniPlayer()" style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:12px;cursor:pointer;">✕</button>
-</div>
-
-<!-- 游戏全屏容器 -->
-<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
-    <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
-        <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
-        <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
-        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
-    </div>
-    <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div>
-            <div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div>
-        </div>
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">最高分</div>
-            <div id="game-best-score" style="color:#FFD700;font-size:20px;font-weight:bold;">0</div>
-        </div>
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div>
-            <div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div>
-        </div>
-    </div>
-    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;"></div>
-    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;">
-        <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
-        <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
-    </div>
-</div>
 </script>
 </body>
 </html>
