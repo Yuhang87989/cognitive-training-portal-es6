@@ -5,12 +5,16 @@ const puppeteer = require('puppeteer');
     await page.setCacheEnabled(false);
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
-    await page.goto('https://yuhang87989.github.io/cognitive-training-portal/?_t=' + Date.now(), { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await page.goto('https://yuhang87989.github.io/cognitive-training-portal/?_t=' + Date.now(), { waitUntil: 'networkidle0', timeout: 90000 });
+    
+    // 等待JS完全加载
     for (let i = 0; i < 30; i++) {
+        const ready = await page.evaluate(() => typeof openFullscreenPage === 'function' && typeof renderDeepseek === 'function');
+        if (ready) break;
         await new Promise(r => setTimeout(r, 2000));
-        if (await page.evaluate(() => typeof openFullscreenPage === 'function')) break;
+        console.log('Waiting for modules...', i+1);
     }
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 2000));
     
     // 12模块测试
     const modules = ['practice','map','plan','topics','method','thinking','podcast','video','games','deepseek','wrongbook','pomodoro'];
