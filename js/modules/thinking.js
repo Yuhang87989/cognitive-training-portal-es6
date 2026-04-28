@@ -508,6 +508,6 @@ function closeModal(modalId) {
 // ============================================================
 window.rateThinkingAnswer = rateThinkingAnswer;
 window.viewThinkingNote = viewThinkingNote;
-window.analyzeThinkingWithAI = analyzeThinkingWithAI;
+
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;

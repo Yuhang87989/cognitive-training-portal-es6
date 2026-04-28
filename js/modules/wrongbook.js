@@ -488,6 +488,150 @@ function viewWrongNotes() {
 }
 
 
+
+// ============================================================
+// 错题重练 & AI分析
+// ============================================================
+
+function retryWrongNote(index) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[index];
+    if (!note) { showToast('错题不存在'); return; }
+    
+    const container = document.getElementById('fullscreen-content');
+    if (!container) return;
+    
+    let optionsHTML = '';
+    if (note.options && note.options.length > 0) {
+        optionsHTML = note.options.map((opt, oi) => 
+            '<button onclick="checkRetryAnswer(' + index + ',' + oi + ')" style="display:block;width:100%;padding:12px;margin:6px 0;background:#f5f7ff;border:2px solid #e0e0ff;border-radius:10px;font-size:14px;cursor:pointer;text-align:left;">' + 
+            String.fromCharCode(65 + oi) + '. ' + opt + '</button>'
+        ).join('');
+    }
+    
+    container.innerHTML = '<div style="padding:20px;">' +
+        '<div style="font-size:18px;font-weight:600;margin-bottom:16px;">🔄 错题重练</div>' +
+        '<div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;font-size:15px;">' + note.question + '</div>' +
+        (optionsHTML ? '<div id="retry-options">' + optionsHTML + '</div>' : 
+         '<div style="margin-top:12px;"><textarea id="retry-text-answer" style="width:100%;height:80px;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;" placeholder="请输入你的答案..."></textarea>' +
+         '<button onclick="checkRetryTextAnswer(' + index + ')" style="margin-top:8px;padding:10px 20px;background:#667eea;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">提交答案</button></div>') +
+        '<button onclick="renderWrongbook(document.getElementById(\'fullscreen-content\'))" style="margin-top:16px;padding:8px 16px;background:#999;color:white;border:none;border-radius:8px;cursor:pointer;">返回错题本</button>' +
+        '</div>';
+}
+
+function checkRetryAnswer(noteIndex, optionIndex) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[noteIndex];
+    if (!note) return;
+    
+    const optionsDiv = document.getElementById('retry-options');
+    if (!optionsDiv) return;
+    
+    const buttons = optionsDiv.querySelectorAll('button');
+    buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        btn.style.cursor = 'default';
+        if (i === note.correctIndex) {
+            btn.style.background = '#d4edda';
+            btn.style.borderColor = '#43E97B';
+        } else if (i === optionIndex) {
+            btn.style.background = '#f8d7da';
+            btn.style.borderColor = '#FF6B6B';
+        }
+    });
+    
+    const isCorrect = optionIndex === note.correctIndex;
+    const resultDiv = document.createElement('div');
+    resultDiv.style.cssText = 'margin-top:12px;padding:12px;border-radius:8px;font-size:14px;';
+    
+    if (isCorrect) {
+        resultDiv.style.background = '#d4edda';
+        resultDiv.style.color = '#155724';
+        resultDiv.innerHTML = '✅ 回答正确！' + (note.explanation ? '<br><small>解析：' + note.explanation + '</small>' : '');
+        markWrongNoteReviewed(noteIndex);
+    } else {
+        resultDiv.style.background = '#f8d7da';
+        resultDiv.style.color = '#721c24';
+        resultDiv.innerHTML = '❌ 回答错误。正确答案：' + String.fromCharCode(65 + note.correctIndex) + '. ' + note.options[note.correctIndex] + (note.explanation ? '<br><small>解析：' + note.explanation + '</small>' : '');
+    }
+    optionsDiv.parentNode.insertBefore(resultDiv, optionsDiv.nextSibling);
+}
+
+function checkRetryTextAnswer(noteIndex) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[noteIndex];
+    if (!note) return;
+    
+    const textarea = document.getElementById('retry-text-answer');
+    const userAns = textarea ? textarea.value.trim() : '';
+    if (!userAns) { showToast('请输入答案'); return; }
+    
+    const isCorrect = userAns === note.answer;
+    const resultDiv = document.createElement('div');
+    resultDiv.style.cssText = 'margin-top:12px;padding:12px;border-radius:8px;font-size:14px;';
+    
+    if (isCorrect) {
+        resultDiv.style.background = '#d4edda';
+        resultDiv.style.color = '#155724';
+        resultDiv.innerHTML = '✅ 回答正确！';
+        markWrongNoteReviewed(noteIndex);
+    } else {
+        resultDiv.style.background = '#f8d7da';
+        resultDiv.style.color = '#721c24';
+        resultDiv.innerHTML = '❌ 回答错误。正确答案：' + note.answer;
+    }
+    textarea.parentNode.insertBefore(resultDiv, textarea.nextSibling);
+    textarea.disabled = true;
+}
+
+function analyzeWrongNoteWithAI(index) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[index];
+    if (!note) { showToast('错题不存在'); return; }
+    
+    showToast('🤖 AI正在分析...');
+    
+    const prompt = '请分析这道错题，指出错误原因和正确思路：\n题目：' + note.question + '\n学生答案：' + note.userAnswer + '\n正确答案：' + note.answer + (note.explanation ? '\n解析：' + note.explanation : '');
+    
+    callDeepSeekAPI(prompt).then(function(result) {
+        const container = document.getElementById('fullscreen-content');
+        if (!container) return;
+        
+        const analysisDiv = document.createElement('div');
+        analysisDiv.style.cssText = 'margin-top:12px;background:linear-gradient(135deg,#f5f7ff,#e8e8ff);border-radius:12px;padding:16px;font-size:13px;line-height:1.6;';
+        analysisDiv.innerHTML = '<div style="font-weight:600;margin-bottom:8px;">🤖 AI分析</div>' + (result || '分析失败，请重试');
+        container.appendChild(analysisDiv);
+        showToast('AI分析完成');
+    }).catch(function(e) {
+        showToast('AI分析失败：' + (e.message || '请稍后重试'));
+    });
+}
+
+function markWrongNoteReviewed(index) {
+    const user = getCurrentUserData();
+    if (!user || !user.wrongNotes || !user.wrongNotes[index]) return;
+    user.wrongNotes[index].reviewed = true;
+    syncUserData(user);
+    showToast('✅ 已标记为已复习');
+}
+
+function reviewAllWrongNotes() {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const unreviewed = wrongNotes.filter(n => !n.reviewed);
+    if (unreviewed.length === 0) { showToast('所有错题已复习完毕！'); return; }
+    
+    // Find first unreviewed and start retry
+    const firstUnreviewedIndex = wrongNotes.findIndex(n => !n.reviewed);
+    if (firstUnreviewedIndex >= 0) {
+        retryWrongNote(firstUnreviewedIndex);
+    }
+}
+
 // ============================================================
 // Pomodoro - 番茄钟
 // ============================================================
