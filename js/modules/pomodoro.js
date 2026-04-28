@@ -111,3 +111,5 @@ window.renderPomodoro = renderPomodoro;
 window.resetPomodoro = resetPomodoro;
 window.setPomodoroTime = setPomodoroTime;
 window.togglePomodoro = togglePomodoro;
+window.pomodoroTime = pomodoroTime;
+window.pomodoroTimer = pomodoroTimer;

@@ -1395,3 +1395,4 @@ window.analyzeTopicWithAI = analyzeTopicWithAI;
 window.checkTopicAnswer = checkTopicAnswer;
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
+window.podcastCourses = podcastCourses;

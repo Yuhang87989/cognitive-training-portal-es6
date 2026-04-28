@@ -511,3 +511,4 @@ window.viewThinkingNote = viewThinkingNote;
 
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
+window.thinkingQuestions = thinkingQuestions;

@@ -124,3 +124,4 @@ window.filterVideoCourse = filterVideoCourse;
 window.playVideoFromList = playVideoFromList;
 window.playLocalVideo = playLocalVideo;
 window.deleteLocalVideo = deleteLocalVideo;
+window.videoCourses = videoCourses;
