@@ -2,10 +2,8 @@
 
 var currentDeepSeekImage = null;
 var deepseekConversationHistory = [];
-// isRecording已在audio.js中声明
-if (typeof isRecording === "undefined") var isRecording = false;
-// deepseekRecognition已在audio.js中声明
-if (typeof deepseekRecognition === "undefined") var deepseekRecognition = null;
+// isRecording在audio.js中声明，此处直接使用
+// deepseekRecognition在audio.js中声明，此处直接使用
 
 
 // 视觉API - 图片理解（支持硅基流动等视觉模型，未配置则优雅降级）
