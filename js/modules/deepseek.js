@@ -93,21 +93,15 @@ async function sendToDeepSeek() {
     let imageDataUrl = currentDeepSeekImage; // 保存图片数据用于视觉API
     
     if (hasImage) {
-        // 尝试使用视觉API分析图片
         const visionResult = await callVisionAPI(imageDataUrl, msg || '请分析这张图片');
         if (visionResult.success) {
-            // 视觉API成功，用分析结果作为用户消息
-            userContent = '[用户上传了一张图片，AI视觉分析结果：' + visionResult.content + ']\n\n' + (msg || '请基于以上图片分析进一步回答');
+            userContent = '[AI图片分析：' + visionResult.content + ']\n\n' + (msg || '请基于以上图片分析进一步回答');
+        } else if (msg) {
+            userContent = msg + '\n（已附上图片，但图片理解API未配置）';
+            showToast('💡 图片分析需配置VISION_API_KEY，已按文字处理');
         } else {
-            // 视觉API失败，提示用户配置API或提供文字描述
-            if (msg) {
-                userContent = '[用户上传了一张图片（图片分析API未配置），已附上文字问题]\n\n' + msg;
-                showToast('💡 提示：图片分析需要配置VISION_API_KEY');
-            } else {
-                userContent = '[用户上传了一张图片]\n请描述图片内容，我来帮你分析';
-                showToast('⚠️ 图片分析API未配置，请输入文字描述图片内容');
-            }
-        }
+            userContent = '请帮我分析这张图片';
+            showToast('⚠️ 请输入文字描述图片内容');
         }
     } else {
         userContent = msg;
