@@ -214,3 +214,94 @@ function checkTopicAnswer(topicId) {
                     explanation: topic.e,
                     userAnswer: answer,
                     time: Date.now()
+                });
+            }
+        }
+        
+        syncUserData(userData);
+        showToast(isCorrect ? '✅ 回答正确！' : '❌ 已加入错题本');
+    }
+}
+
+function analyzeTopicWithAI(topicId) {
+    const topic = findTopic(topicId);
+    if (!topic) return;
+    
+    const resultArea = document.getElementById('topic-result-area');
+    if (!resultArea) return;
+    
+    resultArea.innerHTML = '<div style="text-align:center;padding:20px;"><div style="display:inline-block;width:24px;height:24px;border:3px solid #667eea;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div><div style="margin-top:8px;color:#666;font-size:13px;">🤖 AI正在分析中...</div></div>';
+    
+    const prompt = `请详细讲解这道题目：\n题目：${topic.q}\n正确答案：${topic.a}\n基础解析：${topic.e}\n\n请提供：\n1. 知识点分析\n2. 详细解题步骤\n3. 易错点提示\n4. 举一反三的类似题目（2-3道）`;
+    
+    fetch(DEEPSEEK_API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + DEEPSEEK_API_KEY
+        },
+        body: JSON.stringify({
+            model: DEEPSEEK_MODEL,
+            messages: [
+                { role: 'system', content: '你是一位专业的初中数学老师，擅长详细讲解题目，帮助学生理解知识点。' },
+                { role: 'user', content: prompt }
+            ]
+        })
+    }).then(response => response.json())
+      .then(data => {
+          const aiContent = data.choices?.[0]?.message?.content || 'AI分析失败，请稍后重试';
+          resultArea.innerHTML = '<div style="margin-top:12px;padding:16px;background:#f5f7ff;border-radius:12px;max-height:300px;overflow-y:auto;font-size:14px;line-height:1.8;">' + aiContent.replace(/\n/g, '<br>') + '</div>';
+      })
+      .catch(err => {
+          resultArea.innerHTML = '<div style="margin-top:12px;color:#ff6b6b;">AI分析失败，请检查网络</div>';
+      });
+}
+
+function uploadTopicPhoto(topicId, input) {
+    if (!input.files[0]) return;
+    
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        const user = getCurrentUserData();
+        user.uploadedImages = user.uploadedImages || [];
+        user.uploadedImages.push({
+            id: Date.now(),
+            topicId: topicId,
+            image: imageData,
+            time: Date.now()
+        });
+        syncUserData(user);
+        showToast('📷 照片上传成功！');
+        input.value = '';
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+function removeWrongNote(index) {
+    const user = getCurrentUserData();
+    if (user && user.wrongNotes) {
+        user.wrongNotes.splice(index, 1);
+        syncUserData(user);
+        showToast('已移除错题');
+        const container = document.getElementById('fullscreen-content');
+        if (container) renderTopics(container);
+    }
+}
+
+// 导出函数到window
+window.renderTopics = renderTopics;
+window.selectTopicsGrade = selectTopicsGrade;
+window.selectTopicsSubject = selectTopicsSubject;
+window.loadTopicsList = loadTopicsList;
+window.prevTopicsPage = prevTopicsPage;
+window.nextTopicsPage = nextTopicsPage;
+window.findTopic = findTopic;
+window.openTopicQuestion = openTopicQuestion;
+window.checkTopicAnswer = checkTopicAnswer;
+window.analyzeTopicWithAI = analyzeTopicWithAI;
+window.uploadTopicPhoto = uploadTopicPhoto;
+window.removeWrongNote = removeWrongNote;
