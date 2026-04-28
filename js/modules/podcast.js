@@ -283,7 +283,8 @@ function downloadPodcastFromCoze(courseId) {
                 showToast('正在下载本地音频');
             } else if (course.shareUrl) {
                 // 没有本地音频，打开扣子平台页面让用户下载
-                window.open(course.shareUrl, '_blank');
+                window.renderPodcast = renderPodcast;
+window.open(course.shareUrl, '_blank');
                 showToast('已打开扣子平台页面，可在页面中下载');
             } else {
                 showToast('该播客暂无可下载的音频');

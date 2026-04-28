@@ -812,6 +812,7 @@ window.openDeepSeekRecharge = openDeepSeekRecharge;
 // ============================================================
 // Window Exports
 // ============================================================
+window.renderDeepseek = renderDeepseek;
 window.sendToDeepSeek = sendToDeepSeek;
 window.clearDeepSeekImage = clearDeepSeekImage;
 window.askTemplate = askTemplate;

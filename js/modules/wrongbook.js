@@ -472,6 +472,7 @@ function viewWrongNotes() {
 // ============================================================
 
 // Window exports for onclick handlers
+window.renderWrongbook = renderWrongbook;
 window.clearWrongNotes = clearWrongNotes;
 window.viewWrongNotes = viewWrongNotes;
 window.openFeedback = openFeedback;
