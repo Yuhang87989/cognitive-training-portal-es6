@@ -3524,18 +3524,13 @@ function renderPodcast(container) {
         
         <div id="podcast-list">
             ${podcasts.map(p => `
-            <div class="podcast-item" style="flex-wrap:wrap;gap:8px;">
+            <div class="podcast-item" onclick="playPodcastCourse('${p.id}')">
                 <div class="podcast-thumb" style="background:${p.gradient};">${p.icon}</div>
-                <div class="podcast-info" style="flex:1;min-width:120px;" onclick="playPodcastCourse('${p.id}')">
-                    <div class="podcast-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title}</div>
-                    <div class="podcast-meta">${p.teacher} · ${p.duration} · <span class="media-badge">${p.category}</span></div>
-                </div>
-                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                    ${p.shareUrl ? `<a href="${p.shareUrl}" target="_blank" onclick="event.stopPropagation();" style="padding:4px 10px;background:#f5f7ff;border-radius:6px;font-size:11px;color:#3377FF;text-decoration:none;white-space:nowrap;">🔗扣子</a>` : ''}
-                    <label style="padding:4px 10px;background:#e8f5e9;border-radius:6px;cursor:pointer;font-size:11px;color:#4CAF50;white-space:nowrap;" onclick="event.stopPropagation();">
-                        📤<input type="file" accept="audio/mp3,audio/mpeg,.mp3" style="display:none;" onchange="uploadPodcastFile('${p.id}', this)">
-                    </label>
-                    <button onclick="event.stopPropagation();downloadPodcastFromCoze('${p.id}')" style="padding:4px 10px;background:#fff5f5;border-radius:6px;cursor:pointer;font-size:11px;color:#FF6B6B;border:none;white-space:nowrap;">⬇️</button>
+                <div class="podcast-info">${p.title}<div class="podcast-meta">${p.teacher} · ${p.duration} · ${p.category}</div></div>
+                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;" onclick="event.stopPropagation();">
+                    ${p.shareUrl ? `<a href="${p.shareUrl}" target="_blank" style="font-size:11px;color:#3377FF;text-decoration:none;">🔗</a>` : ''}
+                    <label style="cursor:pointer;font-size:11px;color:#4CAF50;">📤<input type="file" accept="audio/mp3,audio/mpeg,.mp3" style="display:none;" onchange="uploadPodcastFile('${p.id}', this)"></label>
+                    <button onclick="downloadPodcastFromCoze('${p.id}')" style="font-size:11px;color:#FF6B6B;background:none;border:none;cursor:pointer;padding:0;">⬇️</button>
                 </div>
             </div>
             `).join('')}
@@ -3557,18 +3552,13 @@ function filterPodcast(category, btn) {
     
     if (list) {
         list.innerHTML = filtered.map(p => `
-            <div class="podcast-item" style="flex-wrap:wrap;gap:8px;">
+            <div class="podcast-item" onclick="playPodcastCourse('${p.id}')">
                 <div class="podcast-thumb" style="background:${p.gradient};">${p.icon}</div>
-                <div class="podcast-info" style="flex:1;min-width:120px;" onclick="playPodcastCourse('${p.id}')">
-                    <div class="podcast-title" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.title}</div>
-                    <div class="podcast-meta">${p.teacher} · ${p.duration} · <span class="media-badge">${p.category}</span></div>
-                </div>
-                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
-                    ${p.shareUrl ? `<a href="${p.shareUrl}" target="_blank" onclick="event.stopPropagation();" style="padding:4px 10px;background:#f5f7ff;border-radius:6px;font-size:11px;color:#3377FF;text-decoration:none;white-space:nowrap;">🔗扣子</a>` : ''}
-                    <label style="padding:4px 10px;background:#e8f5e9;border-radius:6px;cursor:pointer;font-size:11px;color:#4CAF50;white-space:nowrap;" onclick="event.stopPropagation();">
-                        📤<input type="file" accept="audio/mp3,audio/mpeg,.mp3" style="display:none;" onchange="uploadPodcastFile('${p.id}', this)">
-                    </label>
-                    <button onclick="event.stopPropagation();downloadPodcastFromCoze('${p.id}')" style="padding:4px 10px;background:#fff5f5;border-radius:6px;cursor:pointer;font-size:11px;color:#FF6B6B;border:none;white-space:nowrap;">⬇️</button>
+                <div class="podcast-info">${p.title}<div class="podcast-meta">${p.teacher} · ${p.duration} · ${p.category}</div></div>
+                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;" onclick="event.stopPropagation();">
+                    ${p.shareUrl ? `<a href="${p.shareUrl}" target="_blank" style="font-size:11px;color:#3377FF;text-decoration:none;">🔗</a>` : ''}
+                    <label style="cursor:pointer;font-size:11px;color:#4CAF50;">📤<input type="file" accept="audio/mp3,audio/mpeg,.mp3" style="display:none;" onchange="uploadPodcastFile('${p.id}', this)"></label>
+                    <button onclick="downloadPodcastFromCoze('${p.id}')" style="font-size:11px;color:#FF6B6B;background:none;border:none;cursor:pointer;padding:0;">⬇️</button>
                 </div>
             </div>
         `).join('');
