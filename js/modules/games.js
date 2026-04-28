@@ -3,6 +3,7 @@
 // 安全声明 - 防止游戏加载时序问题
 var playSound = playSound || function() {};
 var gameTimerDisplay = gameTimerDisplay || null;
+var gameTimer = gameTimer || null;
 
 
 function startGame(type) {
