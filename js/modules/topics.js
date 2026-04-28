@@ -213,56 +213,7 @@ function checkTopicAnswer(topicId) {
         }
         syncUserData(userData);
     }
-}
-
-async function analyzeTopicWithAI(topicId) {
-    const topic = findTopic(topicId);
-    if (!topic) return;
-    
-    const resultArea = document.getElementById('topic-result-area');
-    resultArea.innerHTML = '<div class="ai-loading">🤖 AI正在分析中...</div>';
-    
-    const prompt = `请详细讲解这道题目：
-题目：${topic.q}
-正确答案：${topic.a}
-基础解析：${topic.e}
-
-请提供：
-1. 知识点分析
-2. 详细解题步骤
-3. 易错点提示
-4. 举一反三的类似题目（2-3道）`;
-
-    try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
-            },
-            body: JSON.stringify({
-                model: 'deepseek-chat',
-                messages: [
-                    { role: 'system', content: '你是一位专业的初中数学老师，擅长详细讲解题目，帮助学生理解知识点。' },
-                    { role: 'user', content: prompt }
-                ]
-            })
-        });
-        
-        const data = await response.json();
-        const aiContent = data.choices?.[0]?.message?.content || 'AI分析失败，请稍后重试';
-        
-        resultArea.innerHTML = `
-            <div style="margin-top:12px;padding:16px;background:#f5f7ff;border-radius:12px;max-height:300px;overflow-y:auto;">
-                <div style="font-size:14px;line-height:1.8;">${aiContent.replace(/\n/g, '<br/>')}</div>
-            </div>
-        `;
-    } catch (err) {
-        resultArea.innerHTML = '<div style="margin-top:12px;color:#ff6b6b;">AI分析失败，请检查网络</div>';
-    }
-}
-
-function uploadTopicPhoto(topicId, input) {
+}function uploadTopicPhoto(topicId, input) {
     if (!input.files[0]) return;
     showToast('照片上传成功，AI分析中...');
     analyzeTopicWithAI(topicId);

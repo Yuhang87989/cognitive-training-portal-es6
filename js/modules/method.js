@@ -634,60 +634,7 @@ function rateMethodAnswer(methodId, isCorrect, questionIndex) {
     syncUserData(user);
     updateMethodStats();
     showToast(isCorrect ? '回答正确！' : '已加入错题本，继续加油！');
-}
-
-async function analyzeMethodWithAI(methodId, questionIdx) {
-    try {
-        const questions = methodTrainingQuestions[methodId];
-        if (!questions || !questions[questionIdx]) {
-            showToast('题目数据不存在');
-            return;
-        }
-        const q = questions[questionIdx];
-        const resultId = 'method-ai-result-' + methodId + '-' + questionIdx;
-        const resultEl = document.getElementById(resultId);
-        if (!resultEl) {
-            showToast('结果区域未找到，请重新打开此模块');
-            return;
-        }
-        resultEl.innerHTML = '<div style="text-align:center;padding:20px;"><div style="display:inline-block;width:24px;height:24px;border:3px solid #667eea;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div><div style="margin-top:8px;color:#666;font-size:13px;">🤖 AI正在深度分析中...</div></div>';
-
-        const prompt = '请详细讲解这道学习方法题目：\n题目：' + q.q + '\n' + (q.a ? '参考答案：' + q.a : '') + '\n\n请提供：\n1. 知识点分析\n2. 详细解题步骤\n3. 易错点提示\n4. 举一反三的类似题目（2-3道）';
-
-        const response = await fetch(DEEPSEEK_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + DEEPSEEK_API_KEY },
-            body: JSON.stringify({
-                model: DEEPSEEK_MODEL,
-                messages: [
-                    { role: 'system', content: '你是一位专业的青少年教育辅导老师，擅长详细讲解学习方法题目，帮助学生理解知识点并举一反三。请用简洁易懂的语言回答。' },
-                    { role: 'user', content: prompt }
-                ]
-            })
-        });
-
-        if (response.status === 402) {
-            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足，请先充值后再使用AI功能<br><button onclick="showDeepSeekBalanceAlert()" style="margin-top:8px;padding:6px 16px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
-            return;
-        }
-
-        const data = await response.json();
-        const aiContent = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || 'AI分析失败，请稍后重试';
-
-        resultEl.innerHTML = '<div style="padding:16px;background:linear-gradient(135deg,#f5f7ff,#eef1ff);border-radius:12px;max-height:400px;overflow-y:auto;">' +
-            '<div style="font-size:12px;color:#667eea;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:4px;">🤖 AI深度分析</div>' +
-            '<div style="font-size:14px;line-height:1.8;color:#333;">' + aiContent.replace(/\n/g, '<br>') + '</div>' +
-            '</div>';
-    } catch (err) {
-        const resultId = 'method-ai-result-' + methodId + '-' + questionIdx;
-        const resultEl = document.getElementById(resultId);
-        if (resultEl) {
-            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">AI分析失败，请检查网络连接</div>';
-        }
-    }
-}
-
-function conserveAnswer(idx) {
+}function conserveAnswer(idx) {
     const data = window._conserveData;
     if (!data) return;
     if (idx === data.questions[data.current].correct) data.score++;

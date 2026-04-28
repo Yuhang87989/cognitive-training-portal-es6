@@ -1,5 +1,11 @@
 // 版本: V140
 
+var currentDeepSeekImage = null;
+var deepseekConversationHistory = [];
+var isRecording = false;
+var deepseekRecognition = null;
+
+
 // 视觉API - 图片理解（支持硅基流动等视觉模型，未配置则优雅降级）
 async function callVisionAPI(imageDataUrl, question) {
     var visionApiKey = typeof VISION_API_KEY !== 'undefined' ? VISION_API_KEY : '';
@@ -157,11 +163,11 @@ async function analyzeTopicWithAI(topicId) {
 4. 举一反三的类似题目（2-3道）`;
 
     try {
-        const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        const response = await fetch(DEEPSEEK_API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer sk-8413f72a3f084fb08c84389555a76d37'
+                'Authorization': 'Bearer ' + DEEPSEEK_API_KEY
             },
             body: JSON.stringify({
                 model: 'deepseek-chat',
