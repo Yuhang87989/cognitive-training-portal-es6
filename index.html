@@ -413,7 +413,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <span class="module-tag" style="background:#43E97B;">NEW</span>
                 <div class="module-icon">📅</div>
                 <div class="module-name">学习计划</div>
-                <div class="module-desc">Week1-6训练</div>
+                <div class="module-desc">Week1-7训练</div>
             </button>
             <button class="module-btn gradient-pink" onclick="openFullscreenPage('topics')">
                 <div class="module-icon">📚</div>
@@ -2538,10 +2538,11 @@ function switchMainTab(tab, element) {
     document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
     if (element) element.classList.add('active');
     
-    // 如果是首页，关闭所有全屏页面
+    // 如果是首页，关闭所有全屏页面并清理状态
     if (tab === 'home') {
         closeFullscreenPage();
         closeSettingsPanel();
+        cleanupModuleState(); // 清理所有模块状态，包括播放器
     }
 }
 
@@ -2629,6 +2630,12 @@ function cleanupModuleState() {
     const audioPlayerFullscreen = document.getElementById('audio-player-fullscreen');
     if (audioPlayerFullscreen) {
         audioPlayerFullscreen.classList.remove('show');
+    }
+    
+    // 关闭迷你播放器
+    const miniPlayer = document.getElementById('mini-player');
+    if (miniPlayer) {
+        miniPlayer.classList.remove('show');
     }
     
     // 关闭视频全屏播放器
@@ -10961,105 +10968,6 @@ async function askPracticeAI() {
     }
 }
 
-</script>
-
-<!-- 播客全屏播放器 -->
-<div id="audio-player-fullscreen" class="audio-player-modal">
-    <!-- 顶部导航栏 -->
-    <div style="display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,0.3);">
-        <div onclick="closeAudioPlayer()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
-        <div id="ap-title" style="flex:1;font-size:14px;font-weight:600;color:white;text-align:center;">音频课程</div>
-        <div style="width:40px;"></div>
-    </div>
-    
-    <!-- 封面区域 -->
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;">
-        <div id="ap-cover" class="playing" style="width:200px;height:200px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,0.4);transition:all 0.3s;">
-            🎧
-        </div>
-        <div id="ap-course-title" style="color:white;font-size:18px;font-weight:600;text-align:center;margin-bottom:8px;">课程名称</div>
-        <div id="ap-course-teacher" style="color:rgba(255,255,255,0.7);font-size:14px;text-align:center;">讲师 · 分类</div>
-    </div>
-    
-    <!-- 进度条 -->
-    <div style="padding:0 20px 8px;">
-        <div id="ap-progress-bar" onclick="seekAudioPlayer(event)" style="width:100%;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;cursor:pointer;position:relative;">
-            <div id="ap-progress-fill" style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:0%;transition:width 0.1s;"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px;">
-            <span id="ap-current-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-            <span id="ap-total-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
-        </div>
-    </div>
-    
-    <!-- 播放控制按钮 -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:24px;padding:16px 20px;">
-        <button onclick="playPrevTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏮</button>
-        <button onclick="toggleAudioPlay()" id="ap-play-btn" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:white;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(102,126,234,0.4);">▶</button>
-        <button onclick="playNextTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏭</button>
-    </div>
-    
-    <!-- 倍速和音量控制 -->
-    <div style="display:flex;align-items:center;justify-content:space-around;padding:8px 20px 24px;">
-        <div style="position:relative;">
-            <button onclick="toggleSpeedDropdown()" id="ap-speed-btn" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:16px;font-size:14px;cursor:pointer;">1x</button>
-            <div id="ap-speed-dropdown" style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#2a2a4a;border-radius:12px;padding:8px;display:none;margin-bottom:8px;">
-                <div onclick="setPlaybackSpeed(0.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.5x</div>
-                <div onclick="setPlaybackSpeed(0.75)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.75x</div>
-                <div onclick="setPlaybackSpeed(1)" class="ap-speed-option active" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1x</div>
-                <div onclick="setPlaybackSpeed(1.25)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.25x</div>
-                <div onclick="setPlaybackSpeed(1.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.5x</div>
-                <div onclick="setPlaybackSpeed(2)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">2x</div>
-            </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <button onclick="toggleMute()" id="ap-volume-btn" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">🔊</button>
-            <input type="range" id="ap-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)" style="width:80px;height:4px;-webkit-appearance:none;background:rgba(255,255,255,0.3);border-radius:2px;">
-        </div>
-    </div>
-</div>
-
-<!-- 迷你播放器 -->
-<div id="mini-player" class="mini-player" style="display:none;">
-    <div id="mini-player-thumb" style="width:44px;height:44px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎧</div>
-    <div style="flex:1;min-width:0;margin-left:10px;">
-        <div id="mini-player-title" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">课程名称</div>
-        <div id="mini-player-teacher" style="font-size:11px;color:#999;">讲师</div>
-    </div>
-    <button onclick="toggleMiniPlayer()" id="mini-player-btn" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:14px;cursor:pointer;margin-right:8px;">▶</button>
-    <button onclick="closeMiniPlayer()" style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:12px;cursor:pointer;">✕</button>
-</div>
-
-<!-- 游戏全屏容器 -->
-<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
-    <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
-        <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
-        <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
-        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
-    </div>
-    <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div>
-            <div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div>
-        </div>
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">最高分</div>
-            <div id="game-best-score" style="color:#FFD700;font-size:20px;font-weight:bold;">0</div>
-        </div>
-        <div style="text-align:center;">
-            <div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div>
-            <div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div>
-        </div>
-    </div>
-    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;"></div>
-    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;">
-        <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
-        <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
-    </div>
-</div>
-</body>
-</html>
-
 // =====================================================
 // Week1-7 新增认知训练游戏实现
 // =====================================================
@@ -11881,4 +11789,104 @@ function startExperiment() {
     
     showExperiment();
 }
+
+
+</script>
+
+<!-- 播客全屏播放器 -->
+<div id="audio-player-fullscreen" class="audio-player-modal">
+    <!-- 顶部导航栏 -->
+    <div style="display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,0.3);">
+        <div onclick="closeAudioPlayer()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
+        <div id="ap-title" style="flex:1;font-size:14px;font-weight:600;color:white;text-align:center;">音频课程</div>
+        <div style="width:40px;"></div>
+    </div>
+    
+    <!-- 封面区域 -->
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;">
+        <div id="ap-cover" class="playing" style="width:200px;height:200px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:80px;margin-bottom:24px;box-shadow:0 8px 32px rgba(102,126,234,0.4);transition:all 0.3s;">
+            🎧
+        </div>
+        <div id="ap-course-title" style="color:white;font-size:18px;font-weight:600;text-align:center;margin-bottom:8px;">课程名称</div>
+        <div id="ap-course-teacher" style="color:rgba(255,255,255,0.7);font-size:14px;text-align:center;">讲师 · 分类</div>
+    </div>
+    
+    <!-- 进度条 -->
+    <div style="padding:0 20px 8px;">
+        <div id="ap-progress-bar" onclick="seekAudioPlayer(event)" style="width:100%;height:6px;background:rgba(255,255,255,0.2);border-radius:3px;cursor:pointer;position:relative;">
+            <div id="ap-progress-fill" style="height:100%;background:linear-gradient(90deg,#667eea,#764ba2);border-radius:3px;width:0%;transition:width 0.1s;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;">
+            <span id="ap-current-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
+            <span id="ap-total-time" style="color:rgba(255,255,255,0.7);font-size:12px;">0:00</span>
+        </div>
+    </div>
+    
+    <!-- 播放控制按钮 -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;padding:16px 20px;">
+        <button onclick="playPrevTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏮</button>
+        <button onclick="toggleAudioPlay()" id="ap-play-btn" style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);border:none;color:white;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(102,126,234,0.4);">▶</button>
+        <button onclick="playNextTrack()" style="background:none;border:none;color:white;font-size:28px;cursor:pointer;padding:8px;">⏭</button>
+    </div>
+    
+    <!-- 倍速和音量控制 -->
+    <div style="display:flex;align-items:center;justify-content:space-around;padding:8px 20px 24px;">
+        <div style="position:relative;">
+            <button onclick="toggleSpeedDropdown()" id="ap-speed-btn" style="background:rgba(255,255,255,0.1);border:none;color:white;padding:8px 16px;border-radius:16px;font-size:14px;cursor:pointer;">1x</button>
+            <div id="ap-speed-dropdown" style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#2a2a4a;border-radius:12px;padding:8px;display:none;margin-bottom:8px;">
+                <div onclick="setPlaybackSpeed(0.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.5x</div>
+                <div onclick="setPlaybackSpeed(0.75)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">0.75x</div>
+                <div onclick="setPlaybackSpeed(1)" class="ap-speed-option active" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1x</div>
+                <div onclick="setPlaybackSpeed(1.25)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.25x</div>
+                <div onclick="setPlaybackSpeed(1.5)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">1.5x</div>
+                <div onclick="setPlaybackSpeed(2)" class="ap-speed-option" style="padding:8px 16px;color:white;cursor:pointer;border-radius:8px;text-align:center;">2x</div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="toggleMute()" id="ap-volume-btn" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">🔊</button>
+            <input type="range" id="ap-volume-slider" min="0" max="100" value="80" onchange="setVolume(this.value)" style="width:80px;height:4px;-webkit-appearance:none;background:rgba(255,255,255,0.3);border-radius:2px;">
+        </div>
+    </div>
+</div>
+
+<!-- 迷你播放器 -->
+<div id="mini-player" class="mini-player" style="display:none;">
+    <div id="mini-player-thumb" style="width:44px;height:44px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">🎧</div>
+    <div style="flex:1;min-width:0;margin-left:10px;">
+        <div id="mini-player-title" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">课程名称</div>
+        <div id="mini-player-teacher" style="font-size:11px;color:#999;">讲师</div>
+    </div>
+    <button onclick="toggleMiniPlayer()" id="mini-player-btn" style="width:36px;height:36px;border-radius:50%;background:var(--blue);border:none;color:white;font-size:14px;cursor:pointer;margin-right:8px;">▶</button>
+    <button onclick="closeMiniPlayer()" style="width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:none;font-size:12px;cursor:pointer;">✕</button>
+</div>
+
+<!-- 游戏全屏容器 -->
+<div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
+    <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
+        <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
+        <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
+        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
+    </div>
+    <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div>
+            <div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">最高分</div>
+            <div id="game-best-score" style="color:#FFD700;font-size:20px;font-weight:bold;">0</div>
+        </div>
+        <div style="text-align:center;">
+            <div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div>
+            <div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div>
+        </div>
+    </div>
+    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;"></div>
+    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;">
+        <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
+        <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
+    </div>
+</div>
+</body>
+</html>
 
