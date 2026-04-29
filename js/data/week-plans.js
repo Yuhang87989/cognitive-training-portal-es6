@@ -1,6 +1,6 @@
 // 版本: V140
 
-const week5Plan = {
+window.week5Plan = {
     weekId:'week5',weekTitle:'Week5：系统性思维与守恒思维综合周',
     weekDesc:'本周围绕系统性思维和守恒思维进行深度训练',
     days:[

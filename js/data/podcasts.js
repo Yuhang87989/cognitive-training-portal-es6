@@ -1,6 +1,6 @@
 // 版本: V140
 
-const podcastList = [
+window.podcastList = [
     {id: 1, title: "青少年高效记忆法全攻略", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_b2ff66a9-c071-4912-84a7-51f174fd69a2.mp3?sign=1808822218-8a2b090761-0-db0b581cf15d5b549a623ffb6c882f7614bd5a52476bb36c7923398ca409fa2e", duration: "6:14", category: "学霸方法"},
     {id: 2, title: "青少年高效笔记法大揭秘", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_2fd6258b-4ebd-49a9-b1a8-20e8a3bfc750.mp3?sign=1808822237-742cb735e5-0-7c9279fb8f5480d82654cddd5352da5266e2f317c6d5b82d9ba9d0b0ad27e949", duration: "8:10", category: "学霸方法"},
     {id: 3, title: "青少年高效时间管理秘籍", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_c5a06139-dfe9-4a14-94ba-c4d7b4625415.mp3?sign=1808822260-6f500b4d28-0-22cd0458027452b72a475fefc73d0a0ba5b3d3751d601e4212544fb2a1aa9f76", duration: "7:52", category: "学霸方法"},
@@ -24,6 +24,3 @@ const podcastList = [
     {id: 21, title: "四周训练完结！青小年蜕变复盘", url: "https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_e114fd3c-f458-4930-b538-c269094d2df5.mp3?sign=1808822631-9eb2c6ff85-0-51ecf4698fa33b41dc2925d44fe3b9daf19ed6f84ff90dea30233bc0832719f9", duration: "2:24", category: "周度复盘"}
 ];
 
-// ============================================================
-// Videos - 视频数据
-// ============================================================
