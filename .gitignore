@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+
+# Package files
+package.json
+package-lock.json
+
+# Test files
+test_*.js
+*.test.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp files
+tmp/
+temp/
+*.tmp
