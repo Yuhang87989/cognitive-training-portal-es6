@@ -1,7 +1,9 @@
-// 简化版播客模块 - V141
-// 设计原则：简单、不乱、好用
+// 简化版播客模块 - V143
+// 设计原则：简单、不乱、好用、兼容旧版浏览器
 
-let currentPodcastId = null;
+var currentPodcastId = null;
+
+// 播客课程数据 - V143
 var podcastCourses = [
     {id:'podcast1',title:'告别背书苦海！3个记忆妙招助你逆袭',teacher:'学习方法专家',duration:'6:14',durationSec:374,category:'学霸方法',gradient:'linear-gradient(135deg,#667eea,#764ba2)',icon:'🧠',shareUrl:'https://www.coze.cn/s/3rTjJ7Xbdc0/',url:'https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_b2ff66a9-c071-4912-84a7-51f174fd69a2.mp3?sign=1808822218-8a2b090761-0-db0b581cf15d5b549a623ffb6c882f7614bd5a52476bb36c7923398ca409fa2e',views:25000},
     {id:'podcast2',title:'青少年高效笔记法，学习效率翻倍',teacher:'学习方法专家',duration:'5:48',durationSec:348,category:'学霸方法',gradient:'linear-gradient(135deg,#FF9A63,#E87A4E)',icon:'📝',shareUrl:'https://www.coze.cn/s/HAjMzHnxwvY/',url:'https://coze-coding-project.tos.coze.site/coze_storage_7630375842421407780/audio/tts_2fd6258b-4ebd-49a9-b1a8-20e8a3bfc750.mp3?sign=1808822237-742cb735e5-0-7c9279fb8f5480d82654cddd5352da5266e2f317c6d5b82d9ba9d0b0ad27e949',views:18000},
@@ -35,263 +37,374 @@ var podcastPlayerState = {
 };
 
 // ============================================================
+// 辅助函数：生成下拉选项HTML
+// ============================================================
+function getPodcastSelectOptions() {
+    var html = '<option value="">-- 请选择播客 --</option>';
+    var categories = ['学霸方法', '数学', '英语', '物理', '化学', '语文'];
+    var categoryIcons = {'学霸方法':'🎓', '数学':'📐', '英语':'📖', '物理':'⚡', '化学':'🧪', '语文':'📝'};
+    var i, j, podcast;
+    
+    for (i = 0; i < categories.length; i++) {
+        html += '<optgroup label="' + categoryIcons[categories[i]] + ' ' + categories[i] + '">';
+        for (j = 0; j < podcastCourses.length; j++) {
+            podcast = podcastCourses[j];
+            if (podcast.category === categories[i]) {
+                html += '<option value="' + podcast.id + '">' + podcast.icon + ' ' + podcast.title + ' (' + podcast.duration + ')</option>';
+            }
+        }
+        html += '</optgroup>';
+    }
+    return html;
+}
+
+// ============================================================
 // 简化版UI渲染
 // ============================================================
 function renderPodcast(container) {
-    container.innerHTML = `
-        <!-- 顶部固定播放器 -->
-        <div class="podcast-player-fixed">
-            <div class="podcast-player-info">
-                <span class="podcast-player-icon">🎧</span>
-                <div class="podcast-player-text">
-                    <div class="podcast-player-title" id="podcast-player-title">选择播客开始收听</div>
-                    <div class="podcast-player-subtitle" id="podcast-player-subtitle">-</div>
-                </div>
-            </div>
-            <div class="podcast-player-controls">
-                <button class="podcast-btn" id="podcast-prev-btn" onclick="podcastPrev()" title="上一首">⏮</button>
-                <button class="podcast-btn podcast-btn-play" id="podcast-play-btn" onclick="podcastTogglePlay()" title="播放/暂停">▶</button>
-                <button class="podcast-btn" id="podcast-next-btn" onclick="podcastNext()" title="下一首">⏭</button>
-                <button class="podcast-btn podcast-btn-speed" id="podcast-speed-btn" onclick="podcastCycleSpeed()" title="播放速度">1x</button>
-            </div>
-        </div>
-        
-        <!-- 进度条 -->
-        <div class="podcast-progress-container" id="podcast-progress-container" style="display:none;">
-            <div class="podcast-progress-bar" id="podcast-progress-bar">
-                <div class="podcast-progress-fill" id="podcast-progress-fill"></div>
-            </div>
-            <div class="podcast-time-display">
-                <span id="podcast-current-time">0:00</span>
-                <span id="podcast-total-time">0:00</span>
-            </div>
-        </div>
-        
-        <!-- 下拉选择列表 -->
-        <div class="card" style="margin-top:0;">
-            <div class="podcast-select-wrapper">
-                <label class="podcast-select-label">选择播客：</label>
-                <select class="podcast-select" id="podcast-select" onchange="onPodcastSelectChange(this.value)">
-                    <option value="">-- 请选择播客 --</option>
-                    <optgroup label="🎓 学霸方法">
-                        ${podcastCourses.filter(p => p.category === '学霸方法').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                    <optgroup label="📐 数学">
-                        ${podcastCourses.filter(p => p.category === '数学').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                    <optgroup label="📖 英语">
-                        ${podcastCourses.filter(p => p.category === '英语').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                    <optgroup label="⚡ 物理">
-                        ${podcastCourses.filter(p => p.category === '物理').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                    <optgroup label="🧪 化学">
-                        ${podcastCourses.filter(p => p.category === '化学').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                    <optgroup label="📝 语文">
-                        ${podcastCourses.filter(p => p.category === '语文').map(p => 
-                            `<option value="${p.id}">${p.icon} ${p.title} (${p.duration})</option>`
-                        ).join('')}
-                    </optgroup>
-                </select>
-            </div>
-        </div>
-        
-        <!-- 播客列表（可折叠） -->
-        <div class="card" style="margin-top:12px;">
-            <div class="podcast-list-header" onclick="togglePodcastList()">
-                <span>📋 播客列表</span>
-                <span id="podcast-list-toggle">▼</span>
-            </div>
-            <div id="podcast-list-container" class="podcast-list-container">
-                <div class="podcast-list-grid" id="podcast-list">
-                    ${renderPodcastListItems(podcastCourses)}
-                </div>
-            </div>
-        </div>
-    `;
+    var html = '';
+    html += '<!-- 顶部固定播放器 -->';
+    html += '<div class="podcast-player-fixed">';
+    html += '<div class="podcast-player-info">';
+    html += '<span class="podcast-player-icon">🎧</span>';
+    html += '<div class="podcast-player-text">';
+    html += '<div class="podcast-player-title" id="podcast-player-title">选择播客开始收听</div>';
+    html += '<div class="podcast-player-subtitle" id="podcast-player-subtitle">-</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="podcast-player-controls">';
+    html += '<button class="podcast-btn" id="podcast-prev-btn" onclick="podcastPrev()" title="上一首">⏮</button>';
+    html += '<button class="podcast-btn podcast-btn-play" id="podcast-play-btn" onclick="podcastTogglePlay()" title="播放/暂停">▶</button>';
+    html += '<button class="podcast-btn" id="podcast-next-btn" onclick="podcastNext()" title="下一首">⏭</button>';
+    html += '<button class="podcast-btn podcast-btn-speed" id="podcast-speed-btn" onclick="podcastCycleSpeed()" title="播放速度">1x</button>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<!-- 进度条 -->';
+    html += '<div class="podcast-progress-container" id="podcast-progress-container" style="display:none;">';
+    html += '<div class="podcast-progress-bar" id="podcast-progress-bar">';
+    html += '<div class="podcast-progress-fill" id="podcast-progress-fill"></div>';
+    html += '</div>';
+    html += '<div class="podcast-time-display">';
+    html += '<span id="podcast-current-time">0:00</span>';
+    html += '<span id="podcast-total-time">0:00</span>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<!-- 下拉选择列表 -->';
+    html += '<div class="card" style="margin-top:0;">';
+    html += '<div class="podcast-select-wrapper">';
+    html += '<label class="podcast-select-label">选择播客：</label>';
+    html += '<select class="podcast-select" id="podcast-select" onchange="onPodcastSelectChange(this.value)">';
+    html += getPodcastSelectOptions();
+    html += '</select>';
+    html += '</div>';
+    html += '</div>';
+    
+    html += '<!-- 播客列表（可折叠） -->';
+    html += '<div class="card" style="margin-top:12px;">';
+    html += '<div class="podcast-list-header" onclick="togglePodcastList()">';
+    html += '<span>📋 播客列表</span>';
+    html += '<span id="podcast-list-toggle">▼</span>';
+    html += '</div>';
+    html += '<div id="podcast-list-container" class="podcast-list-container">';
+    html += '<div class="podcast-list-grid" id="podcast-list">';
+    html += renderPodcastListItems(podcastCourses);
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    
+    container.innerHTML = html;
     
     // 初始化音频元素
     initPodcastAudio();
 }
 
-// 渲染播客列表项
+// ============================================================
+// 渲染播客列表项 - 使用字符串拼接，兼容旧版浏览器
+// ============================================================
 function renderPodcastListItems(podcasts) {
-    return podcasts.map(p => `
-        <div class="podcast-list-item ${podcastPlayerState.currentPodcast?.id === p.id ? 'active' : ''}" 
-             onclick="playPodcastById('${p.id}')">
-            <span class="podcast-list-icon" style="background:${p.gradient};">${p.icon}</span>
-            <div class="podcast-list-info">
-                <div class="podcast-list-title">${p.title}</div>
-                <div class="podcast-list-meta">${p.teacher} · ${p.duration}</div>
-            </div>
-            ${podcastPlayerState.currentPodcast?.id === p.id && podcastPlayerState.isPlaying ? 
-                '<span class="podcast-playing-indicator">🔊</span>' : 
-                '<span class="podcast-play-icon">▶</span>'
-            }
-        </div>
-    `).join('');
+    var html = '';
+    var i, p, isActive, isPlayingNow, itemHtml, indicator;
+    
+    for (i = 0; i < podcasts.length; i++) {
+        p = podcasts[i];
+        isActive = (podcastPlayerState.currentPodcast && podcastPlayerState.currentPodcast.id === p.id);
+        isPlayingNow = isActive && podcastPlayerState.isPlaying;
+        indicator = isPlayingNow ? '<span class="podcast-playing-indicator">🔊</span>' : '<span class="podcast-play-icon">▶</span>';
+        
+        itemHtml = '<div class="podcast-list-item' + (isActive ? ' active' : '') + '" onclick="playPodcastById(\'' + p.id + '\')">';
+        itemHtml += '<span class="podcast-list-icon" style="background:' + p.gradient + ';">' + p.icon + '</span>';
+        itemHtml += '<div class="podcast-list-info">';
+        itemHtml += '<div class="podcast-list-title">' + p.title + '</div>';
+        itemHtml += '<div class="podcast-list-meta">' + p.teacher + ' · ' + p.duration + '</div>';
+        itemHtml += '</div>';
+        itemHtml += indicator;
+        itemHtml += '</div>';
+        
+        html += itemHtml;
+    }
+    
+    return html;
 }
 
+// ============================================================
 // 切换播客列表显示
+// ============================================================
 function togglePodcastList() {
-    const container = document.getElementById('podcast-list-container');
-    const toggle = document.getElementById('podcast-list-toggle');
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        toggle.textContent = '▲';
-    } else {
-        container.style.display = 'none';
-        toggle.textContent = '▼';
+    var container = document.getElementById('podcast-list-container');
+    var toggle = document.getElementById('podcast-list-toggle');
+    if (container && toggle) {
+        if (container.style.display === 'none') {
+            container.style.display = 'block';
+            toggle.textContent = '▲';
+        } else {
+            container.style.display = 'none';
+            toggle.textContent = '▼';
+        }
     }
 }
 
+// ============================================================
 // 下拉选择变化
+// ============================================================
 function onPodcastSelectChange(podcastId) {
     if (podcastId) {
         playPodcastById(podcastId);
-        // 更新下拉选择
-        document.getElementById('podcast-select').value = podcastId;
     }
 }
 
+// ============================================================
 // 根据ID播放播客
+// ============================================================
 function playPodcastById(podcastId) {
-    const podcast = podcastCourses.find(p => p.id === podcastId);
-    if (!podcast) return;
-    
-    playPodcast(podcast);
+    var i, podcast;
+    for (i = 0; i < podcastCourses.length; i++) {
+        if (podcastCourses[i].id === podcastId) {
+            podcast = podcastCourses[i];
+            break;
+        }
+    }
+    if (podcast) {
+        podcastPlay(podcast);
+    }
 }
 
-// 播放播客
-function playPodcast(podcast) {
+// ============================================================
+// 播放播客 - 音频播放优先，UI更新在try-catch中
+// ============================================================
+function podcastPlay(podcast) {
+    var audio, select, list, btn, titleEl, subtitleEl, progressEl, timeEl, self = this;
+    
+    // 1. 首先设置当前播客状态
     podcastPlayerState.currentPodcast = podcast;
     podcastPlayerState.isPlaying = true;
     
-    // 更新UI
-    document.getElementById('podcast-player-title').textContent = podcast.title;
-    document.getElementById('podcast-player-subtitle').textContent = podcast.teacher + ' · ' + podcast.category;
-    document.getElementById('podcast-play-btn').textContent = '⏸';
-    document.getElementById('podcast-progress-container').style.display = 'block';
-    document.getElementById('podcast-total-time').textContent = podcast.duration;
-    
-    // 更新列表选中状态
-    const list = document.getElementById('podcast-list');
-    if (list) {
-        list.innerHTML = renderPodcastListItems(podcastCourses);
-    }
-    
-    // 更新下拉选择
-    const select = document.getElementById('podcast-select');
-    if (select) select.value = podcast.id;
-    
-    // 播放音频
-    const audio = document.getElementById('hidden-audio');
+    // 2. 立即播放音频（最重要！）
+    audio = document.getElementById('hidden-audio');
     if (audio && podcast.url) {
-        // 先暂停当前播放
         audio.pause();
         audio.currentTime = 0;
         audio.src = podcast.url;
         audio.playbackRate = podcastPlayerState.playbackRate;
         audio.load();
-        audio.play().then(function() {
-            showToast('正在播放: ' + podcast.title);
-            podcastPlayerState.isPlaying = true;
-        }).catch(function(e) {
-            console.warn('自动播放被阻止:', e);
-            podcastPlayerState.isPlaying = false;
-            document.getElementById('podcast-play-btn').textContent = '▶';
-            showToast('点击播放按钮开始收听');
-        });
+        
+        // 使用回调处理自动播放结果
+        var playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                // 播放成功
+                podcastPlayerState.isPlaying = true;
+                updatePodcastUI();
+                if (typeof showToast === 'function') {
+                    showToast('正在播放: ' + podcast.title);
+                }
+            }).catch(function(e) {
+                // 自动播放被阻止，等待用户交互
+                podcastPlayerState.isPlaying = false;
+                btn = document.getElementById('podcast-play-btn');
+                if (btn) btn.textContent = '▶';
+                if (typeof showToast === 'function') {
+                    showToast('点击播放按钮开始收听');
+                }
+            });
+        }
     } else if (!podcast.url) {
-        showToast('该播客暂无音频');
+        if (typeof showToast === 'function') {
+            showToast('该播客暂无音频');
+        }
     }
     
-    // 同时更新迷你播放器
-    try { showMiniPlayer({
-        title: podcast.title,
-        teacher: podcast.teacher,
-        icon: podcast.icon,
-        gradient: podcast.gradient,
-        type: 'podcast'
-    }); } catch(e) { console.warn("迷你播放器不可用:", e); }
+    // 3. UI更新放在后面，用try-catch保护
+    updatePodcastUI();
 }
 
+// ============================================================
+// 更新播客UI（被podcast.js内部调用）
+// ============================================================
+function updatePodcastUI() {
+    var podcast, titleEl, subtitleEl, btn, progressEl, timeEl, list, select;
+    
+    try {
+        podcast = podcastPlayerState.currentPodcast;
+        if (!podcast) return;
+        
+        titleEl = document.getElementById('podcast-player-title');
+        subtitleEl = document.getElementById('podcast-player-subtitle');
+        btn = document.getElementById('podcast-play-btn');
+        progressEl = document.getElementById('podcast-progress-container');
+        timeEl = document.getElementById('podcast-total-time');
+        list = document.getElementById('podcast-list');
+        select = document.getElementById('podcast-select');
+        
+        if (titleEl) titleEl.textContent = podcast.title;
+        if (subtitleEl) subtitleEl.textContent = podcast.teacher + ' · ' + podcast.category;
+        if (btn) btn.textContent = podcastPlayerState.isPlaying ? '⏸' : '▶';
+        if (progressEl) progressEl.style.display = 'block';
+        if (timeEl) timeEl.textContent = podcast.duration;
+        
+        // 更新列表
+        if (list) {
+            list.innerHTML = renderPodcastListItems(podcastCourses);
+        }
+        
+        // 更新下拉选择
+        if (select) select.value = podcast.id;
+        
+    } catch (e) {
+        console.warn('更新播客UI失败:', e);
+    }
+    
+    // 更新迷你播放器（如果有）
+    try {
+        if (typeof showMiniPlayer === 'function' && podcast) {
+            showMiniPlayer({
+                title: podcast.title,
+                teacher: podcast.teacher,
+                icon: podcast.icon,
+                gradient: podcast.gradient,
+                type: 'podcast'
+            });
+        }
+    } catch (e) {
+        console.warn('迷你播放器不可用:', e);
+    }
+}
+
+// ============================================================
 // 切换播放/暂停
+// ============================================================
 function podcastTogglePlay() {
-    const audio = document.getElementById('hidden-audio');
+    var audio = document.getElementById('hidden-audio');
+    var btn = document.getElementById('podcast-play-btn');
+    var list = document.getElementById('podcast-list');
+    
     if (!audio || !podcastPlayerState.currentPodcast) {
-        showToast('请先选择播客');
+        if (typeof showToast === 'function') {
+            showToast('请先选择播客');
+        }
         return;
     }
     
     if (podcastPlayerState.isPlaying) {
         audio.pause();
         podcastPlayerState.isPlaying = false;
-        document.getElementById('podcast-play-btn').textContent = '▶';
+        if (btn) btn.textContent = '▶';
     } else {
         audio.play();
         podcastPlayerState.isPlaying = true;
-        document.getElementById('podcast-play-btn').textContent = '⏸';
+        if (btn) btn.textContent = '⏸';
     }
     
     // 更新列表图标
-    const list = document.getElementById('podcast-list');
     if (list) {
         list.innerHTML = renderPodcastListItems(podcastCourses);
     }
 }
 
+// ============================================================
 // 上一首
+// ============================================================
 function podcastPrev() {
+    var currentIndex, prevIndex, i;
+    
     if (!podcastPlayerState.currentPodcast) {
-        showToast('请先选择播客');
+        if (typeof showToast === 'function') {
+            showToast('请先选择播客');
+        }
         return;
     }
-    const currentIndex = podcastCourses.findIndex(p => p.id === podcastPlayerState.currentPodcast.id);
-    const prevIndex = currentIndex > 0 ? currentIndex - 1 : podcastCourses.length - 1;
-    playPodcast(podcastCourses[prevIndex]);
+    
+    for (i = 0; i < podcastCourses.length; i++) {
+        if (podcastCourses[i].id === podcastPlayerState.currentPodcast.id) {
+            currentIndex = i;
+            break;
+        }
+    }
+    
+    prevIndex = currentIndex > 0 ? currentIndex - 1 : podcastCourses.length - 1;
+    podcastPlay(podcastCourses[prevIndex]);
 }
 
+// ============================================================
 // 下一首
+// ============================================================
 function podcastNext() {
+    var currentIndex, nextIndex, i;
+    
     if (!podcastPlayerState.currentPodcast) {
-        showToast('请先选择播客');
+        if (typeof showToast === 'function') {
+            showToast('请先选择播客');
+        }
         return;
     }
-    const currentIndex = podcastCourses.findIndex(p => p.id === podcastPlayerState.currentPodcast.id);
-    const nextIndex = currentIndex < podcastCourses.length - 1 ? currentIndex + 1 : 0;
-    playPodcast(podcastCourses[nextIndex]);
+    
+    for (i = 0; i < podcastCourses.length; i++) {
+        if (podcastCourses[i].id === podcastPlayerState.currentPodcast.id) {
+            currentIndex = i;
+            break;
+        }
+    }
+    
+    nextIndex = currentIndex < podcastCourses.length - 1 ? currentIndex + 1 : 0;
+    podcastPlay(podcastCourses[nextIndex]);
 }
 
+// ============================================================
 // 切换播放速度
+// ============================================================
 function podcastCycleSpeed() {
-    const speeds = [1, 1.5, 2];
-    const currentIndex = speeds.indexOf(podcastPlayerState.playbackRate);
-    const nextIndex = (currentIndex + 1) % speeds.length;
+    var speeds = [1, 1.5, 2];
+    var currentIndex = -1;
+    var nextIndex, audio, btn, i;
+    
+    for (i = 0; i < speeds.length; i++) {
+        if (speeds[i] === podcastPlayerState.playbackRate) {
+            currentIndex = i;
+            break;
+        }
+    }
+    
+    nextIndex = (currentIndex + 1) % speeds.length;
     podcastPlayerState.playbackRate = speeds[nextIndex];
     
-    const audio = document.getElementById('hidden-audio');
+    audio = document.getElementById('hidden-audio');
     if (audio) audio.playbackRate = podcastPlayerState.playbackRate;
     
-    document.getElementById('podcast-speed-btn').textContent = speeds[nextIndex] + 'x';
-    showToast('播放速度: ' + speeds[nextIndex] + 'x');
+    btn = document.getElementById('podcast-speed-btn');
+    if (btn) btn.textContent = speeds[nextIndex] + 'x';
+    
+    if (typeof showToast === 'function') {
+        showToast('播放速度: ' + speeds[nextIndex] + 'x');
+    }
 }
 
+// ============================================================
 // 初始化音频元素
+// ============================================================
 function initPodcastAudio() {
-    // 确保页面中有隐藏的音频元素
-    let audio = document.getElementById('hidden-audio');
+    var audio = document.getElementById('hidden-audio');
+    
     if (!audio) {
         audio = document.createElement('audio');
         audio.id = 'hidden-audio';
@@ -299,32 +412,45 @@ function initPodcastAudio() {
         document.body.appendChild(audio);
     }
     
-    // 绑定事件
+    // 播放开始
     audio.onplay = function() {
+        var playBtn, list;
         podcastPlayerState.isPlaying = true;
-        const playBtn = document.getElementById('podcast-play-btn');
+        playBtn = document.getElementById('podcast-play-btn');
         if (playBtn) playBtn.textContent = '⏸';
-        const list = document.getElementById('podcast-list');
+        list = document.getElementById('podcast-list');
         if (list) list.innerHTML = renderPodcastListItems(podcastCourses);
     };
     
+    // 暂停
     audio.onpause = function() {
+        var playBtn, list;
         podcastPlayerState.isPlaying = false;
-        const playBtn = document.getElementById('podcast-play-btn');
+        playBtn = document.getElementById('podcast-play-btn');
         if (playBtn) playBtn.textContent = '▶';
-        const list = document.getElementById('podcast-list');
+        list = document.getElementById('podcast-list');
         if (list) list.innerHTML = renderPodcastListItems(podcastCourses);
     };
     
+    // 时间更新
     audio.ontimeupdate = function() {
+        var progressFill, currentTimeEl, duration;
         podcastPlayerState.currentTime = audio.currentTime;
-        podcastPlayerState.duration = audio.duration || podcastPlayerState.currentPodcast?.durationSec || 0;
+        
+        // 获取时长（优先使用实际duration，否则用预设值）
+        duration = audio.duration;
+        if (!duration || isNaN(duration)) {
+            duration = (podcastPlayerState.currentPodcast && podcastPlayerState.currentPodcast.durationSec) 
+                ? podcastPlayerState.currentPodcast.durationSec : 0;
+        }
+        podcastPlayerState.duration = duration;
         
         // 更新进度条
-        const progressFill = document.getElementById('podcast-progress-fill');
-        const currentTimeEl = document.getElementById('podcast-current-time');
+        progressFill = document.getElementById('podcast-progress-fill');
+        currentTimeEl = document.getElementById('podcast-current-time');
+        
         if (progressFill && podcastPlayerState.duration > 0) {
-            const percent = (podcastPlayerState.currentTime / podcastPlayerState.duration) * 100;
+            var percent = (podcastPlayerState.currentTime / podcastPlayerState.duration) * 100;
             progressFill.style.width = percent + '%';
         }
         if (currentTimeEl) {
@@ -332,33 +458,37 @@ function initPodcastAudio() {
         }
     };
     
+    // 播放结束
     audio.onended = function() {
-        // 播放结束，自动播放下一首
         podcastNext();
     };
     
     // 点击进度条跳转
-    const progressBar = document.getElementById('podcast-progress-bar');
+    var progressBar = document.getElementById('podcast-progress-bar');
     if (progressBar) {
         progressBar.onclick = function(e) {
+            var rect, percent;
             if (!podcastPlayerState.duration) return;
-            const rect = progressBar.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
+            rect = progressBar.getBoundingClientRect();
+            percent = (e.clientX - rect.left) / rect.width;
             audio.currentTime = percent * podcastPlayerState.duration;
         };
     }
 }
 
+// ============================================================
 // 格式化时间
+// ============================================================
 function formatTime(seconds) {
+    var mins, secs;
     if (!seconds || isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
+    mins = Math.floor(seconds / 60);
+    secs = Math.floor(seconds % 60);
     return mins + ':' + (secs < 10 ? '0' : '') + secs;
 }
 
 // ============================================================
-// Window Exports
+// Window Exports - 确保全局可用
 // ============================================================
 window.renderPodcast = renderPodcast;
 window.playPodcastById = playPodcastById;
