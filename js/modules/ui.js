@@ -429,39 +429,141 @@ function logoutAndReturn() {
     openRegisterModal();
 }
 
+// ============================================================
+// 完整退出系统函数 - 清除所有状态并返回未登录状态
+// 版本: V141
+// ============================================================
 function doExitSystem() {
-    // 清除当前用户
+    console.log("执行完整退出系统...");
+    
+    // 1. 清除localStorage中的用户数据（保留配置）
     var data = loadData();
     data.currentUser = null;
     saveData(data);
     
-    // 重置播放状态
-    audioCtx.isPlaying = false;
-    audioCtx.currentTrack = null;
-    videoCtx.isPlaying = false;
-    videoCtx.currentVideo = null;
+    // 2. 停止TTS语音
+    if (typeof stopTTSSpeech === "function") {
+        stopTTSSpeech();
+    }
     
-    // 关闭告别弹窗
-    var goodbyeModal = document.getElementById('goodbye-modal');
+    // 3. 停止所有音视频播放
+    var hiddenAudio = document.getElementById("hidden-audio");
+    if (hiddenAudio) { hiddenAudio.pause(); hiddenAudio.src = ""; }
+    
+    var evpVideo = document.getElementById("evp-video");
+    if (evpVideo) { evpVideo.pause(); evpVideo.src = ""; }
+    
+    var vpVideo = document.getElementById("vp-video");
+    if (vpVideo) { vpVideo.pause(); vpVideo.src = ""; }
+    
+    var mpAudio = document.getElementById("mp-audio-element");
+    var mpVideo = document.getElementById("mp-video-element");
+    if (mpAudio) { mpAudio.pause(); mpAudio.src = ""; }
+    if (mpVideo) { mpVideo.pause(); mpVideo.src = ""; }
+    
+    // 4. 重置所有播放器状态
+    if (typeof audioCtx !== "undefined") {
+        audioCtx.isPlaying = false;
+        audioCtx.currentTrack = null;
+        audioCtx.currentIndex = -1;
+    }
+    
+    if (typeof videoCtx !== "undefined") {
+        videoCtx.isPlaying = false;
+        videoCtx.currentVideo = null;
+    }
+    
+    if (typeof mediaPlayer !== "undefined") {
+        mediaPlayer.isPlaying = false;
+        mediaPlayer.currentMedia = null;
+        mediaPlayer.currentIndex = -1;
+    }
+    
+    // 5. 停止所有定时器
+    if (typeof window.pomodoroTimer !== "undefined" && window.pomodoroTimer) {
+        clearInterval(window.pomodoroTimer);
+        window.pomodoroTimer = null;
+    }
+    
+    if (typeof CTM !== "undefined" && CTM.timers) {
+        Object.keys(CTM.timers).forEach(function(key) {
+            clearInterval(CTM.timers[key]);
+        });
+        CTM.timers = {};
+    }
+    
+    if (typeof allTimers !== "undefined") {
+        allTimers.forEach(function(timer) { clearInterval(timer); });
+        window.allTimers = [];
+    }
+    
+    // 6. 关闭所有弹窗
+    document.querySelectorAll(".modal, .modal-overlay, .show").forEach(function(modal) {
+        modal.classList.remove("show");
+    });
+    
+    var goodbyeModal = document.getElementById("goodbye-modal");
     if (goodbyeModal) goodbyeModal.remove();
     
-    // 关闭所有全屏页面
-    var fullscreenEl = document.getElementById('fullscreen-container');
-    if (fullscreenEl) fullscreenEl.classList.remove('active');
+    var videoModal = document.getElementById("video-player-modal");
+    if (videoModal) videoModal.classList.remove("show");
     
-    // 跳转到登录页
-    showPage('login');
+    var audioPlayer = document.getElementById("audio-player-fullscreen");
+    if (audioPlayer) audioPlayer.classList.remove("show");
     
-    // 如果是PWA模式，尝试关闭窗口
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+    var enhancedVideo = document.getElementById("enhanced-video-player");
+    if (enhancedVideo) enhancedVideo.style.display = "none";
+    
+    var mediaPlayerFs = document.getElementById("media-player-fullscreen");
+    if (mediaPlayerFs) mediaPlayerFs.classList.remove("show");
+    
+    var userDropdown = document.getElementById("user-dropdown");
+    if (userDropdown) userDropdown.classList.remove("show");
+    
+    var settingsPanel = document.getElementById("settings-panel");
+    if (settingsPanel) settingsPanel.classList.remove("show");
+    
+    // 7. 关闭所有全屏页面
+    var fullscreenEl = document.getElementById("fullscreen-container");
+    if (fullscreenEl) {
+        fullscreenEl.classList.remove("active");
+        var fullscreenContent = document.getElementById("fullscreen-content");
+        if (fullscreenContent) fullscreenContent.innerHTML = "";
+    }
+    
+    // 8. 关闭游戏全屏
+    var gameArea = document.getElementById("game-area");
+    if (gameArea) {
+        gameArea.classList.remove("active");
+        gameArea.innerHTML = "";
+    }
+    
+    // 9. 重置页面状态 - 显示欢迎页面
+    showPage("home");
+    
+    // 重置UI显示
+    updateUI();
+    
+    // 10. 如果是PWA模式，尝试关闭窗口
+    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
         setTimeout(function() {
-            window.close();
-            // 如果close()被浏览器阻止，尝试后退
-            setTimeout(function() { window.history.go(-999); }, 500);
+            try { window.close(); } catch(e) {
+                setTimeout(function() { window.history.go(-999); }, 500);
+            }
         }, 1000);
     }
+    
+    console.log("系统已退出到未登录状态");
 }
 
+// 辅助函数：收集并清除所有定时器
+window.allTimers = [];
+var originalSetInterval = window.setInterval;
+window.setInterval = function(func, delay) {
+    var timer = originalSetInterval(func, delay);
+    window.allTimers.push(timer);
+    return timer;
+};
 function switchToUser(userId) {
     var data = loadData();
     var user = data.users.find(function(u) { return u.id === userId; });
