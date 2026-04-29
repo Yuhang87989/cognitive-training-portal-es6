@@ -850,3 +850,37 @@ function updateMediaPlayButtons() {
 // ============================================================
 window.playAudioPos = playAudioPos;
 window.startAudioSeq = startAudioSeq;
+// ========== 视频观看记录功能 ==========
+function getVideoWatchRecord(videoId) {
+    try {
+        const user = getCurrentUserData();
+        if (!user || !user.videoWatchRecords) return null;
+        return user.videoWatchRecords[videoId] || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveVideoWatchRecord(videoId, progress, duration) {
+    try {
+        const user = getCurrentUserData();
+        if (!user) return;
+        if (!user.videoWatchRecords) user.videoWatchRecords = {};
+        user.videoWatchRecords[videoId] = {
+            progress: Math.min(progress, 100),
+            duration: duration,
+            timestamp: Date.now()
+        };
+        saveCurrentUserData(user);
+    } catch (e) {}
+}
+
+function updateVideoProgress() {
+    try {
+        const videoEl = document.getElementById('evp-video');
+        if (!videoEl || !videoEl.dataset.videoId) return;
+        const videoId = videoEl.dataset.videoId;
+        const progress = videoEl.duration > 0 ? (videoEl.currentTime / videoEl.duration) * 100 : 0;
+        saveVideoWatchRecord(videoId, progress, videoEl.duration);
+    } catch (e) {}
+}
