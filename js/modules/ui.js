@@ -448,18 +448,18 @@ function doExitSystem() {
     
     // 3. 停止所有音视频播放
     var hiddenAudio = document.getElementById("hidden-audio");
-    if (hiddenAudio) { hiddenAudio.pause(); hiddenAudio.src = ""; }
+    if (hiddenAudio) { hiddenAudio.pause(); hiddenAudio.removeAttribute("src"); hiddenAudio.load(); }
     
     var evpVideo = document.getElementById("evp-video");
-    if (evpVideo) { evpVideo.pause(); evpVideo.src = ""; }
+    if (evpVideo) { evpVideo.pause(); evpVideo.removeAttribute("src"); evpVideo.load(); }
     
     var vpVideo = document.getElementById("vp-video");
-    if (vpVideo) { vpVideo.pause(); vpVideo.src = ""; }
+    if (vpVideo) { vpVideo.pause(); vpVideo.removeAttribute("src"); vpVideo.load(); }
     
     var mpAudio = document.getElementById("mp-audio-element");
     var mpVideo = document.getElementById("mp-video-element");
-    if (mpAudio) { mpAudio.pause(); mpAudio.src = ""; }
-    if (mpVideo) { mpVideo.pause(); mpVideo.src = ""; }
+    if (mpAudio) { mpAudio.pause(); mpAudio.removeAttribute("src"); mpAudio.load(); }
+    if (mpVideo) { mpVideo.pause(); mpVideo.removeAttribute("src"); mpVideo.load(); }
     
     // 4. 重置所有播放器状态
     if (typeof audioCtx !== "undefined") {
