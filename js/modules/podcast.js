@@ -197,23 +197,34 @@ function playPodcast(podcast) {
     
     // 播放音频
     const audio = document.getElementById('hidden-audio');
-    if (audio) {
+    if (audio && podcast.url) {
+        // 先暂停当前播放
+        audio.pause();
+        audio.currentTime = 0;
         audio.src = podcast.url;
         audio.playbackRate = podcastPlayerState.playbackRate;
-        audio.play().catch(e => {
-            console.warn('播放失败:', e);
-            showToast('播放失败，请稍后重试');
+        audio.load();
+        audio.play().then(function() {
+            showToast('正在播放: ' + podcast.title);
+            podcastPlayerState.isPlaying = true;
+        }).catch(function(e) {
+            console.warn('自动播放被阻止:', e);
+            podcastPlayerState.isPlaying = false;
+            document.getElementById('podcast-play-btn').textContent = '▶';
+            showToast('点击播放按钮开始收听');
         });
+    } else if (!podcast.url) {
+        showToast('该播客暂无音频');
     }
     
     // 同时更新迷你播放器
-    showMiniPlayer({
+    try { showMiniPlayer({
         title: podcast.title,
         teacher: podcast.teacher,
         icon: podcast.icon,
         gradient: podcast.gradient,
         type: 'podcast'
-    });
+    }); } catch(e) { console.warn("迷你播放器不可用:", e); }
 }
 
 // 切换播放/暂停
