@@ -636,8 +636,17 @@
             </div>
         </div>
     </div>
-    <div id="evp-big-play" onclick="toggleEnhancedVideoPlay()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;">▶</div>
+    <div id="evp-big-play" onclick="toggleEnhancedVideoPlay()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;z-index:5;">▶</div>
+    <div id="evp-loading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;display:none;z-index:4;">
+        <div style="width:100%;height:100%;border:4px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 1s linear infinite;"></div>
+    </div>
 </div>
+<style>
+@keyframes spin {
+    from { transform: translate(-50%,-50%) rotate(0deg); }
+    to { transform: translate(-50%,-50%) rotate(360deg); }
+}
+</style>
 
 
 <!-- 加载模块化JS文件 -->
@@ -655,6 +664,13 @@
             if (typeof initPortal === 'function') {
                 initPortal();
             }
+            // 初始化视频播放器
+            setTimeout(function() {
+                if (typeof initEnhancedVideoPlayer === 'function' && window.videoCtx && !window.videoCtx.isInitialized) {
+                    initEnhancedVideoPlayer();
+                    console.log('视频播放器已初始化');
+                }
+            }, 50);
             // Register Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('service-worker.js')

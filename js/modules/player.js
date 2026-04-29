@@ -1,4 +1,14 @@
-// 版本: V140
+// 版本: V141 - 视频播放器优化版本
+
+// ========== 视频播放器全局状态 ==========
+window.videoCtx = {
+    isPlaying: false,
+    playbackSpeed: 1,
+    volume: 0.8,
+    lastVolume: 0.8,
+    currentVideo: null,
+    isInitialized: false
+};
 
 function playPodcast(title, id) { if (id) { for (var i = 0; i < podcastCourses.length; i++) { if (podcastCourses[i].id === id) { playPodcastCourse(id); return; } } } for (var i = 0; i < podcastCourses.length; i++) { if (podcastCourses[i].title === title) { playPodcastCourse(podcastCourses[i].id); return; } } showToast('播放: ' + title); }
 
@@ -275,13 +285,27 @@ function initUnifiedPlayer() {
 }
 
 function initEnhancedVideoPlayer() {
+    // 避免重复初始化
+    if (videoCtx.isInitialized) return;
+    
     evpVideo = document.getElementById('evp-video');
     if (!evpVideo) return;
+    
+    // 使用命名函数引用，便于后续移除
+    const boundPlayHandler = function() { videoCtx.isPlaying = true; updateEnhancedPlayButtons(); };
+    const boundPauseHandler = function() { videoCtx.isPlaying = false; updateEnhancedPlayButtons(); };
+    
     evpVideo.addEventListener('timeupdate', updateEnhancedVideoProgress);
     evpVideo.addEventListener('loadedmetadata', onEnhancedVideoLoaded);
     evpVideo.addEventListener('ended', onEnhancedVideoEnded);
-    evpVideo.addEventListener('play', function() { videoCtx.isPlaying = true; updateEnhancedPlayButtons(); });
-    evpVideo.addEventListener('pause', function() { videoCtx.isPlaying = false; updateEnhancedPlayButtons(); });
+    evpVideo.addEventListener('play', boundPlayHandler);
+    evpVideo.addEventListener('pause', boundPauseHandler);
+    evpVideo.addEventListener('error', onEnhancedVideoError);
+    evpVideo.addEventListener('waiting', onEnhancedVideoWaiting);
+    evpVideo.addEventListener('canplay', onEnhancedVideoCanPlay);
+    
+    // 标记为已初始化
+    videoCtx.isInitialized = true;
 }
 
 function closeAudioPlayer() { 
@@ -356,6 +380,10 @@ window.toggleEnhancedVideoPlay = toggleEnhancedVideoPlay;
 window.togglePictureInPicture = togglePictureInPicture;
 window.toggleVolume = toggleVolume;
 window.toggleVpPlay = toggleVpPlay;
+window.onEnhancedVideoError = onEnhancedVideoError;
+window.onEnhancedVideoWaiting = onEnhancedVideoWaiting;
+window.onEnhancedVideoCanPlay = onEnhancedVideoCanPlay;
+window.initEnhancedVideoPlayer = initEnhancedVideoPlayer;
         if (audioCtx.isPlaying) { stopPodcastTTS(); }
         else { audioCtx.isPlaying = true; updatePlayButtons(); speakNextCaption(); }
         return;
@@ -501,34 +529,69 @@ function openEnhancedVideoPlayer(title, url, videoId) {
     const playerEl = document.getElementById('enhanced-video-player');
     const videoEl = document.getElementById('evp-video');
     const titleEl = document.getElementById('evp-title');
+    const bigPlayEl = document.getElementById('evp-big-play');
+    const loadingEl = document.getElementById('evp-loading');
     
     if (playerEl && videoEl && titleEl) {
         titleEl.textContent = title;
-        videoEl.src = url;
+        
+        // 显示加载状态
+        if (loadingEl) loadingEl.style.display = 'flex';
+        if (bigPlayEl) bigPlayEl.style.display = 'none';
         
         // 记录视频ID
         if (videoId) {
             videoEl.dataset.videoId = videoId;
-            
+        }
+        
+        // 先移除旧的事件监听器（避免重复）
+        const onVideoLoadedForResume = function() {
             // 恢复上次观看位置
-            const record = getVideoWatchRecord(videoId);
-            if (record && record.progress < 90) {
-                const savedTime = (record.progress / 100) * videoEl.duration;
-                if (savedTime > 0) {
-                    videoEl.currentTime = savedTime;
-                    showToast('已恢复到上次观看位置');
+            if (videoId) {
+                const record = getVideoWatchRecord(videoId);
+                if (record && record.progress < 90) {
+                    const savedTime = (record.progress / 100) * videoEl.duration;
+                    if (savedTime > 0 && !isNaN(savedTime)) {
+                        videoEl.currentTime = savedTime;
+                        showToast('已恢复到上次观看位置');
+                    }
                 }
             }
+            // 移除这个一次性监听器
+            videoEl.removeEventListener('loadedmetadata', onVideoLoadedForResume);
+        };
+        
+        // 只在需要时添加一次性恢复监听器
+        if (videoId) {
+            videoEl.addEventListener('loadedmetadata', onVideoLoadedForResume);
         }
+        
+        // 设置视频源并播放
+        videoEl.src = url;
+        videoEl.playbackRate = videoCtx.playbackSpeed;
+        videoEl.volume = videoCtx.volume;
         
         playerEl.style.display = 'flex';
         
-        // 添加进度更新监听器
-        videoEl.removeEventListener('timeupdate', updateVideoProgress);
-        videoEl.addEventListener('timeupdate', updateVideoProgress);
-        
-        videoEl.play().catch(e => {});
+        // 确保视频元素引用是最新的
         evpVideo = videoEl;
+        
+        // 尝试播放，处理自动播放限制（移动端）
+        const attemptPlay = function() {
+            videoEl.play().then(function() {
+                videoCtx.isPlaying = true;
+                if (bigPlayEl) bigPlayEl.style.display = 'none';
+                showToast('正在播放: ' + title);
+            }).catch(function(e) {
+                // 自动播放被阻止（常见于移动端），显示大播放按钮等待用户点击
+                videoCtx.isPlaying = false;
+                if (bigPlayEl) bigPlayEl.style.display = 'flex';
+                console.log('自动播放被阻止，等待用户交互:', e.message);
+            });
+        };
+        
+        // 延迟执行播放尝试，确保 loadedmetadata 已触发
+        setTimeout(attemptPlay, 100);
     }
 }
 
@@ -572,7 +635,46 @@ function onAudioLoaded() { var totalEl = document.getElementById('ap-total-time'
 
 function onEnhancedVideoEnded() { videoCtx.isPlaying = false; var bigPlayEl = document.getElementById('evp-big-play'); if (bigPlayEl) bigPlayEl.style.display = 'flex'; updateEnhancedPlayButtons(); }
 
-function onEnhancedVideoLoaded() { var timeEl = document.getElementById('evp-time'); if (timeEl) timeEl.textContent = '0:00 / ' + formatTimeFull(evpVideo.duration); }
+function onEnhancedVideoLoaded() { 
+    var timeEl = document.getElementById('evp-time'); 
+    var loadingEl = document.getElementById('evp-loading');
+    if (timeEl) timeEl.textContent = '0:00 / ' + formatTimeFull(evpVideo.duration); 
+    if (loadingEl) loadingEl.style.display = 'none';
+}
+
+// 视频错误处理
+function onEnhancedVideoError(e) {
+    videoCtx.isPlaying = false;
+    var loadingEl = document.getElementById('evp-loading');
+    var bigPlayEl = document.getElementById('evp-big-play');
+    
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (bigPlayEl) bigPlayEl.style.display = 'flex';
+    
+    var errorMsg = '视频加载失败';
+    if (evpVideo && evpVideo.error) {
+        switch(evpVideo.error.code) {
+            case 1: errorMsg = '视频加载被中断'; break;
+            case 2: errorMsg = '网络错误，请检查网络连接'; break;
+            case 3: errorMsg = '视频解码失败'; break;
+            case 4: errorMsg = '视频格式不支持'; break;
+        }
+    }
+    showToast(errorMsg);
+    console.error('视频加载错误:', evpVideo?.error);
+}
+
+// 视频缓冲等待状态
+function onEnhancedVideoWaiting() {
+    var loadingEl = document.getElementById('evp-loading');
+    if (loadingEl) loadingEl.style.display = 'flex';
+}
+
+// 视频可以播放状态
+function onEnhancedVideoCanPlay() {
+    var loadingEl = document.getElementById('evp-loading');
+    if (loadingEl) loadingEl.style.display = 'none';
+}
 
 function onMediaLoaded() {
     var mediaEl = getCurrentMediaElement();
