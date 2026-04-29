@@ -7,6 +7,10 @@ var gameTimer = gameTimer || null;
 var snakeGame = typeof snakeGame !== 'undefined' ? snakeGame : null;
 var tetrisGame = typeof tetrisGame !== 'undefined' ? tetrisGame : null;
 var whackTimer = typeof whackTimer !== 'undefined' ? whackTimer : null;
+var gameType = "";
+var gameScore = 0;
+var gameLevel = 1;
+var gameStartTime = 0;
 var elimTimer = typeof elimTimer !== 'undefined' ? elimTimer : null;
 
 

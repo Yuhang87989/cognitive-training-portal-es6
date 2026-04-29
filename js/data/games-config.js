@@ -44,3 +44,38 @@ window.gamesConfig = [
     {id:'linkup',icon:'🔗',name:'连连看',desc:'配对挑战',gradient:'linear-gradient(135deg,#00897B,#26A69A)',category:'entertainment'},
     {id:'eliminate',icon:'💎',name:'消消乐',desc:'三消益智',gradient:'linear-gradient(135deg,#F4511E,#FF7043)',category:'entertainment'},
 ];
+
+// gameConfig对象格式 - games.js内部使用
+window.gameConfig = {
+    schulte: {name:'🎯 舒尔特方格',color:'#3377FF',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
+    visual: {name:'👁️ 视觉搜索',color:'#FF6B6B',gradient:'linear-gradient(135deg,#f093fb,#f5576c)'},
+    digit: {name:'🔢 数字记忆',color:'#9B59B6',gradient:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
+    pattern: {name:'🎨 图形记忆',color:'#43E97B',gradient:'linear-gradient(135deg,#43e97b,#38f9d7)'},
+    tap: {name:'⚡ 快速点击',color:'#FFD93D',gradient:'linear-gradient(135deg,#f6d365,#fda085)'},
+    color: {name:'🌈 颜色识别',color:'#4ECDC4',gradient:'linear-gradient(135deg,#4facfe,#00f2fe)'},
+    diff: {name:'🔍 找不同',color:'#FA709A',gradient:'linear-gradient(135deg,#fa709a,#fee140)'},
+    reason: {name:'🧩 图形推理',color:'#667eea',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
+    text: {name:'📝 文字记忆',color:'#E0C3FC',gradient:'linear-gradient(135deg,#e0c3fc,#8ec5fc)'},
+    shape: {name:'🔷 图形推理',color:'#FFECD2',gradient:'linear-gradient(135deg,#ffecd2,#fcb69f)'},
+    math: {name:'🔢 数学速算',color:'#A1C4FD',gradient:'linear-gradient(135deg,#a1c4fd,#c2e9fb)'},
+    space: {name:'🎲 空间旋转',color:'#D299C2',gradient:'linear-gradient(135deg,#d299c2,#fef9d7)'},
+    audio: {name:'🎧 听音辨位',color:'#89F7FE',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'},
+    word: {name:'💬 词汇联想',color:'#FDDB92',gradient:'linear-gradient(135deg,#fddb92,#d1fdff)'},
+    classify: {name:'📂 分类归纳',color:'#C1DFC4',gradient:'linear-gradient(135deg,#c1dfc4,#deecfd)'},
+    attention: {name:'🎯 注意力追踪',color:'#FF9A9E',gradient:'linear-gradient(135deg,#ff9a9e,#fecfef)'},
+    palace: {name:'🏛️ 记忆宫殿',color:'#6a3093',gradient:'linear-gradient(135deg,#6a3093,#a044ff)'},
+    stroop: {name:'🎯 Stroop冲突',color:'#fa709a',gradient:'linear-gradient(135deg,#fa709a,#fee140)'},
+    numshape: {name:'📐 数形结合',color:'#43e97b',gradient:'linear-gradient(135deg,#43e97b,#38f9d7)'},
+    conserve: {name:'⚖️ 守恒推理',color:'#a18cd1',gradient:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
+    network: {name:'🕸️ 知识网络',color:'#667eea',gradient:'linear-gradient(135deg,#667eea,#764ba2)'},
+    reverse: {name:'🔄 逆向推理',color:'#f093fb',gradient:'linear-gradient(135deg,#f093fb,#f5576c)'},
+    experiment: {name:'🧪 实验设计',color:'#89f7fe',gradient:'linear-gradient(135deg,#89f7fe,#66a6ff)'},
+    snake: {name:'🐍 贪吃蛇',color:'#43A047',gradient:'linear-gradient(135deg,#43A047,#66BB6A)'},
+    tetris: {name:'🧱 俄罗斯方块',color:'#E53935',gradient:'linear-gradient(135deg,#E53935,#EF5350)'},
+    flipcard: {name:'🃏 记忆翻牌',color:'#1E88E5',gradient:'linear-gradient(135deg,#1E88E5,#42A5F5)'},
+    slide: {name:'🔢 数字华容道',color:'#FB8C00',gradient:'linear-gradient(135deg,#FB8C00,#FFA726)'},
+    g2048: {name:'🎮 2048',color:'#EDC22E',gradient:'linear-gradient(135deg,#EDC22E,#F0D060)'},
+    whack: {name:'🔨 打地鼠',color:'#8E24AA',gradient:'linear-gradient(135deg,#8E24AA,#AB47BC)'},
+    linkup: {name:'🔗 连连看',color:'#00897B',gradient:'linear-gradient(135deg,#00897B,#26A69A)'},
+    eliminate: {name:'💎 消消乐',color:'#F4511E',gradient:'linear-gradient(135deg,#F4511E,#FF7043)'}
+};
