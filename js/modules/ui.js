@@ -866,8 +866,8 @@ function updateRecommendCard() {
     if (typeof podcastCourses !== 'undefined' && podcastCourses.length > 0) {
         var randomIndex = Math.floor(Math.random() * podcastCourses.length);
         var course = podcastCourses[randomIndex];
-        titleEl.textContent = course.title;
-        subtitleEl.textContent = course.teacher + ' · ' + course.category;
+        titleEl.textContent = '🎧 ' + course.title;
+        subtitleEl.textContent = course.teacher + ' · ' + course.duration;
         
         // 如果有图标元素，更新图标
         if (iconEl) {
