@@ -84,6 +84,20 @@ function cleanupModuleState() {
         currentAudio.currentTime = 0;
     }
     
+    // 停止播客音频（hidden-audio元素）
+    var hiddenAudio = document.getElementById('hidden-audio');
+    if (hiddenAudio) {
+        hiddenAudio.pause();
+        hiddenAudio.currentTime = 0;
+        hiddenAudio.src = '';
+    }
+    // 重置播客播放状态
+    if (typeof podcastPlayerState !== 'undefined' && podcastPlayerState) {
+        podcastPlayerState.isPlaying = false;
+        podcastPlayerState.currentPodcast = null;
+        podcastPlayerState.currentTime = 0;
+    }
+    
     // 停止视频播放
     const videoPlayer = document.getElementById('video-player');
     if (videoPlayer) {

@@ -631,7 +631,19 @@ function openMethodQuestions(methodId) {
         <div style="font-size:12px;color:#666;margin-bottom:12px;text-align:center;">
             共${questions.length}道练习题
         </div>
-        <div id="method-questions-list" style="max-height:400px;overflow-y:auto;">
+        
+        <!-- 拍照上传区域 -->
+        <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:16px;">
+            <div style="font-size:13px;color:#666;margin-bottom:8px;">📷 拍照上传题目图片（可选）</div>
+            <input type="file" id="method-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handleQuestionPhoto(this, 'method-photo-preview')"/>
+            <div style="display:flex;gap:8px;">
+                <button onclick="document.getElementById('method-photo-input').click()" style="flex:1;padding:10px;background:white;border:1px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer;">📷 拍照/选择图片</button>
+                <button onclick="analyzeMethodPhotoWithAI()" style="flex:1;padding:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;">🤖 AI分析图片</button>
+            </div>
+            <div id="method-photo-preview" style="margin-top:8px;display:none;"></div>
+        </div>
+        
+        <div id="method-questions-list" style="max-height:300px;overflow-y:auto;">
             ${questions.map((q, idx) => `
                 <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:12px;">
                     <div style="font-size:13px;color:#1A6BFF;font-weight:600;margin-bottom:8px;">第${idx + 1}题</div>
@@ -645,6 +657,23 @@ function openMethodQuestions(methodId) {
     `;
     document.getElementById('detail-modal').classList.add('show');
 }
+
+// AI分析学霸方法的图片
+async function analyzeMethodPhotoWithAI() {
+    const photoPreview = document.getElementById('method-photo-preview');
+    const imageData = window.currentQuestionPhoto;
+    
+    if (!imageData) {
+        showToast('请先上传图片');
+        return;
+    }
+    
+    // 直接使用新的OCR出题流程
+    photoToQuestion(imageData);
+}
+
+// 导出函数
+window.analyzeMethodPhotoWithAI = analyzeMethodPhotoWithAI;
 
 function submitMethodAnswers(methodId, page) {
     SoundEffects.playSubmit();

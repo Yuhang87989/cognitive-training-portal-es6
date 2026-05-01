@@ -430,3 +430,47 @@ window.showUserSwitchModal = showUserSwitchModal;
 window.toggleUserMenu = toggleUserMenu;
 window.selectAvatar = selectAvatar;
 if (typeof selectGrade !== "undefined") window.selectGrade = selectGrade;
+
+// ====== 管理用户功能 ======
+function openManageUserModal() {
+    var data = loadData();
+    var modal = document.getElementById('detail-modal');
+    var content = document.getElementById('detail-content');
+    if (!modal || !content) return;
+    
+    modal.classList.add('show');
+    
+    var colors = ['#667eea', '#FF9A63', '#43E97B', '#f093fb', '#fa709a'];
+    var htmlContent = '<div class="modal-title">👥 管理用户</div>';
+    htmlContent += '<div style="margin-bottom:16px;">';
+    
+    if (data.users.length === 0) {
+        htmlContent += '<div style="text-align:center;padding:20px;color:#999;">暂无用户</div>';
+    }
+    
+    data.users.forEach(function(u, i) {
+        var isCurrent = u.id === data.currentUser;
+        htmlContent += '<div style="display:flex;align-items:center;gap:10px;padding:12px;background:' + (isCurrent ? '#f0f7ff' : '#f8f9fa') + ';border-radius:12px;margin-bottom:10px;border:' + (isCurrent ? '2px solid #3377ff' : '1px solid #eee') + ';">';
+        htmlContent += '<div style="background:' + colors[i % colors.length] + ';color:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;">' + u.name.charAt(0) + '</div>';
+        htmlContent += '<div style="flex:1;">';
+        htmlContent += '<div style="font-weight:600;font-size:15px;">' + u.name + (isCurrent ? ' <span style="font-size:11px;color:#3377ff;">当前</span>' : '') + '</div>';
+        htmlContent += '<div style="font-size:12px;color:#999;">' + (gradeNames ? gradeNames[u.grade] || '' : '') + ' · Lv.' + u.difficulty + ' · 积分 ' + (u.points || 0) + '</div>';
+        htmlContent += '</div>';
+        htmlContent += '<div style="display:flex;gap:6px;">';
+        if (!isCurrent) {
+            htmlContent += '<button onclick="switchToUser(\'' + u.id + '\');openManageUserModal();" style="padding:6px 10px;background:#3377ff;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">切换</button>';
+            htmlContent += '<button onclick="deleteUser(\'' + u.id + '\');openManageUserModal();" style="padding:6px 10px;background:#ff6b6b;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>';
+        } else {
+            htmlContent += '<span style="font-size:11px;color:#999;padding:6px;">不可操作</span>';
+        }
+        htmlContent += '</div></div>';
+    });
+    
+    htmlContent += '</div>';
+    htmlContent += '<button onclick="showCreateUserModal()" style="width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;margin-bottom:8px;">➕ 创建新用户</button>';
+    htmlContent += '<button onclick="closeDetail()" style="width:100%;padding:12px;background:#f5f5f5;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>';
+    
+    content.innerHTML = htmlContent;
+}
+
+window.openManageUserModal = openManageUserModal;

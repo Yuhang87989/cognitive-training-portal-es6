@@ -140,10 +140,28 @@ function playLocalAudio(audioId) {
 function playLocalVideo(videoId) {
     const user = getCurrentUserData();
     const video = user?.localVideos?.find(v => v.id === videoId);
-    if (!video) return;
+    if (!video) {
+        showToast('视频信息不存在');
+        return;
+    }
     
-    // 使用增强版视频播放器
-    openEnhancedVideoPlayer(video.title, video.url);
+    // 显示加载提示
+    showToast('正在加载视频...');
+    
+    // 从 IndexedDB 读取视频文件
+    getVideoFile(videoId).then(function(blob) {
+        if (blob) {
+            // 生成临时 URL 播放
+            const videoUrl = URL.createObjectURL(blob);
+            openEnhancedVideoPlayer(video.title, videoUrl, videoId);
+        } else {
+            // 视频文件已丢失
+            showToast('视频文件已丢失，请重新上传');
+        }
+    }).catch(function(e) {
+        console.error('读取视频失败:', e);
+        showToast('视频加载失败，请检查网络或重新上传');
+    });
 }
 
 function playMediaCourse(courseId) {
@@ -678,13 +696,28 @@ function onEnhancedVideoError(e) {
     videoCtx.isPlaying = false;
     var loadingEl = document.getElementById('evp-loading');
     var bigPlayEl = document.getElementById('evp-big-play');
+    var playerEl = document.getElementById('enhanced-video-player');
     
     if (loadingEl) loadingEl.style.display = 'none';
     if (bigPlayEl) bigPlayEl.style.display = 'flex';
     
+    // 获取视频元素
+    var videoEl = document.getElementById('evp-video');
+    
+    // 检查播放器是否可见，如果不可见说明是自动加载失败，不显示toast
+    var isPlayerVisible = false;
+    if (playerEl && playerEl.style.display !== 'none') {
+        isPlayerVisible = true;
+    }
+    
+    // 如果播放器不可见，不显示任何错误提示（避免首页自动加载失败弹窗）
+    if (!isPlayerVisible) {
+        console.warn('视频加载失败但播放器不可见，已忽略');
+        return;
+    }
+    
     // 获取重试次数
     var retryCount = 0;
-    var videoEl = document.getElementById('evp-video');
     if (videoEl && videoEl.dataset) {
         retryCount = parseInt(videoEl.dataset.videoRetryCount) || 0;
     }
@@ -695,19 +728,25 @@ function onEnhancedVideoError(e) {
         isEmptySrc = true;
     }
     
+    // 判断是否是本地视频（blob URL）还是网络视频
+    var isLocalVideo = false;
+    if (videoEl && videoEl.src && videoEl.src.indexOf('blob:') === 0) {
+        isLocalVideo = true;
+    }
+    
     var errorMsg = '视频加载失败';
     var errorCode = 0;
     if (videoEl && videoEl.error) {
         errorCode = videoEl.error.code;
     }
     
-    // 判断是否应该重试
-    if (retryCount === 0 && !isEmptySrc && errorCode === 4) {
+    // 判断是否应该重试（网络视频可以重试，blob本地视频不需要）
+    if (retryCount === 0 && !isEmptySrc && errorCode === 4 && !isLocalVideo) {
         // error code 4 在移动端经常是网络/自动播放问题，不一定是格式不支持
-        // 第一次失败时自动重试一次
-        if (videoEl && videoEl.src) {
+        // 第一次失败时自动重试一次（仅针对网络视频）
+        if (videoEl && videoEl.src && videoEl.src.indexOf('blob:') !== 0) {
             videoEl.dataset.videoRetryCount = '1';
-            showToast('视频加载失败，正在重试...');
+            // 减少重试提示频率，只在重试时提示一次
             setTimeout(function() {
                 var currentSrc = videoEl.src;
                 videoEl.load(); // 重置错误状态
@@ -725,17 +764,24 @@ function onEnhancedVideoError(e) {
     
     // 重试后仍然失败，显示更友好的错误提示
     if (isEmptySrc || (videoEl && (!videoEl.src || videoEl.src === ''))) {
-        errorMsg = '视频加载失败，请检查网络';
+        errorMsg = isLocalVideo ? '视频文件已丢失，请重新上传' : '视频加载失败，请检查网络';
+    } else if (isLocalVideo) {
+        // 本地视频的错误提示
+        switch(errorCode) {
+            case 1: errorMsg = '视频读取被中断'; break;
+            case 2: errorMsg = '视频文件损坏，请重新上传'; break;
+            case 3: errorMsg = '视频格式不支持'; break;
+            case 4: errorMsg = '视频加载失败，请重新上传'; break;
+            default: errorMsg = '视频加载失败，请重新上传'; break;
+        }
     } else {
+        // 网络视频的错误提示
         switch(errorCode) {
             case 1: errorMsg = '视频加载被中断'; break;
             case 2: errorMsg = '网络错误，请检查网络连接'; break;
-            case 3: errorMsg = '视频解码失败'; break;
-            case 4: 
-                // error code 4 在移动端经常是网络/自动播放问题，不一定是格式不支持
-                errorMsg = '视频加载失败，请检查网络或稍后重试'; 
-                break;
-            default: errorMsg = '视频加载失败，请检查网络'; break;
+            case 3: errorMsg = '视频解码失败，请稍后重试'; break;
+            case 4: errorMsg = '视频加载失败，请检查网络或稍后重试'; break;
+            default: errorMsg = '网络视频加载失败，请检查网络连接'; break;
         }
     }
     
@@ -864,14 +910,13 @@ function handleVideoUpload(input) {
     const user = getCurrentUserData();
     if (!user.localVideos) user.localVideos = [];
     
-    // 创建视频URL
-    const videoUrl = URL.createObjectURL(file);
+    // 生成视频ID（不存储 blob URL）
+    const videoId = 'local-video-' + Date.now();
     
-    // 添加到用户数据
+    // 添加到用户数据（只存元信息，不存url）
     const videoData = {
-        id: 'local-video-' + Date.now(),
+        id: videoId,
         title: file.name.replace(/\.[^/.]+$/, ''),
-        url: videoUrl,
         size: file.size,
         type: file.type,
         uploadTime: new Date().toLocaleString(),
@@ -881,16 +926,30 @@ function handleVideoUpload(input) {
     user.localVideos.push(videoData);
     syncUserData(user);
     
-    // 获取视频时长
+    // 获取视频时长（使用临时URL）
     const tempVideo = document.createElement('video');
-    tempVideo.src = videoUrl;
+    const tempUrl = URL.createObjectURL(file);
+    tempVideo.src = tempUrl;
     tempVideo.onloadedmetadata = function() {
         const mins = Math.floor(tempVideo.duration / 60);
         const secs = Math.floor(tempVideo.duration % 60);
         videoData.duration = mins + ':' + (secs < 10 ? '0' : '') + secs;
         syncUserData(user);
         renderLocalVideoList();
+        // 释放临时URL
+        URL.revokeObjectURL(tempUrl);
     };
+    tempVideo.onerror = function() {
+        URL.revokeObjectURL(tempUrl);
+    };
+    
+    // 将视频文件存入 IndexedDB（异步，不阻塞UI）
+    saveVideoFile(videoId, file).then(function() {
+        console.log('视频文件已持久化存储:', videoId);
+    }).catch(function(e) {
+        console.error('视频持久化存储失败:', e);
+        showToast('视频存储可能不稳定，请刷新重试');
+    });
     
     showToast('视频上传成功！');
     renderLocalVideoList();
@@ -914,6 +973,14 @@ function deleteLocalVideo(videoId) {
     const user = getCurrentUserData();
     user.localVideos = user.localVideos.filter(v => v.id !== videoId);
     syncUserData(user);
+    
+    // 同时从 IndexedDB 删除视频文件
+    deleteVideoFile(videoId).then(function() {
+        console.log('视频已从存储中删除:', videoId);
+    }).catch(function(e) {
+        console.error('删除视频文件失败:', e);
+    });
+    
     renderLocalVideoList();
     showToast('视频已删除');
 }
@@ -1072,3 +1139,8 @@ function updateVideoProgress() {
         saveVideoWatchRecord(videoId, progress, videoEl.duration);
     } catch (e) {}
 }
+
+// ========== 本地视频相关函数导出 ==========
+window.playLocalVideo = playLocalVideo;
+window.handleVideoUpload = handleVideoUpload;
+window.deleteLocalVideo = deleteLocalVideo;

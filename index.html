@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="css/style.css"/>
 <!-- PeerJS 音视频库 -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<!-- Tesseract.js OCR库（用于拍照识别文字） -->
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -64,6 +66,10 @@
                         <div class="user-dropdown-item" onclick="showCreateUserModal()">
                             <span>➕</span>
                             <span>创建用户</span>
+                        </div>
+                        <div class="user-dropdown-item" onclick="showDeleteUserModal()">
+                            <span>🗑️</span>
+                            <span>删除用户</span>
                         </div>
                         <div class="user-dropdown-divider"></div>
                         <div class="user-dropdown-item" onclick="openSettingsPanel()">
@@ -169,6 +175,18 @@
             </button>
         </div>
     </div>
+
+    <!-- 推荐内容卡片 -->
+    <div class="card" style="margin-top:12px;cursor:pointer;" onclick="openFullscreenPage('podcast')" id="home-recommend-card">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#43E97B,#38F9D7);display:flex;align-items:center;justify-content:center;font-size:22px;">⏰</div>
+            <div style="flex:1;">
+                <div style="font-size:14px;font-weight:600;" id="recommend-title">3招让24小时变48小时</div>
+                <div style="font-size:12px;color:#999;" id="recommend-subtitle">时间管理导师</div>
+            </div>
+            <div style="color:#999;">›</div>
+        </div>
+    </div>
 </div>
 
 <!-- 主页面底部导航栏 -->
@@ -215,7 +233,7 @@
             <div style="display:flex;gap:8px;">
                 <button onclick="openEditProfileModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.2);border:none;border-radius:8px;font-size:13px;color:white;cursor:pointer;">✏️ 修改信息</button>
                 <button onclick="openChangePasswordModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.2);border:none;border-radius:8px;font-size:13px;color:white;cursor:pointer;">🔐 修改密码</button>
-                <button onclick="showUserSwitchModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.2);border:none;border-radius:8px;font-size:13px;color:white;cursor:pointer;">🗑️ 管理用户</button>
+                <button onclick="openManageUserModal()" style="flex:1;padding:10px;background:rgba(255,255,255,0.2);border:none;border-radius:8px;font-size:13px;color:white;cursor:pointer;">👥 管理用户</button>
             </div>
         </div>
         
@@ -463,6 +481,16 @@
     </div>
 </div>
 
+<!-- 删除用户模态框 -->
+<div id="delete-user-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width:350px;">
+        <div class="modal-title">🗑️ 删除用户</div>
+        <div id="delete-user-list" style="margin-bottom:16px;max-height:300px;overflow-y:auto;">
+            <!-- 用户列表动态生成 -->
+        </div>
+        <button onclick="closeDeleteUserModal()" class="login-btn login-btn-secondary">取消</button>
+    </div>
+</div>
 <!-- 难度级别选择模态框 -->
 <div id="difficulty-modal" class="modal-overlay">
     <div class="modal-content" style="max-width:320px;">

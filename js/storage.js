@@ -316,3 +316,298 @@ window.clearAllData = clearAllData;
 window.clearCurrentUserData = clearCurrentUserData;
 window.resetApiConfig = resetApiConfig;
 window.syncData = syncData;
+
+
+// ============================================================
+// IndexedDB 视频文件持久化存储
+// ============================================================
+
+const VIDEO_DB_NAME = 'CognitiveTrainingVideoDB';
+const VIDEO_DB_VERSION = 2; // 版本升级以支持图片存储
+const VIDEO_STORE_NAME = 'videoFiles';
+const IMAGE_STORE_NAME = 'imageFiles';
+
+let videoDB = null;
+
+// 初始化 IndexedDB
+function initVideoDB() {
+    return new Promise(function(resolve, reject) {
+        if (videoDB) {
+            resolve(videoDB);
+            return;
+        }
+        
+        if (!window.indexedDB) {
+            console.warn('浏览器不支持 IndexedDB');
+            reject(new Error('浏览器不支持 IndexedDB'));
+            return;
+        }
+        
+        var request = indexedDB.open(VIDEO_DB_NAME, VIDEO_DB_VERSION);
+        
+        request.onerror = function(e) {
+            console.error('IndexedDB 打开失败:', e);
+            reject(e);
+        };
+        
+        request.onsuccess = function(e) {
+            videoDB = e.target.result;
+            console.log('IndexedDB 初始化成功');
+            resolve(videoDB);
+        };
+        
+        request.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            // 创建视频文件存储仓库
+            if (!db.objectStoreNames.contains(VIDEO_STORE_NAME)) {
+                db.createObjectStore(VIDEO_STORE_NAME, { keyPath: 'videoId' });
+            }
+            // 创建图片文件存储仓库
+            if (!db.objectStoreNames.contains(IMAGE_STORE_NAME)) {
+                db.createObjectStore(IMAGE_STORE_NAME, { keyPath: 'imageId' });
+            }
+            console.log('IndexedDB 升级完成');
+        };
+    });
+}
+
+// 存储视频文件到 IndexedDB
+function saveVideoFile(videoId, blob) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(VIDEO_STORE_NAME);
+            
+            var request = store.put({
+                videoId: videoId,
+                blob: blob,
+                savedAt: new Date().toISOString()
+            });
+            
+            request.onsuccess = function() {
+                console.log('视频文件已保存:', videoId);
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('保存视频文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 从 IndexedDB 读取视频文件
+function getVideoFile(videoId) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([VIDEO_STORE_NAME], 'readonly');
+            var store = transaction.objectStore(VIDEO_STORE_NAME);
+            
+            var request = store.get(videoId);
+            
+            request.onsuccess = function() {
+                var result = request.result;
+                if (result) {
+                    console.log('从 IndexedDB 读取视频:', videoId);
+                    resolve(result.blob);
+                } else {
+                    console.warn('未找到视频文件:', videoId);
+                    resolve(null);
+                }
+            };
+            
+            request.onerror = function(e) {
+                console.error('读取视频文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 从 IndexedDB 删除视频文件
+function deleteVideoFile(videoId) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(VIDEO_STORE_NAME);
+            
+            var request = store.delete(videoId);
+            
+            request.onsuccess = function() {
+                console.log('视频文件已删除:', videoId);
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('删除视频文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 清除所有视频文件
+function clearAllVideoFiles() {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(VIDEO_STORE_NAME);
+            
+            var request = store.clear();
+            
+            request.onsuccess = function() {
+                console.log('所有视频文件已清除');
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('清除视频文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// Window exports for video storage
+window.initVideoDB = initVideoDB;
+window.saveVideoFile = saveVideoFile;
+window.getVideoFile = getVideoFile;
+window.deleteVideoFile = deleteVideoFile;
+window.clearAllVideoFiles = clearAllVideoFiles;
+
+// ============================================================
+// IndexedDB 图片文件持久化存储（用于错题本）
+// ============================================================
+
+// 存储图片文件到 IndexedDB
+function saveImageFile(imageId, blob) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([IMAGE_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(IMAGE_STORE_NAME);
+            
+            var request = store.put({
+                imageId: imageId,
+                blob: blob,
+                savedAt: new Date().toISOString()
+            });
+            
+            request.onsuccess = function() {
+                console.log('图片文件已保存:', imageId);
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('保存图片文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 从 IndexedDB 读取图片文件（返回 Promise<Blob>）
+function getImageFile(imageId) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([IMAGE_STORE_NAME], 'readonly');
+            var store = transaction.objectStore(IMAGE_STORE_NAME);
+            
+            var request = store.get(imageId);
+            
+            request.onsuccess = function() {
+                var result = request.result;
+                if (result) {
+                    console.log('从 IndexedDB 读取图片:', imageId);
+                    resolve(result.blob);
+                } else {
+                    console.warn('未找到图片文件:', imageId);
+                    resolve(null);
+                }
+            };
+            
+            request.onerror = function(e) {
+                console.error('读取图片文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 从 IndexedDB 读取图片并转换为 base64 DataURL
+function getImageFileAsDataUrl(imageId) {
+    return new Promise(function(resolve, reject) {
+        getImageFile(imageId).then(function(blob) {
+            if (blob) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                reader.onerror = function(e) {
+                    reject(e);
+                };
+                reader.readAsDataURL(blob);
+            } else {
+                resolve(null);
+            }
+        }).catch(reject);
+    });
+}
+
+// 从 IndexedDB 删除图片文件
+function deleteImageFile(imageId) {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([IMAGE_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(IMAGE_STORE_NAME);
+            
+            var request = store.delete(imageId);
+            
+            request.onsuccess = function() {
+                console.log('图片文件已删除:', imageId);
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('删除图片文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// 清除所有图片文件
+function clearAllImageFiles() {
+    return new Promise(function(resolve, reject) {
+        initVideoDB().then(function(db) {
+            var transaction = db.transaction([IMAGE_STORE_NAME], 'readwrite');
+            var store = transaction.objectStore(IMAGE_STORE_NAME);
+            
+            var request = store.clear();
+            
+            request.onsuccess = function() {
+                console.log('所有图片文件已清除');
+                resolve();
+            };
+            
+            request.onerror = function(e) {
+                console.error('清除图片文件失败:', e);
+                reject(e);
+            };
+        }).catch(reject);
+    });
+}
+
+// Window exports for image storage
+window.saveImageFile = saveImageFile;
+window.getImageFile = getImageFile;
+window.getImageFileAsDataUrl = getImageFileAsDataUrl;
+window.deleteImageFile = deleteImageFile;
+window.clearAllImageFiles = clearAllImageFiles;
+
+// 页面加载时初始化 IndexedDB
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVideoDB);
+} else {
+    initVideoDB();
+}

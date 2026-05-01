@@ -1,162 +1,1413 @@
-// 版本: V144
+// 版本: V144 - 错题本模块完整重写
+
+// ============================================================
+// 错题本主页
+// ============================================================
+
+function renderWrongbook(container) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const photoCount = user?.uploadedImages?.length || 0;
+    
+    container.innerHTML = `
+        <div class="wrongbook-header">
+            <div class="wrongbook-title">📒 错题本</div>
+            <div class="wrongbook-subtitle">收录练习中的错题，拍照上传，AI帮你分析</div>
+        </div>
+        
+        <div class="wrongbook-stats">
+            <div class="stat-card stat-red">
+                <div class="stat-num">${wrongNotes.length}</div>
+                <div class="stat-label">错题总数</div>
+            </div>
+            <div class="stat-card stat-green">
+                <div class="stat-num">${photoCount}</div>
+                <div class="stat-label">错题照片</div>
+            </div>
+            <div class="stat-card stat-blue">
+                <div class="stat-num">${wrongNotes.filter(n => n.reviewed).length}</div>
+                <div class="stat-label">已复习</div>
+            </div>
+        </div>
+        
+        <div class="wrongbook-actions">
+            <button class="action-btn action-btn-red" onclick="openWrongPhotoCapture()">
+                <span class="action-icon">📷</span>
+                <span class="action-text">拍照上传</span>
+            </button>
+            <button class="action-btn action-btn-purple" onclick="showWrongPhotoGallery()">
+                <span class="action-icon">📁</span>
+                <span class="action-text">照片库(${photoCount})</span>
+            </button>
+        </div>
+        
+        ${wrongNotes.length === 0 ? `
+            <div class="wrongbook-empty">
+                <div class="empty-icon">📝</div>
+                <div class="empty-title">暂无错题，继续加油！</div>
+                <div class="empty-desc">做错题会自动收录，也可以拍照上传</div>
+            </div>
+        ` : `
+            <div class="wrongbook-list-header">
+                <span class="list-title">错题列表</span>
+                <button class="review-all-btn" onclick="reviewAllWrongNotes()">📝 重练全部</button>
+            </div>
+            <div class="wrongbook-list">
+                ${wrongNotes.map((note, i) => `
+                    <div class="wrong-note-card" data-index="${i}">
+                        <div class="note-header">
+                            <span class="note-source" style="background:${getSourceColor(note.source)}">${note.sourceName || '练习'}</span>
+                            <span class="note-status ${note.reviewed ? 'status-reviewed' : 'status-pending'}">
+                                ${note.reviewed ? '✅ 已复习' : '❌ 未复习'}
+                            </span>
+                        </div>
+                        <div class="note-question">${note.question}</div>
+                        <div class="note-answers">
+                            <span class="your-answer">你的答案：${note.userAnswer}</span>
+                            <span class="correct-answer">正确答案：${note.answer}</span>
+                        </div>
+                        ${note.explanation ? '<div class="note-explanation">💡 ' + note.explanation.substring(0, 60) + '...</div>' : ''}
+                        <div class="note-actions">
+                            <button class="note-btn btn-retry" onclick="retryWrongNote(${i})">🔄 重练</button>
+                            <button class="note-btn btn-ai" onclick="analyzeWrongNoteWithAI(${i})">🤖 AI分析</button>
+                            <button class="note-btn btn-delete" onclick="removeWrongNote(${i})">🗑 删除</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `}
+        
+        <style>
+            .wrongbook-header { padding: 16px; text-align: center; }
+            .wrongbook-title { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 4px; }
+            .wrongbook-subtitle { font-size: 13px; color: #999; }
+            
+            .wrongbook-stats { display: flex; gap: 8px; padding: 0 16px; margin-bottom: 16px; }
+            .stat-card { flex: 1; text-align: center; padding: 12px 8px; border-radius: 12px; }
+            .stat-red { background: linear-gradient(135deg, #fff5f5, #ffe0e0); }
+            .stat-green { background: linear-gradient(135deg, #f0fff0, #d4edda); }
+            .stat-blue { background: linear-gradient(135deg, #f5f7ff, #e3f2fd); }
+            .stat-num { font-size: 22px; font-weight: bold; }
+            .stat-red .stat-num { color: #FF6B6B; }
+            .stat-green .stat-num { color: #43E97B; }
+            .stat-blue .stat-num { color: #667eea; }
+            .stat-label { font-size: 11px; color: #666; margin-top: 2px; }
+            
+            .wrongbook-actions { display: flex; gap: 10px; padding: 0 16px; margin-bottom: 16px; }
+            .action-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; 
+                padding: 14px; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; }
+            .action-btn-red { background: linear-gradient(135deg, #FF6B6B, #FF9A63); color: white; }
+            .action-btn-purple { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            .action-icon { font-size: 18px; }
+            
+            .wrongbook-empty { text-align: center; padding: 40px 20px; background: #f9f9f9; border-radius: 16px; margin: 0 16px; }
+            .empty-icon { font-size: 48px; margin-bottom: 12px; }
+            .empty-title { font-size: 16px; color: #666; margin-bottom: 4px; }
+            .empty-desc { font-size: 12px; color: #999; }
+            
+            .wrongbook-list-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
+            .list-title { font-size: 15px; font-weight: 600; color: #333; }
+            .review-all-btn { padding: 8px 16px; background: #43E97B; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+            
+            .wrongbook-list { padding: 0 16px 20px; }
+            
+            .wrong-note-card { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+            .note-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+            .note-source { font-size: 11px; padding: 2px 8px; border-radius: 10px; color: white; }
+            .note-status { font-size: 11px; }
+            .status-reviewed { color: #43E97B; }
+            .status-pending { color: #FF6B6B; }
+            .note-question { font-size: 14px; color: #333; margin-bottom: 8px; line-height: 1.5; }
+            .note-answers { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+            .your-answer { font-size: 12px; color: #FF6B6B; }
+            .correct-answer { font-size: 12px; color: #43E97B; }
+            .note-explanation { font-size: 11px; color: #666; margin-bottom: 8px; }
+            .note-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+            .note-btn { padding: 6px 12px; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
+            .btn-retry { background: #667eea; color: white; }
+            .btn-ai { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            .btn-delete { background: #FF6B6B; color: white; }
+        `;
+}
+
+// 获取来源颜色
+function getSourceColor(source) {
+    const colors = {
+        'topic': '#FF9800',
+        'method': '#2196F3',
+        'thinking': '#9C27B0',
+        'photo': '#E91E63',
+        'manual': '#00BCD4'
+    };
+    return colors[source] || '#666';
+}
+
+// ============================================================
+// 拍照上传错题（整合OCR+AI分析）
+// ============================================================
 
 function openWrongPhotoCapture() {
-    var modal = document.getElementById('detail-modal');
-    var content = document.getElementById('detail-content');
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
     modal.classList.add('show');
-    content.innerHTML = '<div class="modal-title">📷 拍照上传错题</div>' +
-        '<div class="card" style="padding:20px;text-align:center;margin-bottom:12px;">' +
-            '<div style="font-size:48px;margin-bottom:12px;">📸</div>' +
-            '<div style="font-size:13px;color:var(--text-gray);margin-bottom:16px;">拍照或上传错题图片</div>' +
-            '<button class="camera-btn" style="margin-bottom:12px;" onclick="document.getElementById(\'wrong-photo-camera\').click()">📷 拍照</button>' +
-            '<input type="file" id="wrong-photo-camera" accept="image/*" capture="environment" style="display:none" onchange="uploadWrongPhotoDirect(this)"/>' +
-            '<button class="login-btn login-btn-outline" style="width:100%;" onclick="document.getElementById(\'wrong-photo-gallery\').click()">📁 从相册选择</button>' +
-            '<input type="file" id="wrong-photo-gallery" accept="image/*" style="display:none" onchange="uploadWrongPhotoDirect(this)"/>' +
-        '</div>' +
-        '<div style="font-size:12px;color:var(--text-light);text-align:center;margin-bottom:12px;">📁 我的错题照片 (' + (getCurrentUserData()?.uploadedImages?.length || 0) + ')</div>' +
-        '<button class="login-btn login-btn-secondary" style="width:100%;" onclick="showWrongPhotoGallery()">查看错题照片</button>';
+    
+    const photoCount = getCurrentUserData()?.uploadedImages?.length || 0;
+    
+    content.innerHTML = `
+        <div class="modal-header">
+            <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+            <div class="modal-title">📷 拍照上传错题</div>
+        </div>
+        <div class="capture-container">
+            <div class="capture-icon">📸</div>
+            <div class="capture-hint">拍照或上传错题图片</div>
+            <div class="capture-tips">
+                <div class="tip">💡 拍摄时保持光线充足</div>
+                <div class="tip">💡 确保题目文字清晰可见</div>
+            </div>
+            <div class="capture-buttons">
+                <button class="capture-btn capture-btn-camera" onclick="document.getElementById('wrong-photo-camera').click()">
+                    📷 拍照
+                </button>
+                <input type="file" id="wrong-photo-camera" accept="image/*" capture="environment" style="display:none" onchange="uploadWrongPhotoWithAI(this)"/>
+                
+                <button class="capture-btn capture-btn-gallery" onclick="document.getElementById('wrong-photo-gallery').click()">
+                    📁 从相册选择
+                </button>
+                <input type="file" id="wrong-photo-gallery" accept="image/*" style="display:none" onchange="uploadWrongPhotoWithAI(this)"/>
+            </div>
+        </div>
+        <div class="capture-footer">
+            <div class="photo-count">📁 我的错题照片 (${photoCount})</div>
+            <button class="footer-btn" onclick="showWrongPhotoGallery()">查看照片库</button>
+        </div>
+        
+        <style>
+            .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+            .back-btn { background: #f5f5f5; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; color: #666; }
+            .modal-title { font-size: 18px; font-weight: bold; color: #333; }
+            
+            .capture-container { text-align: center; padding: 20px; background: #f9f9f9; border-radius: 16px; margin-bottom: 16px; }
+            .capture-icon { font-size: 64px; margin-bottom: 12px; }
+            .capture-hint { font-size: 15px; color: #666; margin-bottom: 16px; }
+            .capture-tips { margin-bottom: 20px; }
+            .tip { font-size: 12px; color: #999; margin-bottom: 4px; }
+            
+            .capture-buttons { display: flex; flex-direction: column; gap: 10px; }
+            .capture-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+            .capture-btn-camera { background: linear-gradient(135deg, #FF6B6B, #FF9A63); color: white; }
+            .capture-btn-gallery { background: #667eea; color: white; }
+            
+            .capture-footer { text-align: center; }
+            .photo-count { font-size: 12px; color: #999; margin-bottom: 8px; }
+            .footer-btn { background: #f5f5f5; border: none; padding: 10px 24px; border-radius: 8px; font-size: 13px; color: #666; cursor: pointer; }
+        </style>
+    `;
 }
 
-function uploadWrongPhotoDirect(input) {
+// 拍照上传错题（整合OCR+AI分析）- 完整流程
+async function uploadWrongPhotoWithAI(input) {
     if (!input.files[0]) return;
-    var file = input.files[0];
-    var reader = new FileReader();
     
-    reader.onload = function(e) {
-        var imageData = e.target.result;
-        var user = getCurrentUserData() || {};
-        user.uploadedImages = user.uploadedImages || [];
-        var photoId = Date.now();
+    const file = input.files[0];
+    const photoId = 'photo_' + Date.now();
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    
+    // 显示预览和进度
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const imageData = e.target.result;
         
-        user.uploadedImages.push({ 
-            id: photoId, 
-            topicId: null, 
-            image: imageData, 
-            time: Date.now() 
-        });
-        syncUserData(user);
+        // 显示处理中界面
+        content.innerHTML = `
+            <div class="processing-header">
+                <button class="back-btn" onclick="openWrongPhotoCapture()">← 取消</button>
+            </div>
+            <div class="processing-container">
+                <img src="${imageData}" class="preview-image" id="processing-preview"/>
+                <div class="progress-section">
+                    <div class="progress-step" id="step-ocr">
+                        <span class="step-icon">⏳</span>
+                        <span class="step-text">OCR识别中...</span>
+                    </div>
+                    <div class="progress-step" id="step-ai">
+                        <span class="step-icon">⏳</span>
+                        <span class="step-text">AI解析中...</span>
+                    </div>
+                    <div class="progress-step" id="step-save">
+                        <span class="step-icon">⏳</span>
+                        <span class="step-text">保存中...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                .processing-header { margin-bottom: 16px; }
+                .processing-container { text-align: center; }
+                .preview-image { width: 100%; max-height: 200px; object-fit: contain; border-radius: 12px; margin-bottom: 20px; background: #f5f5f5; }
+                .progress-section { background: #f9f9f9; border-radius: 12px; padding: 16px; }
+                .progress-step { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eee; }
+                .progress-step:last-child { border-bottom: none; }
+                .step-icon { font-size: 18px; }
+                .step-text { font-size: 14px; color: #666; }
+                .step-done .step-icon { color: #43E97B; }
+                .step-error .step-icon { color: #FF6B6B; }
+            </style>
+        `;
         
-        showToast('错题照片上传成功！');
-        showWrongPhotoGallery();
-        input.value = '';
+        try {
+            // 1. 保存图片到 IndexedDB
+            updateStepStatus('step-save', 'saving');
+            await saveImageFile(photoId, file);
+            
+            // 记录到用户数据（只存元信息，不存base64）
+            const user = getCurrentUserData() || {};
+            user.uploadedImages = user.uploadedImages || [];
+            user.uploadedImages.push({
+                id: photoId,
+                imageId: photoId,  // IndexedDB中的ID
+                topicId: null,
+                source: 'photo',
+                time: Date.now()
+            });
+            syncUserData(user);
+            updateStepStatus('step-save', 'done');
+            
+            // 2. OCR 识别
+            updateStepStatus('step-ocr', 'doing');
+            let ocrText;
+            try {
+                ocrText = await ocrExtractText(imageData, function(status, progress) {
+                    const stepEl = document.getElementById('step-ocr');
+                    if (stepEl) stepEl.querySelector('.step-text').textContent = 'OCR识别中 ' + progress + '%';
+                });
+            } catch(ocrErr) {
+                console.warn('OCR失败，尝试使用DeepSeek视觉:', ocrErr);
+                // OCR失败时，尝试直接用DeepSeek视觉API
+                ocrText = null;
+            }
+            
+            if (!ocrText || ocrText.length < 5) {
+                // OCR没识别到文字，尝试用视觉API
+                const visionResult = await callVisionAPI(imageData, '请描述这张图片中的题目内容，尽可能完整地提取所有文字');
+                if (visionResult.success) {
+                    ocrText = visionResult.content;
+                }
+            }
+            
+            updateStepStatus('step-ocr', 'done');
+            
+            if (!ocrText || ocrText.length < 5) {
+                // 仍然没有识别到文字
+                showOcrFailedUI(photoId, imageData, '未能识别出文字，请重试或手动输入题目');
+                return;
+            }
+            
+            // 3. AI 解析题目
+            updateStepStatus('step-ai', 'doing');
+            const questionData = await aiParseQuestion(ocrText);
+            updateStepStatus('step-ai', 'done');
+            
+            if (questionData.error) {
+                showOcrFailedUI(photoId, imageData, 'AI解析失败: ' + questionData.error);
+                return;
+            }
+            
+            // 4. 添加到错题本
+            const wrongKey = 'photo-' + photoId;
+            user.wrongNotes = user.wrongNotes || [];
+            
+            // 避免重复添加
+            if (!user.wrongNotes.find(n => n.wrongKey === wrongKey)) {
+                const wrongNote = {
+                    wrongKey: wrongKey,
+                    source: 'photo',
+                    sourceName: '拍照错题',
+                    topicId: null,
+                    photoId: photoId,
+                    question: questionData.question,
+                    type: questionData.type,
+                    options: questionData.options ? Object.values(questionData.options) : [],
+                    optionsMap: questionData.options || {},
+                    answer: questionData.answer,
+                    correctIndex: getCorrectIndex(questionData.options, questionData.answer),
+                    explanation: questionData.explanation,
+                    userAnswer: '',
+                    ocrText: ocrText,
+                    time: Date.now()
+                };
+                user.wrongNotes.push(wrongNote);
+                syncUserData(user);
+            }
+            
+            // 显示成功结果
+            showOcrSuccessUI(questionData, photoId);
+            
+        } catch(error) {
+            console.error('OCR处理失败:', error);
+            showOcrFailedUI(photoId, imageData, '处理失败: ' + error.message);
+        }
     };
     reader.readAsDataURL(file);
+    input.value = '';
 }
 
-function deleteWrongPhoto(photoId) {
-    var user = getCurrentUserData() || {};
+// 更新步骤状态
+function updateStepStatus(stepId, status) {
+    const stepEl = document.getElementById(stepId);
+    if (!stepEl) return;
+    
+    const iconEl = stepEl.querySelector('.step-icon');
+    const textEl = stepEl.querySelector('.step-text');
+    
+    if (status === 'doing') {
+        iconEl.textContent = '🔄';
+        textEl.style.color = '#667eea';
+        stepEl.classList.add('step-doing');
+    } else if (status === 'done') {
+        iconEl.textContent = '✅';
+        textEl.style.color = '#43E97B';
+        stepEl.classList.remove('step-doing');
+        stepEl.classList.add('step-done');
+    } else if (status === 'saving') {
+        iconEl.textContent = '💾';
+        textEl.textContent = '保存图片...';
+    } else if (status === 'error') {
+        iconEl.textContent = '❌';
+        textEl.style.color = '#FF6B6B';
+        stepEl.classList.add('step-error');
+    }
+}
+
+// 获取正确答案的索引
+function getCorrectIndex(optionsMap, answer) {
+    if (!optionsMap) return -1;
+    for (const [key, val] of Object.entries(optionsMap)) {
+        if (val === answer) {
+            return ['A', 'B', 'C', 'D'].indexOf(key);
+        }
+    }
+    return -1;
+}
+
+// 显示OCR成功结果
+function showOcrSuccessUI(questionData, photoId) {
+    const content = document.getElementById('detail-content');
+    const qTypeNames = { choice: '选择题', fill: '填空题', calculation: '计算题', other: '问答题' };
+    
+    content.innerHTML = `
+        <div class="success-header">
+            <button class="back-btn" onclick="openWrongPhotoCapture()">← 继续拍照</button>
+            <div class="modal-title">✅ 识别成功</div>
+        </div>
+        
+        <div class="success-container">
+            <div class="success-icon">🎉</div>
+            <div class="success-message">已识别并添加到错题本</div>
+            
+            <div class="question-preview">
+                <div class="q-type">${qTypeNames[questionData.type] || '题目'}</div>
+                <div class="q-text">${questionData.question}</div>
+                ${questionData.options ? `
+                    <div class="q-options">
+                        ${Object.entries(questionData.options).map(([k, v]) => `<div class="q-option">${k}. ${v}</div>`).join('')}
+                    </div>
+                ` : ''}
+                <div class="q-answer">正确答案：${questionData.answer}</div>
+            </div>
+            
+            <div class="success-actions">
+                <button class="action-btn action-primary" onclick="doWrongQuestionFromPhoto('${photoId}')">
+                    📝 开始做题
+                </button>
+                <button class="action-btn action-secondary" onclick="showWrongbookDetail()">
+                    📒 查看错题本
+                </button>
+            </div>
+        </div>
+        
+        <style>
+            .success-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+            .success-container { text-align: center; }
+            .success-icon { font-size: 64px; margin-bottom: 12px; }
+            .success-message { font-size: 16px; color: #43E97B; font-weight: 600; margin-bottom: 20px; }
+            
+            .question-preview { background: #f9f9f9; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 20px; }
+            .q-type { font-size: 12px; color: #667eea; margin-bottom: 8px; }
+            .q-text { font-size: 14px; color: #333; margin-bottom: 12px; line-height: 1.5; }
+            .q-options { margin-bottom: 12px; }
+            .q-option { font-size: 13px; color: #666; padding: 4px 0; }
+            .q-answer { font-size: 13px; color: #43E97B; font-weight: 600; }
+            
+            .success-actions { display: flex; flex-direction: column; gap: 10px; }
+            .action-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+            .action-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            .action-secondary { background: #f5f5f5; color: #666; }
+        </style>
+    `;
+}
+
+// 显示OCR失败结果
+function showOcrFailedUI(photoId, imageData, message) {
+    const content = document.getElementById('detail-content');
+    
+    content.innerHTML = `
+        <div class="failed-header">
+            <button class="back-btn" onclick="openWrongPhotoCapture()">← 重新拍照</button>
+            <div class="modal-title">⚠️ 识别失败</div>
+        </div>
+        
+        <div class="failed-container">
+            <img src="${imageData}" class="failed-image"/>
+            <div class="failed-message">${message}</div>
+            
+            <div class="failed-tips">
+                <div class="tip-title">💡 提高识别率的方法：</div>
+                <div class="tip">• 确保光线充足，避免反光</div>
+                <div class="tip">• 保持手机稳定，对焦清晰</div>
+                <div class="tip">• 尽量拍摄正面，避免倾斜</div>
+            </div>
+            
+            <button class="action-btn action-primary" onclick="openWrongPhotoCapture()">
+                🔄 重新拍照
+            </button>
+        </div>
+        
+        <style>
+            .failed-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+            .failed-container { text-align: center; }
+            .failed-image { width: 100%; max-height: 200px; object-fit: contain; border-radius: 12px; margin-bottom: 16px; background: #f5f5f5; }
+            .failed-message { font-size: 14px; color: #FF6B6B; margin-bottom: 16px; }
+            .failed-tips { background: #fff9e6; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 20px; }
+            .tip-title { font-size: 13px; color: #ff9500; margin-bottom: 8px; }
+            .tip { font-size: 12px; color: #666; margin-bottom: 4px; }
+            .action-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+            .action-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        </style>
+    `;
+}
+
+// 从照片做题目
+async function doWrongQuestionFromPhoto(photoId) {
+    const user = getCurrentUserData();
+    const note = user?.wrongNotes?.find(n => n.photoId === photoId);
+    
+    if (!note) {
+        showToast('题目不存在');
+        return;
+    }
+    
+    // 找到索引
+    const index = user.wrongNotes.indexOf(note);
+    if (index >= 0) {
+        retryWrongNote(index);
+    }
+}
+
+// ============================================================
+// 照片库
+// ============================================================
+
+function showWrongPhotoGallery() {
+    const user = getCurrentUserData() || {};
+    const photos = user.uploadedImages || [];
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    if (photos.length === 0) {
+        content.innerHTML = `
+            <div class="gallery-header">
+                <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+                <div class="modal-title">📁 错题照片库</div>
+            </div>
+            <div class="gallery-empty">
+                <div class="empty-icon">📂</div>
+                <div class="empty-title">暂无错题照片</div>
+                <div class="empty-desc">开始拍照上传吧！</div>
+            </div>
+            <button class="action-btn action-primary" onclick="openWrongPhotoCapture()">📷 拍照上传</button>
+            
+            <style>
+                .gallery-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+                .gallery-empty { text-align: center; padding: 40px 20px; }
+                .empty-icon { font-size: 64px; margin-bottom: 12px; }
+                .empty-title { font-size: 16px; color: #666; margin-bottom: 4px; }
+                .empty-desc { font-size: 13px; color: #999; }
+                .action-btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 16px; }
+                .action-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+            </style>
+        `;
+        return;
+    }
+    
+    // 加载图片
+    let photosHtml = '';
+    let loadedCount = 0;
+    let totalCount = photos.length;
+    
+    photos.forEach(function(p, idx) {
+        const photoId = p.imageId || p.id;
+        
+        // 默认显示loading占位图
+        photosHtml += `<div class="photo-item" id="photo-item-${photoId}" data-index="${idx}">
+            <div class="photo-placeholder">
+                <div class="loading-spinner"></div>
+            </div>
+            <button class="photo-delete-btn" onclick="event.stopPropagation(); deleteWrongPhotoWithCleanup('${photoId}')">×</button>
+        </div>`;
+    });
+    
+    content.innerHTML = `
+        <div class="gallery-header">
+            <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+            <div class="modal-title">📁 错题照片库 (${photos.length}张)</div>
+        </div>
+        <button class="add-photo-btn" onclick="openWrongPhotoCapture()">+ 添加照片</button>
+        <div class="photo-grid" id="photo-grid">
+            ${photosHtml}
+        </div>
+        <button class="back-bottom-btn" onclick="showWrongbookDetail()">← 返回错题本</button>
+        
+        <style>
+            .gallery-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+            .add-photo-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+            .photo-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 400px; overflow-y: auto; margin-bottom: 16px; }
+            .photo-item { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #f0f0f0; cursor: pointer; }
+            .photo-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f5f5f5; }
+            .loading-spinner { width: 24px; height: 24px; border: 3px solid #e0e0e0; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
+            .photo-item img { width: 100%; height: 100%; object-fit: cover; }
+            .photo-delete-btn { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background: rgba(255,0,0,0.8); color: white; border: none; border-radius: 50%; font-size: 14px; cursor: pointer; line-height: 24px; }
+            .back-bottom-btn { width: 100%; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; font-size: 14px; color: #666; cursor: pointer; }
+        </style>
+    `;
+    
+    // 异步加载图片
+    photos.forEach(async function(p, idx) {
+        const photoId = p.imageId || p.id;
+        const itemEl = document.getElementById('photo-item-' + photoId);
+        if (!itemEl) return;
+        
+        try {
+            let imageUrl = null;
+            
+            // 优先从IndexedDB读取
+            if (typeof getImageFileAsDataUrl === 'function') {
+                imageUrl = await getImageFileAsDataUrl(photoId);
+            }
+            
+            // 如果没有，尝试旧的base64格式
+            if (!imageUrl && p.image) {
+                imageUrl = p.image;
+            }
+            
+            if (imageUrl) {
+                itemEl.innerHTML = `<img src="${imageUrl}" onclick="analyzePhotoWithAI('${photoId}')"/>` +
+                    `<button class="photo-delete-btn" onclick="event.stopPropagation(); deleteWrongPhotoWithCleanup('${photoId}')">×</button>` +
+                    `<button class="photo-ai-btn" onclick="event.stopPropagation(); analyzePhotoWithAI('${photoId}')">🤖 AI识别</button>`;
+            } else {
+                itemEl.innerHTML = `<div class="photo-placeholder"><span style="font-size:24px;">🖼️</span></div>` +
+                    `<button class="photo-delete-btn" onclick="event.stopPropagation(); deleteWrongPhotoWithCleanup('${photoId}')">×</button>`;
+            }
+        } catch(e) {
+            console.warn('加载图片失败:', photoId, e);
+            itemEl.innerHTML = `<div class="photo-placeholder"><span style="font-size:24px;">🖼️</span></div>` +
+                `<button class="photo-delete-btn" onclick="event.stopPropagation(); deleteWrongPhotoWithCleanup('${photoId}')">×</button>`;
+        }
+    });
+}
+
+// 删除照片并清理IndexedDB
+async function deleteWrongPhotoWithCleanup(photoId) {
+    if (!confirm('确定要删除这张照片吗？')) return;
+    
+    try {
+        // 从IndexedDB删除图片
+        if (typeof deleteImageFile === 'function') {
+            await deleteImageFile(photoId);
+        }
+    } catch(e) {
+        console.warn('删除IndexedDB图片失败:', e);
+    }
+    
+    // 从用户数据删除
+    const user = getCurrentUserData() || {};
     user.uploadedImages = user.uploadedImages || [];
-    user.uploadedImages = user.uploadedImages.filter(function(p) { return p.id !== photoId; });
+    user.uploadedImages = user.uploadedImages.filter(function(p) { 
+        return (p.imageId || p.id) !== photoId; 
+    });
     syncUserData(user);
+    
     showToast('已删除');
     showWrongPhotoGallery();
 }
 
-function showWrongPhotoGallery() {
-    var user = getCurrentUserData() || {};
-    var photos = user.uploadedImages || [];
-    var modal = document.getElementById('detail-modal');
-    var content = document.getElementById('detail-content');
+// AI识别照片
+async function analyzePhotoWithAI(photoId) {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    
+    // 显示加载中
+    content.innerHTML = `
+        <div class="analyze-header">
+            <button class="back-btn" onclick="showWrongPhotoGallery()">← 返回</button>
+            <div class="modal-title">🤖 AI识别中</div>
+        </div>
+        <div class="analyze-loading">
+            <div class="loading-icon">🔄</div>
+            <div class="loading-text">正在识别题目...</div>
+            <div class="loading-steps">
+                <div class="step" id="analyze-step-1">⏳ 读取图片</div>
+                <div class="step" id="analyze-step-2">⏳ OCR识别</div>
+                <div class="step" id="analyze-step-3">⏳ AI解析</div>
+            </div>
+        </div>
+        
+        <style>
+            .analyze-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+            .analyze-loading { text-align: center; padding: 40px 20px; }
+            .loading-icon { font-size: 48px; margin-bottom: 16px; animation: spin 1s linear infinite; }
+            .loading-text { font-size: 16px; color: #666; margin-bottom: 20px; }
+            .loading-steps { background: #f9f9f9; border-radius: 12px; padding: 16px; }
+            .step { font-size: 14px; color: #666; padding: 8px 0; }
+            .step.done { color: #43E97B; }
+        </style>
+    `;
+    
+    try {
+        // 1. 读取图片
+        updateAnalyzeStep(1, 'doing', '读取图片');
+        let imageUrl = null;
+        
+        if (typeof getImageFileAsDataUrl === 'function') {
+            imageUrl = await getImageFileAsDataUrl(photoId);
+        }
+        
+        // 尝试从用户数据获取旧格式
+        if (!imageUrl) {
+            const user = getCurrentUserData() || {};
+            const photo = user.uploadedImages?.find(p => (p.imageId || p.id) === photoId);
+            if (photo && photo.image) {
+                imageUrl = photo.image;
+            }
+        }
+        
+        if (!imageUrl) {
+            throw new Error('图片不存在');
+        }
+        
+        updateAnalyzeStep(1, 'done', '读取图片');
+        
+        // 2. OCR识别
+        updateAnalyzeStep(2, 'doing', 'OCR识别');
+        let ocrText;
+        try {
+            ocrText = await ocrExtractText(imageUrl);
+        } catch(ocrErr) {
+            console.warn('OCR失败:', ocrErr);
+        }
+        
+        if (!ocrText || ocrText.length < 5) {
+            // 尝试用视觉API
+            const visionResult = await callVisionAPI(imageUrl, '请描述这张图片中的题目内容，尽可能完整地提取所有文字');
+            if (visionResult.success) {
+                ocrText = visionResult.content;
+            }
+        }
+        updateAnalyzeStep(2, 'done', 'OCR识别');
+        
+        if (!ocrText || ocrText.length < 5) {
+            content.innerHTML = `
+                <div class="analyze-header">
+                    <button class="back-btn" onclick="showWrongPhotoGallery()">← 返回</button>
+                    <div class="modal-title">⚠️ 识别失败</div>
+                </div>
+                <div class="analyze-result">
+                    <div class="result-icon">😕</div>
+                    <div class="result-message">未能识别出文字</div>
+                    <div class="result-tips">请尝试重新拍照，确保图片清晰</div>
+                </div>
+                <button class="back-btn-full" onclick="showWrongPhotoGallery()">← 返回照片库</button>
+            `;
+            return;
+        }
+        
+        // 3. AI解析
+        updateAnalyzeStep(3, 'doing', 'AI解析');
+        const questionData = await aiParseQuestion(ocrText);
+        updateAnalyzeStep(3, 'done', 'AI解析');
+        
+        if (questionData.error) {
+            content.innerHTML = `
+                <div class="analyze-header">
+                    <button class="back-btn" onclick="showWrongPhotoGallery()">← 返回</button>
+                    <div class="modal-title">⚠️ 解析失败</div>
+                </div>
+                <div class="analyze-result">
+                    <div class="result-icon">😅</div>
+                    <div class="result-message">${questionData.error}</div>
+                </div>
+                <button class="back-btn-full" onclick="showWrongPhotoGallery()">← 返回照片库</button>
+            `;
+            return;
+        }
+        
+        // 4. 添加到错题本
+        const wrongKey = 'photo-' + photoId;
+        const user = getCurrentUserData();
+        
+        // 检查是否已存在
+        if (!user.wrongNotes) user.wrongNotes = [];
+        
+        const existingIndex = user.wrongNotes.findIndex(n => n.wrongKey === wrongKey);
+        
+        const wrongNote = {
+            wrongKey: wrongKey,
+            source: 'photo',
+            sourceName: '拍照错题',
+            topicId: null,
+            photoId: photoId,
+            question: questionData.question,
+            type: questionData.type,
+            options: questionData.options ? Object.values(questionData.options) : [],
+            optionsMap: questionData.options || {},
+            answer: questionData.answer,
+            correctIndex: getCorrectIndex(questionData.options, questionData.answer),
+            explanation: questionData.explanation,
+            userAnswer: '',
+            ocrText: ocrText,
+            time: Date.now()
+        };
+        
+        if (existingIndex >= 0) {
+            user.wrongNotes[existingIndex] = wrongNote;
+        } else {
+            user.wrongNotes.push(wrongNote);
+        }
+        syncUserData(user);
+        
+        // 显示结果
+        const qTypeNames = { choice: '选择题', fill: '填空题', calculation: '计算题', other: '问答题' };
+        content.innerHTML = `
+            <div class="analyze-header">
+                <button class="back-btn" onclick="showWrongPhotoGallery()">← 返回</button>
+                <div class="modal-title">✅ 识别成功</div>
+            </div>
+            <div class="analyze-result">
+                <div class="result-icon">🎉</div>
+                <div class="result-message">已添加到错题本</div>
+                
+                <div class="question-card">
+                    <div class="q-type-tag">${qTypeNames[questionData.type] || '题目'}</div>
+                    <div class="q-content">${questionData.question}</div>
+                    ${questionData.options ? `
+                        <div class="q-options-list">
+                            ${Object.entries(questionData.options).map(([k, v]) => `<div class="q-option-item">${k}. ${v}</div>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="q-answer-tag">✓ 正确答案：${questionData.answer}</div>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="action-btn-primary" onclick="doWrongQuestionFromPhoto('${photoId}')">📝 开始做题</button>
+                    <button class="action-btn-secondary" onclick="showWrongbookDetail()">📒 查看错题本</button>
+                </div>
+            </div>
+            
+            <style>
+                .analyze-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+                .analyze-result { text-align: center; }
+                .result-icon { font-size: 64px; margin-bottom: 12px; }
+                .result-message { font-size: 16px; color: #43E97B; font-weight: 600; margin-bottom: 20px; }
+                .result-tips { font-size: 13px; color: #999; margin-bottom: 20px; }
+                .question-card { background: #f9f9f9; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 20px; }
+                .q-type-tag { font-size: 11px; color: #667eea; background: #e8e8ff; padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+                .q-content { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 12px; }
+                .q-options-list { margin-bottom: 12px; }
+                .q-option-item { font-size: 13px; color: #666; padding: 3px 0; }
+                .q-answer-tag { font-size: 13px; color: #43E97B; font-weight: 600; }
+                .result-actions { display: flex; flex-direction: column; gap: 10px; }
+                .action-btn-primary { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+                .action-btn-secondary { width: 100%; padding: 14px; background: #f5f5f5; color: #666; border: none; border-radius: 12px; font-size: 15px; cursor: pointer; }
+                .back-btn-full { width: 100%; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; font-size: 14px; color: #666; cursor: pointer; margin-top: 16px; }
+            </style>
+        `;
+        
+    } catch(error) {
+        console.error('AI识别失败:', error);
+        content.innerHTML = `
+            <div class="analyze-header">
+                <button class="back-btn" onclick="showWrongPhotoGallery()">← 返回</button>
+                <div class="modal-title">❌ 识别失败</div>
+            </div>
+            <div class="analyze-result">
+                <div class="result-icon">😢</div>
+                <div class="result-message">${error.message}</div>
+            </div>
+            <button class="back-btn-full" onclick="showWrongPhotoGallery()">← 返回照片库</button>
+        `;
+    }
+}
+
+// 更新识别步骤
+function updateAnalyzeStep(stepNum, status, text) {
+    const stepEl = document.getElementById('analyze-step-' + stepNum);
+    if (!stepEl) return;
+    
+    if (status === 'doing') {
+        stepEl.textContent = '🔄 ' + text;
+        stepEl.style.color = '#667eea';
+    } else if (status === 'done') {
+        stepEl.textContent = '✅ ' + text;
+        stepEl.style.color = '#43E97B';
+        stepEl.classList.add('done');
+    }
+}
+
+// ============================================================
+// 错题本详情主页（被其他模块调用）
+// ============================================================
+
+function showWrongbookDetail() {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
     modal.classList.add('show');
     
-    if (photos.length === 0) {
-        content.innerHTML = '<div class="modal-title">📁 错题照片库</div>' +
-            '<div style="text-align:center;padding:40px;color:var(--text-light);">' +
-                '<div style="font-size:48px;margin-bottom:12px;">📂</div>' +
-                '<div>暂无错题照片</div>' +
-                '<div style="font-size:12px;margin-top:4px;">开始拍照上传吧！</div>' +
-            '</div>' +
-            '<button class="login-btn login-btn-secondary" style="width:100%;" onclick="openWrongPhotoCapture()">拍照上传</button>';
+    // 直接渲染到modal
+    renderWrongbook(content);
+}
+
+// ============================================================
+// 错题重练（完善版 - 支持所有题型）
+// ============================================================
+
+function retryWrongNote(index) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[index];
+    if (!note) { showToast('错题不存在'); return; }
+    
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    const qTypeNames = { choice: '选择题', fill: '填空题', calculation: '计算题', other: '问答题' };
+    const noteType = note.type || (note.options && note.options.length > 0 ? 'choice' : 'fill');
+    
+    let questionHTML = `
+        <div class="retry-header">
+            <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+            <div class="modal-title">🔄 错题重练</div>
+        </div>
+        
+        <div class="retry-container">
+            <div class="retry-source">
+                <span class="source-tag" style="background:${getSourceColor(note.source)}">${note.sourceName || '练习'}</span>
+                <span class="type-tag">${qTypeNames[noteType] || '题目'}</span>
+            </div>
+            
+            <div class="retry-question">${note.question}</div>
+            
+            ${note.options && note.options.length > 0 ? `
+                <div class="retry-options" id="retry-options-container">
+                    ${note.options.map((opt, oi) => `
+                        <button class="option-btn" data-index="${oi}" onclick="selectRetryOption(this, ${index}, ${oi})">
+                            <span class="option-letter">${String.fromCharCode(65 + oi)}</span>
+                            <span class="option-text">${opt}</span>
+                        </button>
+                    `).join('')}
+                </div>
+                <input type="hidden" id="retry-selected-option" value="-1">
+            ` : `
+                <div class="retry-input-area">
+                    <textarea id="retry-text-answer" class="retry-textarea" placeholder="请输入你的答案..."></textarea>
+                </div>
+            `}
+            
+            <div id="retry-result-area" style="display:none;"></div>
+            
+            <div class="retry-actions">
+                ${note.options && note.options.length > 0 ? `
+                    <button class="submit-btn" id="retry-submit-btn" onclick="submitRetryChoiceAnswer(${index})" disabled>提交答案</button>
+                ` : `
+                    <button class="submit-btn" id="retry-submit-btn" onclick="submitRetryTextAnswer(${index})">提交答案</button>
+                `}
+                <button class="back-btn-full" onclick="showWrongbookDetail()">← 返回错题本</button>
+            </div>
+        </div>
+        
+        <style>
+            .retry-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+            .retry-container { }
+            .retry-source { display: flex; gap: 8px; margin-bottom: 12px; }
+            .source-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; color: white; }
+            .type-tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #e8e8ff; color: #667eea; }
+            
+            .retry-question { background: linear-gradient(135deg, #f5f7ff, #e8f4ff); border-radius: 12px; padding: 16px; font-size: 15px; color: #333; line-height: 1.6; margin-bottom: 16px; }
+            
+            .retry-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+            .option-btn { display: flex; align-items: center; gap: 12px; padding: 14px; background: white; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.2s; }
+            .option-btn:hover { border-color: #667eea; background: #f5f7ff; }
+            .option-btn.selected { border-color: #667eea; background: #e8e8ff; }
+            .option-btn.correct { border-color: #43E97B; background: #d4edda; }
+            .option-btn.wrong { border-color: #FF6B6B; background: #f8d7da; }
+            .option-letter { width: 28px; height: 28px; background: #667eea; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+            .option-text { font-size: 14px; color: #333; flex: 1; }
+            
+            .retry-input-area { margin-bottom: 16px; }
+            .retry-textarea { width: 100%; height: 100px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 14px; resize: none; box-sizing: border-box; }
+            .retry-textarea:focus { outline: none; border-color: #667eea; }
+            
+            .retry-result { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+            .result-correct { background: #d4edda; border: 2px solid #43E97B; }
+            .result-wrong { background: #f8d7da; border: 2px solid #FF6B6B; }
+            .result-icon { font-size: 32px; margin-bottom: 8px; }
+            .result-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+            .result-correct .result-title { color: #155724; }
+            .result-wrong .result-title { color: #721c24; }
+            .result-detail { font-size: 13px; color: #666; margin-bottom: 8px; }
+            .result-explanation { font-size: 12px; color: #666; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 8px; margin-top: 8px; }
+            
+            .retry-actions { display: flex; flex-direction: column; gap: 10px; }
+            .submit-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+            .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+            .back-btn-full { width: 100%; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; font-size: 14px; color: #666; cursor: pointer; }
+        </style>
+    `;
+    
+    content.innerHTML = questionHTML;
+}
+
+// 选择选项
+function selectRetryOption(el, noteIndex, optionIndex) {
+    // 移除其他选项的选中状态
+    document.querySelectorAll('.option-btn').forEach(function(btn) {
+        btn.classList.remove('selected');
+    });
+    
+    // 选中当前选项
+    el.classList.add('selected');
+    
+    // 保存选择
+    document.getElementById('retry-selected-option').value = optionIndex;
+    
+    // 启用提交按钮
+    const submitBtn = document.getElementById('retry-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+}
+
+// 提交选择题答案
+function submitRetryChoiceAnswer(noteIndex) {
+    const selectedOption = parseInt(document.getElementById('retry-selected-option').value);
+    if (selectedOption < 0) {
+        showToast('请选择一个答案');
         return;
     }
     
-    var photosHtml = photos.slice().reverse().map(function(p) {
-        return '<div style="position:relative;display:inline-block;width:calc(50% - 6px);margin:3px;">' +
-            '<img src="' + p.image + '" style="width:100%;height:100px;object-fit:cover;border-radius:8px;cursor:pointer;" onclick="showPhotoPreview(\'' + p.image + '\', ' + p.topicId + ', ' + p.id + ')"/>' +
-            '<button style="position:absolute;top:4px;right:4px;background:rgba(255,0,0,0.8);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px;" onclick="deleteWrongPhoto(' + p.id + ')">×</button>' +
-        '</div>';
-    }).join('');
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[noteIndex];
+    if (!note) return;
     
-    content.innerHTML = '<div class="modal-title">📁 错题照片库 (' + photos.length + '张)</div>' +
-        '<div style="text-align:right;margin-bottom:8px;">' +
-            '<button class="login-btn login-btn-outline" style="padding:6px 12px;font-size:12px;" onclick="openWrongPhotoCapture()">+ 添加</button>' +
-        '</div>' +
-        '<div style="max-height:400px;overflow-y:auto;">' + photosHtml + '</div>' +
-        '<button class="login-btn login-btn-secondary" style="margin-top:12px;width:100%;" onclick="closeDetail()">关闭</button>';
+    const correctIndex = note.correctIndex;
+    const isCorrect = selectedOption === correctIndex;
+    
+    // 显示结果
+    const resultArea = document.getElementById('retry-result-area');
+    resultArea.style.display = 'block';
+    resultArea.innerHTML = `
+        <div class="retry-result ${isCorrect ? 'result-correct' : 'result-wrong'}">
+            <div class="result-icon">${isCorrect ? '🎉' : '😢'}</div>
+            <div class="result-title">${isCorrect ? '回答正确！' : '回答错误'}</div>
+            ${!isCorrect ? `<div class="result-detail">你的答案：${String.fromCharCode(65 + selectedOption)}. ${note.options[selectedOption]}</div>` : ''}
+            <div class="result-detail" style="color: ${isCorrect ? '#43E97B' : '#43E97B'};">正确答案：${String.fromCharCode(65 + correctIndex)}. ${note.options[correctIndex]}</div>
+            ${note.explanation ? `<div class="result-explanation">💡 解析：${note.explanation}</div>` : ''}
+        </div>
+    `;
+    
+    // 更新错题状态
+    note.userAnswer = String.fromCharCode(65 + selectedOption) + '. ' + note.options[selectedOption];
+    if (isCorrect) {
+        note.reviewed = true;
+        showToast('太棒了！回答正确！');
+    }
+    syncUserData(user);
+    
+    // 禁用选项按钮
+    document.querySelectorAll('.option-btn').forEach(function(btn, i) {
+        btn.style.cursor = 'default';
+        if (i === correctIndex) {
+            btn.classList.add('correct');
+        } else if (i === selectedOption && !isCorrect) {
+            btn.classList.add('wrong');
+        }
+    });
+    
+    // 隐藏提交按钮
+    const submitBtn = document.getElementById('retry-submit-btn');
+    if (submitBtn) {
+        submitBtn.style.display = 'none';
+    }
 }
 
-function showWrongNotes() {
-    const user = getCurrentUserData() || {};
-    const wrongNotes = user.wrongNotes || [];
-    const content = document.getElementById('detail-content');
-    if (wrongNotes.length === 0) {
-        content.innerHTML = `
-            <div style="font-size:18px;font-weight:bold;margin-bottom:16px;">📝 错题本</div>
-            <div style="text-align:center;padding:40px;color:var(--text-light);">
-                <div style="font-size:48px;margin-bottom:12px;">✨</div>
-                <div>暂无错题记录</div>
-                <div style="font-size:12px;margin-top:4px;">继续保持，加油！</div>
+// 提交填空/计算题答案（AI智能批改）
+async function submitRetryTextAnswer(noteIndex) {
+    const textarea = document.getElementById('retry-text-answer');
+    const userAns = textarea ? textarea.value.trim() : '';
+    
+    if (!userAns) {
+        showToast('请输入答案');
+        return;
+    }
+    
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[noteIndex];
+    if (!note) return;
+    
+    const correctAnswer = note.answer;
+    
+    // 显示加载中
+    const resultArea = document.getElementById('retry-result-area');
+    resultArea.style.display = 'block';
+    resultArea.innerHTML = `
+        <div class="retry-result" style="background: #f9f9f9;">
+            <div class="loading-icon" style="font-size: 24px;">🤖 AI批改中...</div>
+        </div>
+    `;
+    
+    // 调用AI判断答案
+    try {
+        const prompt = `请判断用户的答案是否正确。
+
+题目：${note.question}
+正确答案：${correctAnswer}
+用户答案：${userAns}
+
+请用以下JSON格式返回判断结果：
+{
+    "isCorrect": true/false,
+    "similarity": 0-100的相似度百分比,
+    "feedback": "简短的反馈意见"
+}
+
+注意：允许合理的等价表达方式（如"2/3"和"0.666"都算正确），数学表达式等价也算正确。`;
+
+        const messages = [
+            { role: 'system', content: '你是一个智能的作业批改AI，能够理解学生答案的等价表达。' },
+            { role: 'user', content: prompt }
+        ];
+        
+        const result = await callDeepSeekAPI(messages, 0.3);
+        
+        let isCorrect = false;
+        let feedback = '';
+        
+        if (result.success) {
+            // 解析JSON结果
+            const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                try {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    isCorrect = parsed.isCorrect || parsed.similarity > 70;
+                    feedback = parsed.feedback || '';
+                } catch(e) {
+                    // JSON解析失败，使用模糊匹配
+                    isCorrect = fuzzyMatch(userAns, correctAnswer);
+                }
+            } else {
+                isCorrect = fuzzyMatch(userAns, correctAnswer);
+            }
+        } else {
+            // API失败，使用本地模糊匹配
+            isCorrect = fuzzyMatch(userAns, correctAnswer);
+        }
+        
+        // 显示结果
+        resultArea.innerHTML = `
+            <div class="retry-result ${isCorrect ? 'result-correct' : 'result-wrong'}">
+                <div class="result-icon">${isCorrect ? '🎉' : '😢'}</div>
+                <div class="result-title">${isCorrect ? '回答正确！' : '回答错误'}</div>
+                <div class="result-detail">你的答案：${userAns}</div>
+                <div class="result-detail" style="color: #43E97B;">正确答案：${correctAnswer}</div>
+                ${feedback ? `<div class="result-explanation">💡 ${feedback}</div>` : ''}
+                ${note.explanation ? `<div class="result-explanation">📖 解析：${note.explanation}</div>` : ''}
             </div>
-            <button class="login-btn login-btn-secondary" onclick="closeDetail()">关闭</button>
         `;
-    } else {
+        
+        // 更新错题状态
+        note.userAnswer = userAns;
+        if (isCorrect) {
+            note.reviewed = true;
+            showToast('太棒了！回答正确！');
+        }
+        syncUserData(user);
+        
+    } catch(error) {
+        console.error('AI批改失败:', error);
+        // 使用本地模糊匹配作为备选
+        const isCorrect = fuzzyMatch(userAns, correctAnswer);
+        
+        resultArea.innerHTML = `
+            <div class="retry-result ${isCorrect ? 'result-correct' : 'result-wrong'}">
+                <div class="result-icon">${isCorrect ? '🎉' : '❌'}</div>
+                <div class="result-title">${isCorrect ? '回答正确！' : '回答错误'}</div>
+                <div class="result-detail">你的答案：${userAns}</div>
+                <div class="result-detail" style="color: #43E97B;">正确答案：${correctAnswer}</div>
+                ${note.explanation ? `<div class="result-explanation">📖 解析：${note.explanation}</div>` : ''}
+            </div>
+        `;
+        
+        note.userAnswer = userAns;
+        if (isCorrect) {
+            note.reviewed = true;
+        }
+        syncUserData(user);
+    }
+    
+    // 禁用输入框和提交按钮
+    textarea.disabled = true;
+    const submitBtn = document.getElementById('retry-submit-btn');
+    if (submitBtn) {
+        submitBtn.style.display = 'none';
+    }
+}
+
+// 模糊匹配答案（本地备选方案）
+function fuzzyMatch(userAns, correctAns) {
+    // 移除空格和标点
+    const normalize = function(s) {
+        return s.toLowerCase()
+            .replace(/[\s\.,，。、；;]/g, '')
+            .replace(/（/g, '(')
+            .replace(/）/g, ')');
+    };
+    
+    const normUser = normalize(userAns);
+    const normCorrect = normalize(correctAns);
+    
+    // 完全匹配
+    if (normUser === normCorrect) return true;
+    
+    // 数字比较（处理小数精度问题）
+    const numUser = parseFloat(normUser);
+    const numCorrect = parseFloat(normCorrect);
+    if (!isNaN(numUser) && !isNaN(numCorrect)) {
+        const diff = Math.abs(numUser - numCorrect);
+        const tolerance = Math.max(0.001, Math.abs(numCorrect) * 0.001);
+        if (diff < tolerance) return true;
+    }
+    
+    // 包含匹配
+    if (normUser.includes(normCorrect) || normCorrect.includes(normUser)) return true;
+    
+    // 分数比较
+    const fractionMatch = normUser.match(/^(\d+)\/(\d+)$/);
+    const fractionCorrect = normCorrect.match(/^(\d+)\/(\d+)$/);
+    if (fractionMatch && fractionCorrect) {
+        const u = parseInt(fractionMatch[1]) / parseInt(fractionMatch[2]);
+        const c = parseInt(fractionCorrect[1]) / parseInt(fractionCorrect[2]);
+        if (Math.abs(u - c) < 0.001) return true;
+    }
+    
+    return false;
+}
+
+// ============================================================
+// AI分析错题
+// ============================================================
+
+async function analyzeWrongNoteWithAI(index) {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const note = wrongNotes[index];
+    if (!note) { showToast('错题不存在'); return; }
+    
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    // 显示加载中
+    content.innerHTML = `
+        <div class="ai-header">
+            <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+            <div class="modal-title">🤖 AI分析</div>
+        </div>
+        <div class="ai-loading">
+            <div class="loading-icon">🤖</div>
+            <div class="loading-text">AI正在深度分析中...</div>
+        </div>
+        
+        <style>
+            .ai-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+            .ai-loading { text-align: center; padding: 40px; }
+            .loading-icon { font-size: 48px; margin-bottom: 16px; }
+            .loading-text { font-size: 14px; color: #666; }
+        </style>
+    `;
+    
+    try {
+        const prompt = `请详细分析这道错题，帮助学生理解错误原因并掌握正确解法：
+
+【题目】
+${note.question}
+${note.options ? '\n【选项】\n' + note.options.map((o, i) => String.fromCharCode(65 + i) + '. ' + o).join('\n') : ''}
+
+【正确答案】
+${note.answer}
+
+【学生的错误答案】
+${note.userAnswer || '未知'}
+
+【解析】
+${note.explanation || '无'}
+
+请从以下几个方面进行分析：
+1. 错误原因分析：学生为什么会做错？
+2. 知识点讲解：涉及哪些知识点？
+3. 正确解题思路：应该怎么做？
+4. 易错点提示：做这类题要注意什么？
+5. 举一反三：出一道类似的练习题（附答案）`;
+
+        const messages = [
+            { role: 'system', content: '你是一位专业、耐心的初中数学老师，擅长分析学生的错题，给出详细易懂的讲解。请用清晰的结构回答。' },
+            { role: 'user', content: prompt }
+        ];
+        
+        const result = await callDeepSeekAPI(messages, 0.7);
+        
+        if (result.error) {
+            content.innerHTML = `
+                <div class="ai-header">
+                    <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+                    <div class="modal-title">⚠️ AI分析失败</div>
+                </div>
+                <div class="ai-error">
+                    <div class="error-icon">😢</div>
+                    <div class="error-message">${result.message}</div>
+                    <button class="retry-btn" onclick="analyzeWrongNoteWithAI(${index})">🔄 重试</button>
+                </div>
+                <button class="back-btn-full" onclick="showWrongbookDetail()">← 返回错题本</button>
+            `;
+            return;
+        }
+        
+        // 显示分析结果
+        const analysisContent = result.content.replace(/\n/g, '<br>');
+        
         content.innerHTML = `
-            <div style="font-size:18px;font-weight:bold;margin-bottom:16px;">📝 错题本 (${wrongNotes.length}道)</div>
-            <div style="margin-bottom:12px;">
-                <button onclick="showWrongNotesBySource('all')" style="padding:6px 10px;background:#f5f5f5;border:none;border-radius:6px;font-size:12px;margin-right:6px;cursor:pointer;">全部</button>
-                <button onclick="showWrongNotesBySource('topic')" style="padding:6px 10px;background:#fff3e0;border:none;border-radius:6px;font-size:12px;margin-right:6px;cursor:pointer;">母题训练</button>
-                <button onclick="showWrongNotesBySource('method')" style="padding:6px 10px;background:#e3f2fd;border:none;border-radius:6px;font-size:12px;margin-right:6px;cursor:pointer;">学霸方法</button>
-                <button onclick="showWrongNotesBySource('thinking')" style="padding:6px 10px;background:#f3e5f5;border:none;border-radius:6px;font-size:12px;cursor:pointer;">思维训练</button>
+            <div class="ai-header">
+                <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+                <div class="modal-title">🤖 AI分析结果</div>
             </div>
-            <div id="wrong-notes-list" style="max-height:400px;overflow-y:auto;">
-                ${wrongNotes.map(n => `
-                    <div class="wrong-note-card" onclick="handleWrongNoteClick('${n.source}', '${n.wrongKey}', ${n.topicId})">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                            <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${n.source === 'topic' ? '#FF9800' : n.source === 'method' ? '#2196F3' : '#9C27B0'};color:white;">${n.sourceName || '未知'}</span>
-                            <span style="font-size:10px;color:#999;">${new Date(n.time).toLocaleDateString()}</span>
-                        </div>
-                        <div class="wrong-note-question">${n.question}</div>
-                        <div class="wrong-note-answer">答案：${n.answer}</div>
-                        ${n.explanation ? '<div style="font-size:11px;color:#666;margin-top:4px;">💡 ' + n.explanation.substring(0, 50) + '...</div>' : ''}
-                    </div>
-                `).join('')}
+            
+            <div class="ai-result">
+                <div class="question-brief">
+                    <div class="brief-label">题目</div>
+                    <div class="brief-content">${note.question}</div>
+                </div>
+                
+                <div class="analysis-content">
+                    ${analysisContent}
+                </div>
+                
+                <button class="speak-btn" onclick="speakText(this.previousElementSibling.textContent)">🔊 朗读</button>
             </div>
-            <button class="login-btn login-btn-secondary" onclick="closeDetail()">关闭</button>
+            
+            <button class="back-btn-full" onclick="showWrongbookDetail()">← 返回错题本</button>
+            
+            <style>
+                .ai-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+                .ai-result { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 16px; max-height: 400px; overflow-y: auto; }
+                .question-brief { background: white; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+                .brief-label { font-size: 11px; color: #667eea; margin-bottom: 4px; }
+                .brief-content { font-size: 13px; color: #333; line-height: 1.5; }
+                .analysis-content { font-size: 13px; line-height: 1.8; color: #333; }
+                .analysis-content br { display: block; margin: 4px 0; }
+                .speak-btn { width: 100%; padding: 10px; background: #667eea; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; margin-bottom: 16px; }
+                .ai-error { text-align: center; padding: 40px; }
+                .error-icon { font-size: 48px; margin-bottom: 12px; }
+                .error-message { font-size: 14px; color: #FF6B6B; margin-bottom: 16px; }
+                .retry-btn { padding: 10px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+                .back-btn-full { width: 100%; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; font-size: 14px; color: #666; cursor: pointer; }
+            </style>
+        `;
+        
+        // 记录调用
+        if (typeof recordDeepSeekCall === 'function') {
+            recordDeepSeekCall(Math.ceil(result.content.length / 4));
+        }
+        
+    } catch(error) {
+        console.error('AI分析失败:', error);
+        content.innerHTML = `
+            <div class="ai-header">
+                <button class="back-btn" onclick="showWrongbookDetail()">← 返回</button>
+                <div class="modal-title">❌ 分析失败</div>
+            </div>
+            <div class="ai-error">
+                <div class="error-icon">😢</div>
+                <div class="error-message">${error.message}</div>
+            </div>
+            <button class="back-btn-full" onclick="showWrongbookDetail()">← 返回错题本</button>
         `;
     }
-    document.getElementById('detail-modal').classList.add('show');
 }
 
-function showWrongNotesBySource(source) {
-    const user = getCurrentUserData() || {};
-    const wrongNotes = user.wrongNotes || [];
-    const filteredNotes = source === 'all' ? wrongNotes : wrongNotes.filter(n => n.source === source);
-    const container = document.getElementById('wrong-notes-list');
-    if (container) {
-        container.innerHTML = filteredNotes.length === 0 
-            ? '<div style="text-align:center;padding:30px;color:#999;">该模块暂无错题</div>'
-            : filteredNotes.map(n => `
-                <div class="wrong-note-card" onclick="handleWrongNoteClick('${n.source}', '${n.wrongKey}', ${n.topicId})">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <span style="font-size:11px;padding:2px 8px;border-radius:10px;background:${n.source === 'topic' ? '#FF9800' : n.source === 'method' ? '#2196F3' : '#9C27B0'};color:white;">${n.sourceName || '未知'}</span>
-                        <span style="font-size:10px;color:#999;">${new Date(n.time).toLocaleDateString()}</span>
-                    </div>
-                    <div class="wrong-note-question">${n.question}</div>
-                    <div class="wrong-note-answer">答案：${n.answer}</div>
-                    ${n.explanation ? '<div style="font-size:11px;color:#666;margin-top:4px;">💡 ' + n.explanation.substring(0, 50) + '...</div>' : ''}
-                </div>
-            `).join('');
+// ============================================================
+// 其他功能
+// ============================================================
+
+function markWrongNoteReviewed(index) {
+    const user = getCurrentUserData();
+    if (!user || !user.wrongNotes || !user.wrongNotes[index]) return;
+    user.wrongNotes[index].reviewed = true;
+    syncUserData(user);
+    showToast('✅ 已标记为已复习');
+    
+    // 刷新显示
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    if (modal && content) {
+        renderWrongbook(content);
     }
 }
 
 function removeWrongNote(index) {
+    if (!confirm('确定要删除这道错题吗？')) return;
+    
     const user = getCurrentUserData();
     if (user && user.wrongNotes) {
         user.wrongNotes.splice(index, 1);
         syncUserData(user);
         showToast('已移除错题');
-        const container = document.getElementById('fullscreen-content');
-        if (container) renderWrongbook(container);
+        
+        // 刷新显示
+        const modal = document.getElementById('detail-modal');
+        const content = document.getElementById('detail-content');
+        if (modal && content) {
+            renderWrongbook(content);
+        }
+    }
+}
+
+function reviewAllWrongNotes() {
+    const user = getCurrentUserData();
+    const wrongNotes = user?.wrongNotes || [];
+    const unreviewed = wrongNotes.filter(n => !n.reviewed);
+    
+    if (unreviewed.length === 0) {
+        showToast('所有错题已复习完毕！');
+        return;
+    }
+    
+    // 从第一个未复习的开始
+    const firstUnreviewedIndex = wrongNotes.findIndex(n => !n.reviewed);
+    if (firstUnreviewedIndex >= 0) {
+        retryWrongNote(firstUnreviewedIndex);
     }
 }
 
@@ -167,294 +1418,45 @@ function clearWrongNotes() {
     if (user) {
         user.wrongNotes = [];
         syncUserData(user);
-        
-        // 更新设置面板显示
-        const wrongCountEl = document.getElementById('settings-wrong-count');
-        if (wrongCountEl) wrongCountEl.textContent = '共 0 道错题';
-        
         showToast('错题本已清空');
-    }
-}
-
-function handleWrongNoteClick(source, wrongKey, topicId) {
-    if (source === 'topic') {
-        closeDetail();
-        openTopicQuestion(topicId);
-    } else if (source === 'method') {
-        showToast('可在学霸方法中重新练习该内容');
-    } else if (source === 'thinking') {
-        showToast('可在思维训练中重新练习该内容');
-    }
-}
-
-function viewMethodNote(noteId) {
-    const user = getCurrentUserData();
-    const note = user?.methodNotes?.find(n => n.id === noteId);
-    if (!note) return;
-    
-    const modal = document.getElementById('detail-modal');
-    const content = document.getElementById('detail-content');
-    modal.classList.add('show');
-    
-    content.innerHTML = `
-        <div class="modal-title">📝 学习笔记</div>
-        <img src="${note.image}" style="width:100%;border-radius:8px;margin-bottom:16px;">
-        <div style="font-size:12px;color:#999;margin-bottom:16px;">上传时间：${note.uploadTime}</div>
-        <button class="modal-close" onclick="closeModal()">关闭</button>
-    `;
-}
-
-function viewThinkingNote(noteId) {
-    const user = getCurrentUserData();
-    const note = user?.thinkingNotes?.find(n => n.id === noteId);
-    if (!note) return;
-    
-    const modal = document.getElementById('detail-modal');
-    const content = document.getElementById('detail-content');
-    modal.classList.add('show');
-    content.innerHTML = `
-        <div class="modal-title">📝 思维训练笔记</div>
-        <img src="${note.image}" style="width:100%;border-radius:8px;margin-bottom:16px;">
-        <div style="font-size:12px;color:#999;margin-bottom:16px;">上传时间：${note.uploadTime}</div>
-        <button class="modal-close" onclick="closeModal()">关闭</button>
-    `;
-}
-
-function deleteMethodNote(noteId) {
-    if (!confirm('确定删除这个笔记吗？')) return;
-    
-    const user = getCurrentUserData();
-    user.methodNotes = user.methodNotes.filter(n => n.id !== noteId);
-    syncUserData(user);
-    
-    renderMethodNotes();
-    updateMethodStats();
-    showToast('笔记已删除');
-}
-
-function deleteThinkingNote(noteId) {
-    if (!confirm('确定删除这个笔记吗？')) return;
-    const user = getCurrentUserData();
-    user.thinkingNotes = user.thinkingNotes.filter(n => n.id !== noteId);
-    syncUserData(user);
-    renderThinkingNotes();
-    showToast('笔记已删除');
-}
-
-function handleMethodNoteUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    
-    if (!file.type.startsWith('image/')) {
-        showToast('请上传图片文件');
-        return;
-    }
-    
-    const user = getCurrentUserData();
-    if (!user.methodNotes) user.methodNotes = [];
-    
-    const imageUrl = URL.createObjectURL(file);
-    const noteData = {
-        id: 'method-note-' + Date.now(),
-        image: imageUrl,
-        name: file.name,
-        uploadTime: new Date().toLocaleString()
-    };
-    
-    user.methodNotes.push(noteData);
-    syncUserData(user);
-    
-    showToast('笔记上传成功！');
-    renderMethodNotes();
-    updateMethodStats();
-}
-
-function handleThinkingNoteUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-        showToast('请上传图片文件');
-        return;
-    }
-    
-    const user = getCurrentUserData();
-    if (!user.thinkingNotes) user.thinkingNotes = [];
-    
-    const imageUrl = URL.createObjectURL(file);
-    user.thinkingNotes.push({
-        id: 'thinking-note-' + Date.now(),
-        image: imageUrl,
-        name: file.name,
-        uploadTime: new Date().toLocaleString()
-    });
-    syncUserData(user);
-    showToast('笔记上传成功！');
-    renderThinkingNotes();
-}
-
-function rateMethodAnswer(methodId, isCorrect, questionIndex) {
-    // 播放正确/错误音效
-    if (isCorrect) {
-        SoundEffects.playCorrect();
-    } else {
-        SoundEffects.playWrong();
-    }
-    
-    const user = getCurrentUserData();
-    if (!user.methodStats) user.methodStats = {};
-    if (!user.methodStats[methodId]) user.methodStats[methodId] = { completed: 0, correct: 0, answeredQuestions: [] };
-    
-    // 避免重复统计同一题
-    if (!user.methodStats[methodId].answeredQuestions.includes(questionIndex)) {
-        user.methodStats[methodId].completed++;
-        if (isCorrect) user.methodStats[methodId].correct++;
-        user.methodStats[methodId].answeredQuestions.push(questionIndex);
-    }
-    
-    // 如果答错，自动加入错题本
-    if (!isCorrect) {
-        const questions = methodTrainingQuestions[methodId];
-        const question = questions[questionIndex];
-        if (question) {
-            const wrongKey = 'method-' + methodId + '-' + questionIndex;
-            if (!user.wrongNotes) user.wrongNotes = [];
-            // 避免重复添加同一错题
-            if (!user.wrongNotes.find(n => n.wrongKey === wrongKey)) {
-                user.wrongNotes.push({
-                    wrongKey: wrongKey,
-                    source: 'method',
-                    sourceName: '学霸方法',
-                    topicId: questionIndex,
-                    question: question.q,
-                    answer: question.a,
-                    explanation: '参考答案：' + question.a,
-                    userAnswer: '未达标',
-                    time: Date.now()
-                });
-            }
+        
+        // 刷新显示
+        const modal = document.getElementById('detail-modal');
+        const content = document.getElementById('detail-content');
+        if (modal && content) {
+            renderWrongbook(content);
         }
     }
-    
-    syncUserData(user);
-    updateMethodStats();
-    showToast(isCorrect ? '回答正确！' : '已加入错题本，继续加油！');
 }
 
-function rateThinkingAnswer(type, isCorrect, questionIdx) {
-    // 播放正确/错误音效
-    if (isCorrect) {
-        SoundEffects.playCorrect();
-    } else {
-        SoundEffects.playWrong();
-    }
-    
-    const user = getCurrentUserData();
-    if (!user.thinkingStats) user.thinkingStats = {};
-    if (!user.thinkingStats[type]) user.thinkingStats[type] = { completed: 0, correct: 0, answeredQuestions: [] };
-    
-    if (!user.thinkingStats[type].answeredQuestions.includes(questionIdx)) {
-        user.thinkingStats[type].completed++;
-        if (isCorrect) user.thinkingStats[type].correct++;
-        user.thinkingStats[type].answeredQuestions.push(questionIdx);
-    }
-    
-    // 如果答错，自动加入错题本
-    if (!isCorrect) {
-        const questions = thinkingQuestions[type];
-        const question = questions[questionIdx];
-        const typeNames = {
-            logic: '逻辑思维', creative: '创意思维', critical: '批判思维', system: '系统思维',
-            reverse: '逆向思维', divergent: '发散思维', converge: '收敛思维', spatial: '空间思维',
-            abstract: '抽象思维'
-        };
-        if (question) {
-            const wrongKey = 'thinking-' + type + '-' + questionIdx;
-            if (!user.wrongNotes) user.wrongNotes = [];
-            // 避免重复添加同一错题
-            if (!user.wrongNotes.find(n => n.wrongKey === wrongKey)) {
-                user.wrongNotes.push({
-                    wrongKey: wrongKey,
-                    source: 'thinking',
-                    sourceName: typeNames[type] || '思维训练',
-                    topicId: questionIdx,
-                    question: question.q,
-                    answer: question.opts ? question.opts[question.a] : question.a,
-                    explanation: '参考答案：' + (question.opts ? question.opts[question.a] : question.a),
-                    userAnswer: '回答错误',
-                    time: Date.now()
-                });
-            }
-        }
-    }
-    
-    syncUserData(user);
-    updateThinkingStats();
-    showToast(isCorrect ? '回答正确！' : '已加入错题本，继续加油！');
-}
+// ============================================================
+// Window Exports
+// ============================================================
+window.renderWrongbook = renderWrongbook;
+window.showWrongbookDetail = showWrongbookDetail;
+window.openWrongPhotoCapture = openWrongPhotoCapture;
+window.uploadWrongPhotoWithAI = uploadWrongPhotoWithAI;
+window.showWrongPhotoGallery = showWrongPhotoGallery;
+window.analyzePhotoWithAI = analyzePhotoWithAI;
+window.doWrongQuestionFromPhoto = doWrongQuestionFromPhoto;
+window.retryWrongNote = retryWrongNote;
+window.selectRetryOption = selectRetryOption;
+window.submitRetryChoiceAnswer = submitRetryChoiceAnswer;
+window.submitRetryTextAnswer = submitRetryTextAnswer;
+window.analyzeWrongNoteWithAI = analyzeWrongNoteWithAI;
+window.markWrongNoteReviewed = markWrongNoteReviewed;
+window.removeWrongNote = removeWrongNote;
+window.clearWrongNotes = clearWrongNotes;
+window.reviewAllWrongNotes = reviewAllWrongNotes;
+window.deleteWrongPhotoWithCleanup = deleteWrongPhotoWithCleanup;
+window.viewWrongNotes = viewWrongNotes;
+window.openFeedback = openFeedback;
+window.submitFeedback = submitFeedback;
 
-function renderWrongbook(container) {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const photoCount = user?.uploadedImages?.length || 0;
-    
-    container.innerHTML = `
-        <div class="card">
-            <h3 style="margin-bottom:12px;">📒 错题本</h3>
-            <p style="color:#666;font-size:13px;margin-bottom:16px;">收录练习中的错题，拍照上传，AI帮你分析</p>
-            <div style="display:flex;gap:12px;margin-bottom:16px;">
-                <div style="flex:1;text-align:center;padding:16px;background:#fff5f5;border-radius:12px;">
-                    <div style="font-size:24px;font-weight:bold;color:#FF6B6B;">${wrongNotes.length}</div>
-                    <div style="font-size:12px;color:#666;">错题总数</div>
-                </div>
-                <div style="flex:1;text-align:center;padding:16px;background:#f0fff0;border-radius:12px;">
-                    <div style="font-size:24px;font-weight:bold;color:#43E97B;">${photoCount}</div>
-                    <div style="font-size:12px;color:#666;">错题照片</div>
-                </div>
-                <div style="flex:1;text-align:center;padding:16px;background:#f5f7ff;border-radius:12px;">
-                    <div style="font-size:24px;font-weight:bold;color:#667eea;">${wrongNotes.filter(n => n.reviewed).length}</div>
-                    <div style="font-size:12px;color:#666;">已复习</div>
-                </div>
-            </div>
-            <div style="display:flex;gap:10px;margin-bottom:16px;">
-                <button onclick="openWrongPhotoCapture()" style="flex:1;padding:14px;background:linear-gradient(135deg,#FF6B6B,#FF9A63);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">📷 拍照上传</button>
-                <button onclick="showWrongPhotoGallery()" style="flex:1;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">📁 照片库(${photoCount})</button>
-            </div>
-        </div>
-        ${wrongNotes.length === 0 ? `
-            <div class="card" style="text-align:center;padding:40px;">
-                <div style="font-size:48px;margin-bottom:16px;">📝</div>
-                <div style="color:#666;">暂无错题，继续加油！</div>
-                <div style="color:#999;font-size:12px;margin-top:8px;">做错题会自动收录，也可以拍照上传</div>
-            </div>
-        ` : `
-            <div class="card">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-                    <h4 style="margin:0;">错题列表</h4>
-                    <button onclick="reviewAllWrongNotes()" style="padding:8px 16px;background:#43E97B;color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-weight:600;">📝 重练全部</button>
-                </div>
-                ${wrongNotes.map((note, i) => `
-                    <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:12px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <span style="font-size:11px;color:#999;background:#e8e8e8;padding:2px 8px;border-radius:4px;">${note.source || '练习'}</span>
-                            ${note.reviewed ? '<span style="font-size:11px;color:#43E97B;">✅ 已复习</span>' : '<span style="font-size:11px;color:#FF6B6B;">未复习</span>'}
-                        </div>
-                        <div style="font-size:14px;margin-bottom:8px;">${note.question}</div>
-                        <div style="display:flex;gap:8px;margin-bottom:8px;">
-                            <span style="font-size:12px;color:#FF6B6B;">你的答案：${note.userAnswer}</span>
-                            <span style="font-size:12px;color:#43E97B;">正确答案：${note.answer}</span>
-                        </div>
-                        ${note.explanation ? '<div style="font-size:12px;color:#666;margin-bottom:8px;">解析：' + note.explanation + '</div>' : ''}
-                        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
-                            <button onclick="retryWrongNote(${i})" style="padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">🔄 重练</button>
-                            <button onclick="analyzeWrongNoteWithAI(${i})" style="padding:6px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">🤖 AI分析</button>
-                            <button onclick="markWrongNoteReviewed(${i})" style="padding:6px 12px;background:#43E97B;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">✅ 已复习</button>
-                            <button onclick="removeWrongNote(${i})" style="padding:6px 12px;background:#FF6B6B;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">🗑 删除</button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `}
-    `;
+// 从设置面板打开错题本
+function viewWrongNotes() {
+    closeSettingsPanel();
+    openFullscreenPage('wrongbook');
 }
 
 function openFeedback() {
@@ -462,12 +1464,20 @@ function openFeedback() {
     const content = document.getElementById('detail-content');
     modal.classList.add('show');
     content.innerHTML = `
-        <div class="modal-title">💬 反馈建议</div>
-        <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <textarea id="feedback-text" style="width:100%;height:100px;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;resize:none;" placeholder="请描述您的问题或建议..."></textarea>
+        <div class="modal-header">
+            <button class="back-btn" onclick="closeDetail()">← 返回</button>
+            <div class="modal-title">💬 反馈建议</div>
         </div>
-        <button onclick="submitFeedback()" class="login-btn login-btn-primary" style="margin-bottom:8px;">提交反馈</button>
-        <button class="modal-close" onclick="closeModal()">关闭</button>
+        <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
+            <textarea id="feedback-text" style="width:100%;height:120px;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;resize:none;box-sizing:border-box;" placeholder="请描述您的问题或建议..."></textarea>
+        </div>
+        <button onclick="submitFeedback()" style="width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:12px;">提交反馈</button>
+        <button class="back-btn-full" onclick="closeDetail()">关闭</button>
+        
+        <style>
+            .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+            .back-btn-full { width: 100%; padding: 12px; background: #f5f5f5; border: none; border-radius: 10px; font-size: 14px; color: #666; cursor: pointer; }
+        </style>
     `;
 }
 
@@ -477,188 +1487,6 @@ function submitFeedback() {
         showToast('请输入反馈内容');
         return;
     }
-    // 模拟提交
-    closeModal();
+    closeDetail();
     showToast('感谢您的反馈！我们会认真处理');
 }
-
-function viewWrongNotes() {
-    closeSettingsPanel();
-    openFullscreenPage('wrongNotes');
-}
-
-
-
-// ============================================================
-// 错题重练 & AI分析
-// ============================================================
-
-function retryWrongNote(index) {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const note = wrongNotes[index];
-    if (!note) { showToast('错题不存在'); return; }
-    
-    const container = document.getElementById('fullscreen-content');
-    if (!container) return;
-    
-    let optionsHTML = '';
-    if (note.options && note.options.length > 0) {
-        optionsHTML = note.options.map((opt, oi) => 
-            '<button onclick="checkRetryAnswer(' + index + ',' + oi + ')" style="display:block;width:100%;padding:12px;margin:6px 0;background:#f5f7ff;border:2px solid #e0e0ff;border-radius:10px;font-size:14px;cursor:pointer;text-align:left;">' + 
-            String.fromCharCode(65 + oi) + '. ' + opt + '</button>'
-        ).join('');
-    }
-    
-    container.innerHTML = '<div style="padding:20px;">' +
-        '<div style="font-size:18px;font-weight:600;margin-bottom:16px;">🔄 错题重练</div>' +
-        '<div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;font-size:15px;">' + note.question + '</div>' +
-        (optionsHTML ? '<div id="retry-options">' + optionsHTML + '</div>' : 
-         '<div style="margin-top:12px;"><textarea id="retry-text-answer" style="width:100%;height:80px;border:1px solid #ddd;border-radius:8px;padding:12px;font-size:14px;" placeholder="请输入你的答案..."></textarea>' +
-         '<button onclick="checkRetryTextAnswer(' + index + ')" style="margin-top:8px;padding:10px 20px;background:#667eea;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;">提交答案</button></div>') +
-        '<button onclick="renderWrongbook(document.getElementById(\'fullscreen-content\'))" style="margin-top:16px;padding:8px 16px;background:#999;color:white;border:none;border-radius:8px;cursor:pointer;">返回错题本</button>' +
-        '</div>';
-}
-
-function checkRetryAnswer(noteIndex, optionIndex) {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const note = wrongNotes[noteIndex];
-    if (!note) return;
-    
-    const optionsDiv = document.getElementById('retry-options');
-    if (!optionsDiv) return;
-    
-    const buttons = optionsDiv.querySelectorAll('button');
-    buttons.forEach((btn, i) => {
-        btn.disabled = true;
-        btn.style.cursor = 'default';
-        if (i === note.correctIndex) {
-            btn.style.background = '#d4edda';
-            btn.style.borderColor = '#43E97B';
-        } else if (i === optionIndex) {
-            btn.style.background = '#f8d7da';
-            btn.style.borderColor = '#FF6B6B';
-        }
-    });
-    
-    const isCorrect = optionIndex === note.correctIndex;
-    const resultDiv = document.createElement('div');
-    resultDiv.style.cssText = 'margin-top:12px;padding:12px;border-radius:8px;font-size:14px;';
-    
-    if (isCorrect) {
-        resultDiv.style.background = '#d4edda';
-        resultDiv.style.color = '#155724';
-        resultDiv.innerHTML = '✅ 回答正确！' + (note.explanation ? '<br><small>解析：' + note.explanation + '</small>' : '');
-        markWrongNoteReviewed(noteIndex);
-    } else {
-        resultDiv.style.background = '#f8d7da';
-        resultDiv.style.color = '#721c24';
-        resultDiv.innerHTML = '❌ 回答错误。正确答案：' + String.fromCharCode(65 + note.correctIndex) + '. ' + note.options[note.correctIndex] + (note.explanation ? '<br><small>解析：' + note.explanation + '</small>' : '');
-    }
-    optionsDiv.parentNode.insertBefore(resultDiv, optionsDiv.nextSibling);
-}
-
-function checkRetryTextAnswer(noteIndex) {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const note = wrongNotes[noteIndex];
-    if (!note) return;
-    
-    const textarea = document.getElementById('retry-text-answer');
-    const userAns = textarea ? textarea.value.trim() : '';
-    if (!userAns) { showToast('请输入答案'); return; }
-    
-    const isCorrect = userAns === note.answer;
-    const resultDiv = document.createElement('div');
-    resultDiv.style.cssText = 'margin-top:12px;padding:12px;border-radius:8px;font-size:14px;';
-    
-    if (isCorrect) {
-        resultDiv.style.background = '#d4edda';
-        resultDiv.style.color = '#155724';
-        resultDiv.innerHTML = '✅ 回答正确！';
-        markWrongNoteReviewed(noteIndex);
-    } else {
-        resultDiv.style.background = '#f8d7da';
-        resultDiv.style.color = '#721c24';
-        resultDiv.innerHTML = '❌ 回答错误。正确答案：' + note.answer;
-    }
-    textarea.parentNode.insertBefore(resultDiv, textarea.nextSibling);
-    textarea.disabled = true;
-}
-
-function analyzeWrongNoteWithAI(index) {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const note = wrongNotes[index];
-    if (!note) { showToast('错题不存在'); return; }
-    
-    showToast('🤖 AI正在分析...');
-    
-    const prompt = '请分析这道错题，指出错误原因和正确思路：\n题目：' + note.question + '\n学生答案：' + note.userAnswer + '\n正确答案：' + note.answer + (note.explanation ? '\n解析：' + note.explanation : '');
-    
-    callDeepSeekAPI(prompt).then(function(result) {
-        const container = document.getElementById('fullscreen-content');
-        if (!container) return;
-        
-        const analysisDiv = document.createElement('div');
-        analysisDiv.style.cssText = 'margin-top:12px;background:linear-gradient(135deg,#f5f7ff,#e8e8ff);border-radius:12px;padding:16px;font-size:13px;line-height:1.6;';
-        analysisDiv.innerHTML = '<div style="font-weight:600;margin-bottom:8px;">🤖 AI分析</div>' + (result || '分析失败，请重试');
-        container.appendChild(analysisDiv);
-        showToast('AI分析完成');
-    }).catch(function(e) {
-        showToast('AI分析失败：' + (e.message || '请稍后重试'));
-    });
-}
-
-function markWrongNoteReviewed(index) {
-    const user = getCurrentUserData();
-    if (!user || !user.wrongNotes || !user.wrongNotes[index]) return;
-    user.wrongNotes[index].reviewed = true;
-    syncUserData(user);
-    showToast('✅ 已标记为已复习');
-}
-
-function reviewAllWrongNotes() {
-    const user = getCurrentUserData();
-    const wrongNotes = user?.wrongNotes || [];
-    const unreviewed = wrongNotes.filter(n => !n.reviewed);
-    if (unreviewed.length === 0) { showToast('所有错题已复习完毕！'); return; }
-    
-    // Find first unreviewed and start retry
-    const firstUnreviewedIndex = wrongNotes.findIndex(n => !n.reviewed);
-    if (firstUnreviewedIndex >= 0) {
-        retryWrongNote(firstUnreviewedIndex);
-    }
-}
-
-// ============================================================
-// Pomodoro - 番茄钟
-// ============================================================
-
-// Window exports for onclick handlers
-window.renderWrongbook = renderWrongbook;
-window.clearWrongNotes = clearWrongNotes;
-window.viewWrongNotes = viewWrongNotes;
-window.openFeedback = openFeedback;
-
-// ============================================================
-// Window Exports
-// ============================================================
-window.handleWrongNoteClick = handleWrongNoteClick;
-window.showWrongNotesBySource = showWrongNotesBySource;
-window.openWrongPhotoCapture = openWrongPhotoCapture;
-window.deleteWrongPhoto = deleteWrongPhoto;
-window.removeWrongNote = removeWrongNote;
-window.showPhotoPreview = showPhotoPreview;
-window.showWrongPhotoGallery = showWrongPhotoGallery;
-window.submitFeedback = submitFeedback;
-window.closeDetail = closeDetail;
-window.closeModal = closeModal;
-
-window.retryWrongNote = retryWrongNote;
-window.checkRetryAnswer = checkRetryAnswer;
-window.checkRetryTextAnswer = checkRetryTextAnswer;
-window.analyzeWrongNoteWithAI = analyzeWrongNoteWithAI;
-window.markWrongNoteReviewed = markWrongNoteReviewed;
-window.reviewAllWrongNotes = reviewAllWrongNotes;

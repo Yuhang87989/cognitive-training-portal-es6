@@ -33,9 +33,9 @@ function renderPractice(container) {
         </div>
         
         <div class="card">
-            <h4 style="margin-bottom:12px;">📷 拍照上传题目</h4>
-            <p style="font-size:12px;color:#666;margin-bottom:12px;">拍下你不会的题目，AI帮你分析讲解</p>
-            <input type="file" id="practice-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePracticePhoto(this)"/>
+            <h4 style="margin-bottom:12px;">📷 拍照识别题目</h4>
+            <p style="font-size:12px;color:#666;margin-bottom:12px;">拍下题目图片，AI识别并生成可答题</p>
+            <input type="file" id="practice-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoToQuestion(this)"/>
             <button class="camera-btn" onclick="document.getElementById('practice-photo-input').click()">📷 拍照识别</button>
         </div>
         
@@ -60,6 +60,145 @@ function renderPractice(container) {
 }
 
 window.renderPractice = renderPractice;
+
+// ============================================================
+// 拍照上传处理函数
+// ============================================================
+
+// 处理母题训练的拍照上传
+function handlePracticePhoto(input) {
+    if (!input.files[0]) return;
+    
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        
+        // 显示预览和分析弹窗
+        showPracticePhotoModal(imageData);
+        
+        // 清空input
+        input.value = '';
+    };
+    
+    reader.onerror = function() {
+        showToast('图片读取失败，请重试');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// 显示拍照分析弹窗
+function showPracticePhotoModal(imageData) {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    
+    modal.classList.add('show');
+    
+    content.innerHTML = `
+        <div class="modal-title">📷 题目图片分析</div>
+        <div class="card" style="padding:12px;">
+            <img src="${imageData}" style="width:100%;max-height:250px;object-fit:contain;border-radius:8px;margin-bottom:12px;"/>
+            <div id="practice-photo-preview-info" style="font-size:12px;color:#666;margin-bottom:8px;">✅ 图片已准备好</div>
+        </div>
+        <div style="margin-top:12px;">
+            <textarea id="practice-photo-question" placeholder="请描述你想问的问题（可选）..." style="width:100%;height:60px;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:13px;resize:none;"></textarea>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+                <button onclick="analyzePracticePhoto('${imageData.replace(/'/g, "\\'")}')" style="padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">🤖 AI分析</button>
+                <button onclick="closeModal()" style="padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">取消</button>
+            </div>
+        </div>
+        <div id="practice-photo-result" style="margin-top:12px;"></div>
+    `;
+}
+
+// 分析拍照图片
+async function analyzePracticePhoto(imageData) {
+    const resultDiv = document.getElementById('practice-photo-result');
+    const question = document.getElementById('practice-photo-question');
+    const questionText = question ? question.value.trim() : '';
+    
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;"><div style="display:inline-block;width:24px;height:24px;border:3px solid #667eea;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;"></div><div style="margin-top:8px;color:#666;font-size:13px;">🤖 AI正在分析中...</div></div>';
+    
+    const analysisPrompt = questionText ? 
+        '用户问题：' + questionText + '\n\n请分析这张图片中的题目，并回答用户的问题。' :
+        '请分析这张图片中的题目内容，给出：\n1. 题目识别结果\n2. 详细解答\n3. 相关知识点\n4. 举一反三练习';
+    
+    try {
+        const messages = [
+            {role: 'system', content: '你是一位专业的数学辅导老师，擅长分析学生拍摄的题目照片，给出详细的讲解和解答。请用清晰的结构化格式回答。'},
+            {role: 'user', content: analysisPrompt}
+        ];
+        
+        // 如果有图片，尝试使用视觉API
+        if (VISION_API_KEY && VISION_API_URL) {
+            const visionResult = await callVisionAPI(imageData, analysisPrompt);
+            if (visionResult.success) {
+                messages[1] = {role: 'user', content: '[图片内容分析结果：' + visionResult.content + ']\n\n' + analysisPrompt};
+            }
+        }
+        
+        const result = await callDeepSeekAPI(messages);
+        
+        if (result.error) {
+            if (result.type === 'balance') {
+                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showDeepSeekBalanceAlert()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
+            } else {
+                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">❌ 分析失败：' + escapeHtml(result.message) + '</div>';
+            }
+        } else {
+            // 记录调用
+            recordDeepSeekCall(Math.ceil(result.content.length / 4));
+            
+            resultDiv.innerHTML = '<div style="padding:16px;background:linear-gradient(135deg,#f5f7ff,#eef1ff);border-radius:12px;max-height:300px;overflow-y:auto;">' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:12px;color:#667eea;font-weight:600;">🤖 AI分析结果</span>' +
+                '<button onclick="speakText(this.parentElement.nextElementSibling.textContent)" style="padding:4px 8px;background:#667eea;color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer;">🔊 朗读</button></div>' +
+                '<div style="font-size:14px;line-height:1.8;color:#333;">' + result.content.replace(/\n/g, '<br>') + '</div>' +
+                '</div>';
+        }
+    } catch (err) {
+        console.error('分析失败:', err);
+        resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">❌ 网络错误，请检查网络后重试<br><button onclick="analyzePracticePhoto(\'' + imageData.replace(/'/g, "\\'") + '\')" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">重试</button></div>';
+    }
+}
+
+// 通用拍照上传处理函数（供其他模块调用）
+function handleQuestionPhoto(input, resultContainerId) {
+    if (!input.files[0]) return;
+    
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        const resultContainer = document.getElementById(resultContainerId);
+        
+        if (resultContainer) {
+            // 显示预览
+            resultContainer.innerHTML = '<div style="padding:8px;background:#f5f7ff;border-radius:8px;margin-bottom:8px;">' +
+                '<img src="' + imageData + '" style="width:100%;max-height:150px;object-fit:contain;border-radius:6px;"/>' +
+                '<div style="font-size:11px;color:#666;margin-top:4px;">✅ 图片已上传</div></div>';
+        }
+        
+        // 存储当前图片数据供后续分析使用
+        window.currentQuestionPhoto = imageData;
+        showToast('图片已上传，可点击AI分析按钮');
+    };
+    
+    reader.onerror = function() {
+        showToast('图片读取失败');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// 导出函数
+window.handlePracticePhoto = handlePracticePhoto;
+window.showPracticePhotoModal = showPracticePhotoModal;
+window.analyzePracticePhoto = analyzePracticePhoto;
+window.handleQuestionPhoto = handleQuestionPhoto;
 
 
 // ============================================================

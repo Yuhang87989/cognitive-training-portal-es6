@@ -376,7 +376,7 @@ function openFullscreenPage(module) {
     container.classList.add('active');
 }
 
-function closeFullscreenPage() { const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
+function closeFullscreenPage() { cleanupModuleState(); const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
 
 function handleLogin() {
     const data = loadData();
@@ -863,6 +863,35 @@ function updateUI() {
     if (avatarEl) avatarEl.textContent = user.name.charAt(0);
     if (dropNameEl) dropNameEl.textContent = user.name;
     if (dropInfoEl) dropInfoEl.textContent = gradeNames[user.grade] + ' · Lv.' + user.difficulty;
+    
+    // 更新首页推荐卡片
+    updateRecommendCard();
+}
+
+// 更新首页推荐卡片 - 从播客课程中随机选取
+function updateRecommendCard() {
+    var titleEl = document.getElementById('recommend-title');
+    var subtitleEl = document.getElementById('recommend-subtitle');
+    var iconEl = document.getElementById('home-recommend-card');
+    
+    if (!titleEl || !subtitleEl) return;
+    
+    // 如果播客课程已加载，随机选取一个
+    if (typeof podcastCourses !== 'undefined' && podcastCourses.length > 0) {
+        var randomIndex = Math.floor(Math.random() * podcastCourses.length);
+        var course = podcastCourses[randomIndex];
+        titleEl.textContent = course.title;
+        subtitleEl.textContent = course.teacher + ' · ' + course.category;
+        
+        // 如果有图标元素，更新图标
+        if (iconEl) {
+            var iconContainer = iconEl.querySelector('div:first-child');
+            if (iconContainer && course.icon) {
+                iconContainer.innerHTML = course.icon;
+                iconContainer.style.background = course.gradient;
+            }
+        }
+    }
 }
 
 function toggleSettingsGroup(groupId) {
@@ -1767,3 +1796,51 @@ function initPortal() {
 }
 
 // ============================================================
+
+// ====== 删除用户功能 ======
+function showDeleteUserModal() {
+    closeUserMenu();
+    var data = loadData();
+    
+    if (data.users.length === 0) {
+        showToast('暂无用户');
+        return;
+    }
+    
+    var container = document.getElementById('delete-user-list');
+    if (!container) {
+        showToast('页面加载异常');
+        return;
+    }
+    
+    var colors = ['#667eea', '#FF9A63', '#43E97B'];
+    var htmlContent = '';
+    
+    data.users.forEach(function(u, i) {
+        var isCurrent = u.id === data.currentUser;
+        htmlContent += '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:' + (isCurrent ? '#fff3f3' : '#f8f9fa') + ';border-radius:8px;margin-bottom:8px;">';
+        htmlContent += '<div style="background:' + colors[i % 3] + ';color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;">' + u.name.charAt(0) + '</div>';
+        htmlContent += '<div style="flex:1;">';
+        htmlContent += '<div style="font-weight:600;">' + u.name + (isCurrent ? ' (当前用户)' : '') + '</div>';
+        htmlContent += '<div style="font-size:11px;color:#999;">' + (gradeNames ? gradeNames[u.grade] || '' : '') + ' · Lv.' + u.difficulty + '</div>';
+        htmlContent += '</div>';
+        if (isCurrent) {
+            htmlContent += '<span style="font-size:11px;color:#ff6b6b;">不可删除</span>';
+        } else {
+            htmlContent += '<button onclick="deleteUser(\'' + u.id + '\');showDeleteUserModal();" style="background:#ff6b6b;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>';
+        }
+        htmlContent += '</div>';
+    });
+    
+    container.innerHTML = htmlContent;
+    document.getElementById('delete-user-modal').classList.add('show');
+}
+
+function closeDeleteUserModal() {
+    var el = document.getElementById('delete-user-modal');
+    if (el) el.classList.remove('show');
+}
+
+window.showDeleteUserModal = showDeleteUserModal;
+window.closeDeleteUserModal = closeDeleteUserModal;
+window.updateRecommendCard = updateRecommendCard;

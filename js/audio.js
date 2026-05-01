@@ -288,3 +288,94 @@ function toggleDeepSeekVoice() {
 }
 
 window.toggleDeepSeekVoice = toggleDeepSeekVoice;
+
+// ============================================================
+// toggleVoiceInput - 通用语音输入函数（供其他模块调用）
+// ============================================================
+
+let voiceInputRecognition = null;
+let currentVoiceInputCallback = null;
+let currentVoiceInputBtn = null;
+
+function toggleVoiceInput(btn, inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) {
+        showToast('输入框未找到');
+        return;
+    }
+    
+    // 检查浏览器支持
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showToast('您的浏览器不支持语音输入');
+        return;
+    }
+    
+    // 初始化语音识别
+    if (!voiceInputRecognition) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        voiceInputRecognition = new SpeechRecognition();
+        voiceInputRecognition.lang = 'zh-CN';
+        voiceInputRecognition.continuous = false;
+        voiceInputRecognition.interimResults = false;
+        
+        voiceInputRecognition.onstart = function() {
+            isRecording = true;
+            currentVoiceInputBtn = btn;
+            if (btn) btn.textContent = '🔴';
+            showToast('正在聆听...');
+        };
+        
+        voiceInputRecognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            // 追加内容到输入框
+            if (input.value && !input.value.endsWith(' ')) {
+                input.value += ' ';
+            }
+            input.value += transcript;
+            // 触发input事件以更新UI
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            if (btn) btn.textContent = '🎤';
+            showToast('已识别: ' + transcript);
+        };
+        
+        voiceInputRecognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+            isRecording = false;
+            if (btn) btn.textContent = '🎤';
+            if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                showToast('语音识别错误: ' + event.error);
+            }
+        };
+        
+        voiceInputRecognition.onend = function() {
+            isRecording = false;
+            currentVoiceInputBtn = null;
+            if (btn) btn.textContent = '🎤';
+        };
+    }
+    
+    // 停止之前的 TTS
+    stopTTSSpeech();
+    
+    if (isRecording && currentVoiceInputBtn === btn) {
+        // 停止当前录音
+        voiceInputRecognition.stop();
+        isRecording = false;
+        if (btn) btn.textContent = '🎤';
+    } else {
+        // 开始新录音
+        try {
+            voiceInputRecognition.start();
+        } catch(e) {
+            // 如果已经在运行，先停止再开始
+            voiceInputRecognition.stop();
+            setTimeout(function() {
+                voiceInputRecognition.start();
+            }, 100);
+        }
+    }
+}
+
+// 导出到window
+window.toggleVoiceInput = toggleVoiceInput;
+window.isRecording = isRecording;

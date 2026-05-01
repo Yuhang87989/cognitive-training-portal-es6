@@ -411,7 +411,19 @@ function startThinkingQuiz(type, page = 0) {
         <div style="font-size:12px;color:#666;margin-bottom:12px;text-align:center;">
             第 ${currentPage + 1} / ${totalPages} 页（共${questions.length}题）
         </div>
-        <div style="max-height:400px;overflow-y:auto;margin-bottom:16px;">
+        
+        <!-- 拍照上传区域 -->
+        <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:16px;">
+            <div style="font-size:13px;color:#666;margin-bottom:8px;">📷 拍照上传题目图片（可选）</div>
+            <input type="file" id="thinking-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handleQuestionPhoto(this, 'thinking-photo-preview')"/>
+            <div style="display:flex;gap:8px;">
+                <button onclick="document.getElementById('thinking-photo-input').click()" style="flex:1;padding:10px;background:white;border:1px solid #ddd;border-radius:8px;font-size:13px;cursor:pointer;">📷 拍照/选择图片</button>
+                <button onclick="analyzeThinkingPhotoWithAI()" style="flex:1;padding:10px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;">🤖 AI分析图片</button>
+            </div>
+            <div id="thinking-photo-preview" style="margin-top:8px;display:none;"></div>
+        </div>
+        
+        <div style="max-height:300px;overflow-y:auto;margin-bottom:16px;">
             ${pageQuestions.map((q, idx) => `
                 <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:12px;">
                     <div style="font-size:13px;color:#1A6BFF;font-weight:600;margin-bottom:8px;">第${startIndex + idx + 1}题</div>
@@ -436,6 +448,23 @@ function startThinkingQuiz(type, page = 0) {
         <button class="modal-close" onclick="closeModal()" style="margin-top:8px;">关闭</button>
     `;
 }
+
+// AI分析思维训练的图片
+async function analyzeThinkingPhotoWithAI() {
+    const photoPreview = document.getElementById('thinking-photo-preview');
+    const imageData = window.currentQuestionPhoto;
+    
+    if (!imageData) {
+        showToast('请先上传图片');
+        return;
+    }
+    
+    // 直接使用新的OCR出题流程
+    photoToQuestion(imageData);
+}
+
+// 导出函数
+window.analyzeThinkingPhotoWithAI = analyzeThinkingPhotoWithAI;
 
 // 选择选项
 function selectThinkingOpt(el, selectedIdx, questionIdx) {

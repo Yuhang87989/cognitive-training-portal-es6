@@ -3,8 +3,8 @@
 // 番茄钟模块
 // ============================================================
 
-window.window.pomodoroTime = 25 * 60;
-window.window.pomodoroTimer = null;
+window.pomodoroTime = 25 * 60;
+window.pomodoroTimer = null;
 let pomodoroRunning = false;
 let pomodoroMode = 'work'; // work, break
 
@@ -75,7 +75,7 @@ function togglePomodoro() {
         pomodoroRunning = true;
         window.pomodoroTimer = setInterval(() => {
             window.pomodoroTime--;
-            if (window.window.pomodoroTime <= 0) {
+            if (window.pomodoroTime <= 0) {
                 clearInterval(window.pomodoroTimer);
                 pomodoroRunning = false;
                 // 播放提示音
@@ -111,5 +111,3 @@ window.renderPomodoro = renderPomodoro;
 window.resetPomodoro = resetPomodoro;
 window.setPomodoroTime = setPomodoroTime;
 window.togglePomodoro = togglePomodoro;
-window.
-window.window.pomodoroTimer = window.pomodoroTimer;

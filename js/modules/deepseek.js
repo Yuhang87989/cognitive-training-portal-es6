@@ -73,6 +73,15 @@ async function sendToDeepSeek() {
     // 停止之前的 TTS
     stopTTSSpeech();
     
+    // 禁用输入和发送按钮，防止重复发送
+    const sendBtn = document.querySelector('.chat-send') || document.querySelector('#deepseek-send-btn');
+    if (input) input.disabled = true;
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = '0.6';
+        sendBtn.style.cursor = 'not-allowed';
+    }
+    
     // 构建用户消息显示
     let userMsgHtml = '<div class="chat-msg user"><div class="chat-avatar">👤</div><div class="chat-bubble">';
     if (currentDeepSeekImage) {
@@ -117,6 +126,17 @@ async function sendToDeepSeek() {
         const result = await callDeepSeekAPI(deepseekConversationHistory);
         const bubbles = messagesEl.querySelectorAll('.chat-bubble');
         
+        // 恢复输入框和按钮
+        if (input) {
+            input.disabled = false;
+            input.focus();
+        }
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.style.opacity = '1';
+            sendBtn.style.cursor = 'pointer';
+        }
+        
         if (result.error) {
             if (bubbles.length > 0) {
                 if (result.type === 'balance') {
@@ -128,17 +148,31 @@ async function sendToDeepSeek() {
         } else {
             const responseContent = result.content;
             if (bubbles.length > 0) {
-                bubbles[bubbles.length - 1].innerHTML = formatAIResponse(responseContent);
+                bubbles[bubbles.length - 1].innerHTML = formatAIResponse(responseContent) + 
+                    '<button onclick="speakText(this.parentElement.querySelector(\'.ai-text\').textContent || this.parentElement.textContent)" style="margin-top:8px;padding:4px 8px;background:#f0f0f0;border:none;border-radius:4px;font-size:11px;cursor:pointer;">🔊 朗读</button>';
             }
             // 添加AI回复到历史
             deepseekConversationHistory.push({role: 'assistant', content: responseContent});
+            // 记录调用
+            recordDeepSeekCall(Math.ceil(responseContent.length / 4));
             // 自动朗读AI回复
             speakText(responseContent);
         }
     } catch (error) {
+        // 恢复输入框和按钮
+        if (input) {
+            input.disabled = false;
+            input.focus();
+        }
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.style.opacity = '1';
+            sendBtn.style.cursor = 'pointer';
+        }
+        
         const bubbles = messagesEl.querySelectorAll('.chat-bubble');
         if (bubbles.length > 0) {
-            bubbles[bubbles.length - 1].innerHTML = '❌ 发生错误，请稍后重试。';
+            bubbles[bubbles.length - 1].innerHTML = '❌ 发生错误，请稍后重试。错误信息：' + escapeHtml(error.message);
         }
     }
     
@@ -227,18 +261,31 @@ async function analyzeMethodWithAI(methodId, questionIdx) {
             return;
         }
 
+        if (!response.ok) {
+            throw new Error('API请求失败 (HTTP ' + response.status + ')');
+        }
+
         const data = await response.json();
         const aiContent = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || 'AI分析失败，请稍后重试';
 
+        // 记录调用
+        recordDeepSeekCall(Math.ceil(aiContent.length / 4));
+        
+        // 提取纯文本用于朗读
+        const plainText = aiContent.replace(/\*\*/g, '').replace(/<[^>]*>/g, '');
+
         resultEl.innerHTML = '<div style="padding:16px;background:linear-gradient(135deg,#f5f7ff,#eef1ff);border-radius:12px;max-height:400px;overflow-y:auto;">' +
-            '<div style="font-size:12px;color:#667eea;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:4px;">🤖 AI深度分析</div>' +
-            '<div style="font-size:14px;line-height:1.8;color:#333;">' + aiContent.replace(/\n/g, '<br>') + '</div>' +
+            '<div style="font-size:12px;color:#667eea;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:4px;justify-content:space-between;">' +
+            '<span>🤖 AI深度分析</span>' +
+            '<button onclick="speakText(this.parentElement.nextElementSibling.textContent)" style="padding:4px 8px;background:#667eea;color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer;">🔊 朗读</button></div>' +
+            '<div style="font-size:14px;line-height:1.8;color:#333;" class="ai-content">' + aiContent.replace(/\n/g, '<br>') + '</div>' +
             '</div>';
     } catch (err) {
+        console.error('AI分析失败:', err);
         const resultId = 'method-ai-result-' + methodId + '-' + questionIdx;
         const resultEl = document.getElementById(resultId);
         if (resultEl) {
-            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">AI分析失败，请检查网络连接</div>';
+            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">❌ AI分析失败<br><span style="font-size:11px;color:#999;">' + escapeHtml(err.message) + '</span><br><button onclick="analyzeMethodWithAI(\'' + methodId + '\', ' + questionIdx + ')" style="margin-top:8px;padding:6px 16px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">重试</button></div>';
         }
     }
 }
@@ -281,18 +328,28 @@ async function analyzeThinkingWithAI(type, questionIdx) {
             return;
         }
 
+        if (!response.ok) {
+            throw new Error('API请求失败 (HTTP ' + response.status + ')');
+        }
+
         const data = await response.json();
         const aiContent = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || 'AI分析失败，请稍后重试';
 
+        // 记录调用
+        recordDeepSeekCall(Math.ceil(aiContent.length / 4));
+
         resultEl.innerHTML = '<div style="padding:16px;background:linear-gradient(135deg,#f5f7ff,#eef1ff);border-radius:12px;max-height:400px;overflow-y:auto;">' +
-            '<div style="font-size:12px;color:#667eea;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:4px;">🤖 ' + (typeNames[type] || '思维训练') + 'AI深度分析</div>' +
-            '<div style="font-size:14px;line-height:1.8;color:#333;">' + aiContent.replace(/\n/g, '<br>') + '</div>' +
+            '<div style="font-size:12px;color:#667eea;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:4px;justify-content:space-between;">' +
+            '<span>🤖 ' + (typeNames[type] || '思维训练') + ' AI深度分析</span>' +
+            '<button onclick="speakText(this.parentElement.nextElementSibling.textContent)" style="padding:4px 8px;background:#667eea;color:white;border:none;border-radius:4px;font-size:11px;cursor:pointer;">🔊 朗读</button></div>' +
+            '<div style="font-size:14px;line-height:1.8;color:#333;" class="ai-content">' + aiContent.replace(/\n/g, '<br>') + '</div>' +
             '</div>';
     } catch (err) {
+        console.error('AI分析失败:', err);
         const resultId = 'thinking-ai-result-' + type + '-' + questionIdx;
         const resultEl = document.getElementById(resultId);
         if (resultEl) {
-            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">AI分析失败，请检查网络连接</div>';
+            resultEl.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">❌ AI分析失败<br><span style="font-size:11px;color:#999;">' + escapeHtml(err.message) + '</span><br><button onclick="analyzeThinkingWithAI(\'' + type + '\', ' + questionIdx + ')" style="margin-top:8px;padding:6px 16px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">重试</button></div>';
         }
     }
 }
@@ -437,9 +494,49 @@ function sendMentorMessage() {
     }, 500);
 }
 
+// 余额估算存储键
+const DEEPSEEK_USAGE_KEY = 'deepseek_usage_stats';
+const DEEPSEEK_ESTIMATED_BALANCE = 'deepseek_estimated_balance';
+
+// 初始化DeepSeek使用统计
+function initDeepSeekUsage() {
+    let stats = localStorage.getItem(DEEPSEEK_USAGE_KEY);
+    if (!stats) {
+        stats = { totalCalls: 0, totalTokens: 0, lastReset: Date.now() };
+    } else {
+        stats = JSON.parse(stats);
+    }
+    // 每天重置统计
+    const today = new Date().toDateString();
+    if (new Date(stats.lastReset).toDateString() !== today) {
+        stats.todayCalls = 0;
+        stats.lastReset = Date.now();
+    }
+    return stats;
+}
+
+// 记录DeepSeek API调用
+function recordDeepSeekCall(tokens) {
+    const stats = initDeepSeekUsage();
+    stats.totalCalls = (stats.totalCalls || 0) + 1;
+    stats.todayCalls = (stats.todayCalls || 0) + 1;
+    stats.totalTokens = (stats.totalTokens || 0) + (tokens || 500);
+    localStorage.setItem(DEEPSEEK_USAGE_KEY, JSON.stringify(stats));
+    
+    // 更新用户数据中的调用统计
+    const user = getCurrentUserData();
+    if (!user.deepSeekCalls) user.deepSeekCalls = { today: 0, total: 0 };
+    user.deepSeekCalls.today = (user.deepSeekCalls.today || 0) + 1;
+    user.deepSeekCalls.total = (user.deepSeekCalls.total || 0) + 1;
+    saveUserData(user);
+    
+    return stats;
+}
+
 async function queryDeepSeekBalance(showToast) {
     try {
-        const response = await fetch('https://api.deepseek.com/v1/users/me/balance', {
+        // 尝试新的余额API路径
+        const response = await fetch('https://api.deepseek.com/user/balance', {
             method: 'GET',
             headers: {
                 'Authorization': 'Bearer ' + DEEPSEEK_API_KEY,
@@ -448,42 +545,43 @@ async function queryDeepSeekBalance(showToast) {
         });
         
         if (!response.ok) {
-            throw new Error('无法获取余额');
+            throw new Error('无法获取余额 (HTTP ' + response.status + ')');
         }
         
         const data = await response.json();
-        const balance = data.is_available ? (data.balance / 100).toFixed(2) : '0.00';
-        const tokens = data.is_available ? Math.floor(data.balance / 0.001) : 0;
         
-        // 获取本地存储的调用统计
-        const user = getCurrentUserData();
-        const todayCalls = user?.deepSeekCalls?.today || 0;
-        const totalCalls = user?.deepSeekCalls?.total || 0;
-        
-        if (showToast) {
-            const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:white;padding:12px 24px;border-radius:8px;font-size:14px;z-index:9999;';
-            toast.textContent = '余额已更新';
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 1500);
+        // 保存估算余额
+        let balanceInfo = { is_available: true, balance_in_use: 0, total_balance: 0 };
+        if (data.balance_infos && data.balance_infos.length > 0) {
+            balanceInfo = data.balance_infos[0];
         }
         
+        const balance = balanceInfo.is_available ? balanceInfo.total_balance : 0;
+        const balanceStr = '¥' + (balance / 100).toFixed(2);
+        
+        // 获取本地存储的调用统计
+        const stats = initDeepSeekUsage();
+        
         return {
-            balance: '¥' + balance,
-            tokens: tokens.toLocaleString(),
-            todayCalls: todayCalls,
-            totalCalls: totalCalls,
-            lastUpdate: new Date().toLocaleTimeString()
+            balance: balanceStr,
+            tokens: Math.floor(balance / 0.0001).toLocaleString(),
+            todayCalls: stats.todayCalls || 0,
+            totalCalls: stats.totalCalls || 0,
+            lastUpdate: new Date().toLocaleTimeString(),
+            raw: data
         };
     } catch (error) {
-        // 返回默认数据
+        console.warn('DeepSeek余额查询失败:', error.message);
+        // 返回本地统计作为备选
+        const stats = initDeepSeekUsage();
         return {
             balance: '¥--',
             tokens: '--',
-            todayCalls: 0,
-            totalCalls: 0,
-            lastUpdate: '查询失败',
-            error: error.message
+            todayCalls: stats.todayCalls || 0,
+            totalCalls: stats.totalCalls || 0,
+            lastUpdate: '查询失败: ' + error.message,
+            error: error.message,
+            isEstimate: true
         };
     }
 }
@@ -823,9 +921,571 @@ window.askTemplate = askTemplate;
 window.queryDeepSeekBalance = queryDeepSeekBalance;
 window.refreshDeepSeekBalance = refreshDeepSeekBalance;
 window.showDeepSeekBalanceAlert = showDeepSeekBalanceAlert;
-window.analyzePhotoWithAI = analyzePhotoWithAI;
 window.sendMentorMessage = sendMentorMessage;
-window.toggleVoiceInput = toggleVoiceInput;
 window.closeDetail = closeDetail;
 window.selectRechargePackage = selectRechargePackage;
-window.closeModal = closeModal;
+window.recordDeepSeekCall = recordDeepSeekCall;
+window.initDeepSeekUsage = initDeepSeekUsage;
+window.callDeepSeekAPI = callDeepSeekAPI;
+window.callVisionAPI = callVisionAPI;
+
+// ============================================================
+// OCR拍照出题模块 - Tesseract.js + DeepSeek
+// ============================================================
+
+// Tesseract.js 状态
+var tesseractWorker = null;
+var isTesseractInitializing = false;
+
+// 初始化Tesseract.js（异步加载语言包）
+async function initTesseract() {
+    if (tesseractWorker) return tesseractWorker;
+    if (isTesseractInitializing) {
+        // 等待初始化完成
+        while (isTesseractInitializing) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+        return tesseractWorker;
+    }
+    
+    isTesseractInitializing = true;
+    try {
+        // 使用 createWorker 创建 worker，自动下载语言包
+        tesseractWorker = await Tesseract.createWorker('chi_sim+eng', 1, {
+            logger: m => {
+                if (m.status === 'loading language api') {
+                    console.log('OCR语言包加载中...', m.progress);
+                }
+            }
+        });
+        console.log('Tesseract.js 初始化完成');
+        return tesseractWorker;
+    } catch (e) {
+        console.error('Tesseract.js 初始化失败:', e);
+        isTesseractInitializing = false;
+        return null;
+    } finally {
+        isTesseractInitializing = false;
+    }
+}
+
+// OCR提取文字（使用Tesseract.js）
+async function ocrExtractText(imageDataUrl, progressCallback) {
+    try {
+        // 检查Tesseract是否可用
+        if (typeof Tesseract === 'undefined') {
+            console.warn('Tesseract.js 未加载，尝试直接使用DeepSeek');
+            return null;
+        }
+        
+        // 显示进度
+        if (progressCallback) progressCallback('正在初始化OCR引擎...', 0);
+        
+        // 初始化/获取worker
+        const worker = await initTesseract();
+        if (!worker) {
+            return null;
+        }
+        
+        if (progressCallback) progressCallback('正在识别文字...', 30);
+        
+        // 执行OCR识别
+        const result = await worker.recognize(imageDataUrl);
+        
+        if (progressCallback) progressCallback('识别完成', 100);
+        
+        // 返回识别的文字
+        const text = result.data.text.trim();
+        console.log('OCR识别结果:', text);
+        
+        return text;
+    } catch (e) {
+        console.error('OCR识别失败:', e);
+        return null;
+    }
+}
+
+// AI解析OCR文字为结构化题目
+async function aiParseQuestion(ocrText) {
+    if (!ocrText || ocrText.length < 5) {
+        return { error: '识别文字太少，请重新拍照或手动输入题目' };
+    }
+    
+    const prompt = `请将以下OCR识别的题目文字整理成结构化格式。
+
+要求：
+1. 如果是选择题：识别题干和各选项（A/B/C/D），判断正确答案
+2. 如果是填空题/计算题：识别题干和答案
+3. 如果文字有误请根据上下文修正
+4. 生成简洁准确的解析
+
+OCR文字：
+${ocrText}
+
+请严格用以下JSON格式返回，不要包含其他内容：
+{
+    "type": "choice/fill/calculation/other",
+    "question": "题目文字（修正后的）",
+    "options": {"A": "选项A", "B": "选项B", "C": "选项C", "D": "选项D"},
+    "answer": "正确答案",
+    "explanation": "简要解析"
+}`;
+
+    try {
+        const messages = [
+            { role: 'system', content: '你是一个专业的题目解析AI，专门帮助学生整理和解析学习题目。请直接返回JSON格式，不要有多余内容。' },
+            { role: 'user', content: prompt }
+        ];
+        
+        const result = await callDeepSeekAPI(messages, 0.3);
+        
+        if (result.error) {
+            return result;
+        }
+        
+        // 尝试解析JSON
+        let parsed;
+        const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+            try {
+                parsed = JSON.parse(jsonMatch[0]);
+            } catch (e) {
+                // 尝试修复JSON
+                const fixed = jsonMatch[0]
+                    .replace(/[\u2018\u2019]/g, "'")
+                    .replace(/[\u201C\u201D]/g, '"');
+                parsed = JSON.parse(fixed);
+            }
+        } else {
+            return { error: 'AI解析失败，请重试' };
+        }
+        
+        // 确保必要字段存在
+        if (!parsed.type) parsed.type = 'other';
+        if (!parsed.question) parsed.question = ocrText;
+        if (!parsed.options) parsed.options = {};
+        if (!parsed.answer) parsed.answer = '';
+        if (!parsed.explanation) parsed.explanation = '';
+        
+        return parsed;
+    } catch (e) {
+        console.error('AI解析失败:', e);
+        return { error: 'AI解析失败: ' + e.message };
+    }
+}
+
+// 渲染交互式题目
+function renderInteractiveQuestion(questionData) {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    const q = questionData;
+    const qTypeNames = { choice: '选择题', fill: '填空题', calculation: '计算题', other: '问答题' };
+    
+    let questionHtml = `
+        <div class="modal-title">📝 ${qTypeNames[q.type] || '题目'}</div>
+        <div id="ocr-question-area" style="margin-bottom:16px;">
+            <div class="card" style="padding:16px;background:linear-gradient(135deg,#f5f7ff,#e8f4ff);">
+                <div style="font-size:13px;color:#1A6BFF;margin-bottom:8px;font-weight:600;">📋 题目</div>
+                <div style="font-size:15px;line-height:1.8;color:#333;">${q.question}</div>
+            </div>
+    `;
+    
+    // 根据题型显示不同答题方式
+    if (q.type === 'choice' && q.options && Object.keys(q.options).length > 0) {
+        questionHtml += `
+            <div style="margin-top:16px;">
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">请选择正确答案：</div>
+                <div id="ocr-options-area" style="display:grid;gap:8px;">
+                    ${['A', 'B', 'C', 'D'].map(opt => q.options[opt] ? `
+                        <div class="ocr-option-btn" onclick="selectOcrOption(this, '${opt}')" data-option="${opt}" style="padding:12px;background:white;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;font-size:14px;transition:all 0.2s;">
+                            <span style="font-weight:600;color:#1A6BFF;margin-right:8px;">${opt}.</span>
+                            <span>${q.options[opt]}</span>
+                        </div>
+                    ` : '').join('')}
+                </div>
+                <input type="hidden" id="ocr-selected-option" value="">
+            </div>
+        `;
+    } else {
+        questionHtml += `
+            <div style="margin-top:16px;">
+                <div style="font-size:12px;color:#666;margin-bottom:8px;">请输入你的答案：</div>
+                <textarea id="ocr-user-answer" style="width:100%;height:80px;padding:12px;border:2px solid #e0e0e0;border-radius:12px;font-size:14px;resize:none;" placeholder="输入答案..."></textarea>
+            </div>
+        `;
+    }
+    
+    questionHtml += `
+            <button id="ocr-submit-btn" onclick="submitOcrAnswer()" style="width:100%;margin-top:16px;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">提交答案</button>
+            <button onclick="closeModal()" style="width:100%;margin-top:8px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+        </div>
+        <div id="ocr-result-area" style="display:none;"></div>
+    `;
+    
+    content.innerHTML = questionHtml;
+    
+    // 保存题目数据到全局变量
+    window.currentOcrQuestion = q;
+}
+
+// 选择选项
+function selectOcrOption(el, opt) {
+    // 移除其他选项的高亮
+    document.querySelectorAll('.ocr-option-btn').forEach(btn => {
+        btn.style.background = 'white';
+        btn.style.borderColor = '#e0e0e0';
+    });
+    // 高亮当前选项
+    el.style.background = '#e3f2fd';
+    el.style.borderColor = '#1A6BFF';
+    // 保存选择
+    document.getElementById('ocr-selected-option').value = opt;
+}
+
+// 提交答案并AI批改
+async function submitOcrAnswer() {
+    const q = window.currentOcrQuestion;
+    if (!q) {
+        showToast('题目数据丢失');
+        return;
+    }
+    
+    let userAnswer = '';
+    let isCorrect = false;
+    
+    if (q.type === 'choice') {
+        const selectedOpt = document.getElementById('ocr-selected-option').value;
+        if (!selectedOpt) {
+            showToast('请先选择一个选项');
+            return;
+        }
+        userAnswer = selectedOpt + '. ' + (q.options[selectedOpt] || '');
+        // 检查是否正确（简化判断：比较选项字母）
+        isCorrect = selectedOpt.toUpperCase() === q.answer.toUpperCase().charAt(0);
+    } else {
+        userAnswer = document.getElementById('ocr-user-answer').value.trim();
+        if (!userAnswer) {
+            showToast('请输入答案');
+            return;
+        }
+        // 非选择题发送给AI判断
+    }
+    
+    const submitBtn = document.getElementById('ocr-submit-btn');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'AI批改中...';
+    }
+    
+    // 如果是非选择题或需要AI深度判断，发请求给AI
+    if (q.type !== 'choice' || !q.answer) {
+        try {
+            const prompt = `请判断用户的答案是否正确。
+            
+原题目：${q.question}
+正确答案：${q.answer}
+用户答案：${userAnswer}
+
+请分析用户答案是否正确，并给出简要评价。
+
+请用以下JSON格式返回：
+{
+    "isCorrect": true/false,
+    "evaluation": "简要评价"
+}`;
+
+            const messages = [
+                { role: 'system', content: '你是一个严格的AI批改老师，请客观评判答案是否正确。' },
+                { role: 'user', content: prompt }
+            ];
+            
+            const result = await callDeepSeekAPI(messages, 0.1);
+            
+            if (result.success) {
+                const jsonMatch = result.content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    isCorrect = parsed.isCorrect;
+                }
+            }
+        } catch (e) {
+            console.error('AI批改失败:', e);
+        }
+    }
+    
+    // 显示结果
+    const resultArea = document.getElementById('ocr-result-area');
+    resultArea.style.display = 'block';
+    resultArea.innerHTML = `
+        <div style="margin-top:16px;">
+            <div style="padding:16px;border-radius:12px;${isCorrect ? 'background:linear-gradient(135deg,#e8f5e9,#c8e6c9);' : 'background:linear-gradient(135deg,#ffebee,#ffcdd2);'}">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <span style="font-size:24px;">${isCorrect ? '✅' : '❌'}</span>
+                    <span style="font-size:16px;font-weight:bold;${isCorrect ? 'color:#2e7d32;' : 'color:#c62828;'}">${isCorrect ? '回答正确！' : '回答错误'}</span>
+                </div>
+                
+                <div style="background:white;border-radius:8px;padding:12px;margin-bottom:8px;">
+                    <div style="font-size:12px;color:#666;margin-bottom:4px;">你的答案</div>
+                    <div style="font-size:14px;color:#333;">${userAnswer}</div>
+                </div>
+                
+                ${q.answer ? `
+                <div style="background:white;border-radius:8px;padding:12px;margin-bottom:8px;">
+                    <div style="font-size:12px;color:#1A6BFF;margin-bottom:4px;">正确答案</div>
+                    <div style="font-size:14px;color:#333;font-weight:600;">${q.answer}</div>
+                </div>
+                ` : ''}
+                
+                <div style="background:white;border-radius:8px;padding:12px;">
+                    <div style="font-size:12px;color:#667eea;margin-bottom:4px;">💡 解析</div>
+                    <div style="font-size:14px;color:#333;line-height:1.6;">${q.explanation || (isCorrect ? '回答正确！' : '请查看正确答案后理解解题思路')}</div>
+                </div>
+            </div>
+            
+            <button onclick="showOcrQuestionModal()" style="width:100%;margin-top:12px;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;">📷 再来一题</button>
+            <button onclick="closeModal()" style="width:100%;margin-top:8px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+        </div>
+    `;
+    
+    // 隐藏题目区域
+    document.getElementById('ocr-question-area').style.display = 'none';
+    
+    // 记录统计
+    recordOcrQuestionResult(isCorrect);
+}
+
+// 显示OCR拍照出题模态框（用于再来一题）
+function showOcrQuestionModal() {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    content.innerHTML = `
+        <div class="modal-title">📷 拍照识别题目</div>
+        <div class="card" style="padding:16px;margin-bottom:16px;text-align:center;">
+            <div style="font-size:48px;margin-bottom:12px;">📸</div>
+            <p style="font-size:14px;color:#666;margin-bottom:16px;">拍下你的题目，AI帮你识别并生成可答题</p>
+            
+            <input type="file" id="ocr-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoToQuestion(this)"/>
+            <button onclick="document.getElementById('ocr-photo-input').click()" style="width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;">📷 拍照/选择图片</button>
+        </div>
+        
+        <div class="card" style="padding:16px;background:#fff8e1;">
+            <div style="font-size:13px;color:#856404;font-weight:600;margin-bottom:8px;">💡 使用提示</div>
+            <div style="font-size:12px;color:#856404;line-height:1.6;">
+                1. 请确保题目图片清晰<br>
+                2. 光线充足可提高识别准确率<br>
+                3. 如果识别有误，可以手动输入修正
+            </div>
+        </div>
+        
+        <button onclick="closeModal()" style="width:100%;margin-top:12px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">取消</button>
+    `;
+}
+
+// 核心函数：拍照上传 → OCR → AI出题 → 交互答题
+async function photoToQuestion(imageDataUrl) {
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    modal.classList.add('show');
+    
+    // 显示加载状态
+    content.innerHTML = `
+        <div class="modal-title">📷 正在识别题目...</div>
+        <div class="card" style="padding:24px;text-align:center;">
+            <img src="${imageDataUrl}" style="width:100%;max-height:200px;object-fit:contain;border-radius:12px;margin-bottom:20px;"/>
+            <div id="ocr-progress" style="padding:16px;background:#f5f7ff;border-radius:12px;">
+                <div style="font-size:14px;color:#1A6BFF;margin-bottom:12px;" id="ocr-progress-text">🔄 正在初始化OCR引擎...</div>
+                <div style="height:6px;background:#e0e0e0;border-radius:3px;overflow:hidden;">
+                    <div id="ocr-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#667eea,#764ba2);transition:width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const progressText = document.getElementById('ocr-progress-text');
+    const progressBar = document.getElementById('ocr-progress-bar');
+    
+    const updateProgress = (text, percent) => {
+        if (progressText) progressText.textContent = text;
+        if (progressBar) progressBar.style.width = percent + '%';
+    };
+    
+    try {
+        // Step 1: OCR提取文字
+        updateProgress('🔄 正在识别文字...', 30);
+        const ocrText = await ocrExtractText(imageDataUrl, updateProgress);
+        
+        if (!ocrText || ocrText.length < 5) {
+            // OCR识别失败或文字太少，尝试直接用DeepSeek视觉理解
+            updateProgress('🔄 OCR识别文字较少，尝试AI图片理解...', 60);
+            
+            // 尝试使用视觉API
+            if (VISION_API_KEY && VISION_API_URL) {
+                const visionResult = await callVisionAPI(imageDataUrl, '请识别这张图片中的题目内容，包括题干、选项（如果有）、答案（如果有）。用中文回答。');
+                if (visionResult.success) {
+                    updateProgress('🔄 AI正在解析题目...', 80);
+                    const questionData = await aiParseQuestion(visionResult.content);
+                    if (!questionData.error) {
+                        renderInteractiveQuestion(questionData);
+                        return;
+                    }
+                }
+            }
+            
+            // 降级处理
+            content.innerHTML = `
+                <div class="modal-title">⚠️ 识别结果不理想</div>
+                <div class="card" style="padding:16px;">
+                    <p style="font-size:14px;color:#666;margin-bottom:16px;text-align:center;">
+                        抱歉，图片识别效果不佳，可能是：
+                    </p>
+                    <ul style="font-size:13px;color:#666;line-height:2;margin-bottom:16px;padding-left:20px;">
+                        <li>图片不够清晰</li>
+                        <li>光线不足或反光</li>
+                        <li>文字太小或模糊</li>
+                    </ul>
+                    <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
+                        <div style="font-size:13px;color:#1A6BFF;margin-bottom:8px;font-weight:600;">🤖 已识别的文字</div>
+                        <div style="font-size:13px;color:#333;line-height:1.6;background:white;padding:12px;border-radius:8px;max-height:150px;overflow-y:auto;">${ocrText || '(未能识别出文字)'}</div>
+                    </div>
+                    <textarea id="ocr-correct-input" placeholder="如果识别有误，请在此修正题目内容..." style="width:100%;height:100px;padding:12px;border:2px solid #e0e0e0;border-radius:12px;font-size:13px;resize:none;margin-bottom:12px;">${ocrText || ''}</textarea>
+                    <button onclick="aiParseFromText(document.getElementById('ocr-correct-input').value)" style="width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">🤖 AI生成题目</button>
+                </div>
+                <button onclick="closeModal()" style="width:100%;margin-top:8px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+            `;
+            return;
+        }
+        
+        // Step 2: AI解析为结构化题目
+        updateProgress('🔄 AI正在解析题目结构...', 70);
+        const questionData = await aiParseQuestion(ocrText);
+        
+        if (questionData.error) {
+            content.innerHTML = `
+                <div class="modal-title">❌ 解析失败</div>
+                <div class="card" style="padding:16px;text-align:center;">
+                    <div style="font-size:48px;margin-bottom:12px;">😕</div>
+                    <p style="font-size:14px;color:#666;margin-bottom:16px;">${questionData.error}</p>
+                    <div style="background:#f5f7ff;border-radius:12px;padding:12px;margin-bottom:16px;text-align:left;">
+                        <div style="font-size:12px;color:#666;margin-bottom:4px;">已识别的文字：</div>
+                        <div style="font-size:13px;color:#333;">${ocrText}</div>
+                    </div>
+                    <textarea id="ocr-correct-input" placeholder="请手动输入或修正题目..." style="width:100%;height:80px;padding:12px;border:2px solid #e0e0e0;border-radius:12px;font-size:13px;resize:none;margin-bottom:12px;">${ocrText}</textarea>
+                    <button onclick="aiParseFromText(document.getElementById('ocr-correct-input').value)" style="width:100%;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;">🤖 继续解析</button>
+                </div>
+                <button onclick="closeModal()" style="width:100%;margin-top:8px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+            `;
+            return;
+        }
+        
+        // Step 3: 渲染交互式题目
+        updateProgress('✅ 识别完成！', 100);
+        setTimeout(() => {
+            renderInteractiveQuestion(questionData);
+        }, 300);
+        
+    } catch (e) {
+        console.error('photoToQuestion error:', e);
+        content.innerHTML = `
+            <div class="modal-title">❌ 出错了</div>
+            <div class="card" style="padding:16px;text-align:center;">
+                <div style="font-size:48px;margin-bottom:12px;">😕</div>
+                <p style="font-size:14px;color:#666;margin-bottom:16px;">识别过程中出现错误：${escapeHtml(e.message)}</p>
+                <button onclick="closeModal()" style="width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+            </div>
+        `;
+    }
+}
+
+// 从文本直接解析题目（OCR识别后手动修正用）
+async function aiParseFromText(text) {
+    if (!text || text.trim().length < 5) {
+        showToast('请输入题目内容');
+        return;
+    }
+    
+    const modal = document.getElementById('detail-modal');
+    const content = document.getElementById('detail-content');
+    
+    content.innerHTML = `
+        <div class="modal-title">🤖 正在生成题目...</div>
+        <div class="card" style="padding:24px;text-align:center;">
+            <div class="ai-loading">AI正在分析题目...</div>
+        </div>
+    `;
+    
+    try {
+        const questionData = await aiParseQuestion(text);
+        
+        if (questionData.error) {
+            content.innerHTML = `
+                <div class="modal-title">❌ 解析失败</div>
+                <div class="card" style="padding:16px;text-align:center;">
+                    <p style="font-size:14px;color:#666;">${questionData.error}</p>
+                    <button onclick="closeModal()" style="margin-top:12px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+                </div>
+            `;
+            return;
+        }
+        
+        renderInteractiveQuestion(questionData);
+    } catch (e) {
+        content.innerHTML = `
+            <div class="modal-title">❌ 出错了</div>
+            <div class="card" style="padding:16px;text-align:center;">
+                <p style="font-size:14px;color:#666;">${escapeHtml(e.message)}</p>
+                <button onclick="closeModal()" style="margin-top:12px;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:10px;font-size:14px;cursor:pointer;">关闭</button>
+            </div>
+        `;
+    }
+}
+
+// 处理拍照输入（统一入口）
+function handlePhotoToQuestion(input) {
+    if (!input.files[0]) return;
+    
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        photoToQuestion(imageData);
+        input.value = '';
+    };
+    
+    reader.onerror = function() {
+        showToast('图片读取失败，请重试');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// 记录OCR题目答题结果
+function recordOcrQuestionResult(isCorrect) {
+    const user = getCurrentUserData();
+    if (!user) return;
+    
+    if (!user.ocrPracticeStats) {
+        user.ocrPracticeStats = { total: 0, correct: 0 };
+    }
+    user.ocrPracticeStats.total++;
+    if (isCorrect) {
+        user.ocrPracticeStats.correct++;
+    }
+    saveUserData(user);
+}
+
+// Window exports
+window.photoToQuestion = photoToQuestion;
+window.ocrExtractText = ocrExtractText;
+window.aiParseQuestion = aiParseQuestion;
+window.renderInteractiveQuestion = renderInteractiveQuestion;
+window.submitOcrAnswer = submitOcrAnswer;
+window.selectOcrOption = selectOcrOption;
+window.handlePhotoToQuestion = handlePhotoToQuestion;
+window.showOcrQuestionModal = showOcrQuestionModal;
+window.aiParseFromText = aiParseFromText;
+window.recordOcrQuestionResult = recordOcrQuestionResult;
