@@ -952,6 +952,7 @@ window.recordDeepSeekCall = recordDeepSeekCall;
 window.initDeepSeekUsage = initDeepSeekUsage;
 window.callDeepSeekAPI = callDeepSeekAPI;
 window.callVisionAPI = callVisionAPI;
+window.formatAIResponse = formatAIResponse;
 
 // ============================================================
 // OCR拍照出题模块 - Tesseract.js + DeepSeek
