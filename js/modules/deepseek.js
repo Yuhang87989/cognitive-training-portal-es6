@@ -1,4 +1,12 @@
-// 版本: V144
+// 版本: V146 - DeepSeek模块全功能修复
+
+// V146修复: 添加escapeHtml函数（确保在ui.js加载前可用）
+function escapeHtml(text) {
+    if (typeof text !== 'string') return text;
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 var currentDeepSeekImage = null;
 var deepseekConversationHistory = [];
@@ -581,12 +589,19 @@ async function queryDeepSeekBalance(showToast) {
         const data = await response.json();
         
         // 保存估算余额
+        // V146修复: balance_infos[0]中没有is_available字段，需要从data.is_available获取
         let balanceInfo = { is_available: true, balance_in_use: 0, total_balance: 0 };
         if (data.balance_infos && data.balance_infos.length > 0) {
             balanceInfo = data.balance_infos[0];
+            // V146修复: 如果balanceInfo没有is_available，从data中获取（data.is_available默认true）
+            if (balanceInfo.is_available === undefined) {
+                balanceInfo.is_available = data.is_available !== false;
+            }
         }
         
-        const balance = balanceInfo.is_available ? parseFloat(balanceInfo.total_balance || 0) : 0;
+        // V146修复: 确保total_balance是字符串或数字
+        const totalBalance = balanceInfo.total_balance || '0';
+        const balance = balanceInfo.is_available ? parseFloat(totalBalance) : 0;
         const balanceStr = '¥' + balance.toFixed(2);
         
         // 获取本地存储的调用统计

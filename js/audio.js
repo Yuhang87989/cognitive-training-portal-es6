@@ -1,4 +1,4 @@
-// 版本: V144
+// 版本: V146 - DeepSeek模块全功能修复
 
 const SoundEffects = {
     audioContext: null,
