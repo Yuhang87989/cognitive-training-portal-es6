@@ -1742,7 +1742,7 @@ function updateTodayStats() {
     const user = getCurrentUserData();
     if (!user) return;
     
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0];
     const todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
     
     // 如果不是今天，重置统计
@@ -1869,7 +1869,7 @@ function showDataStatsModal() {
     
     // 计算统计数据
     const totalDays = Object.keys(studyDays).length;
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0];
     const todayStats = user.todayStats || { questions: 0, correct: 0, minutes: 0 };
     const accuracy = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) : 0;
     

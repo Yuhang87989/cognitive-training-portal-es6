@@ -15,7 +15,7 @@ function getTopicsPerPage() {
 
 function renderTopics(container) {
     const currentUser = getCurrentUserData();
-    const userGrade = currentUser ? currentUser.grade : 7;
+    const userGrade = (currentUser && currentUser.grade) ? currentUser.grade : 7;
     
     container.innerHTML = `
         <div class="card">
@@ -60,7 +60,7 @@ function selectTopicsSubject(btn, subject) {
 }
 
 function getTopicsList() {
-    const key = currentTopicsSubject + currentTopicsGrade;
+    const key = (currentTopicsSubject || 'math') + (currentTopicsGrade || 7);
     return typeof topics !== 'undefined' ? (topics[key] || []) : [];
 }
 

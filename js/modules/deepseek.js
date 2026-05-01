@@ -1,4 +1,4 @@
-// 版本: V148 - DeepSeek核心API+图片上传+语音输入彻底修复
+// 版本: V149 - DeepSeek核心API+图片上传+语音输入彻底修复
 // V148-fix: callVisionAPI添加详细日志、图片格式处理、错误处理
 // V148-fix: toggleDeepSeekVoice添加微信浏览器检测
 // V147修复: 添加escapeHtml到window导出，确保全局可用
@@ -478,26 +478,75 @@ async function analyzePhotoWithAI(photoId) {
     }
 }
 
-function handleDeepSeekImage(input) {
+// V149: 统一处理图片/文件上传 - 自动OCR识别文字后发给AI
+async function handleDeepSeekUpload(input, source) {
     if (!input.files[0]) return;
     const file = input.files[0];
-    const reader = new FileReader();
     
-    reader.onload = function(e) {
-        currentDeepSeekImage = e.target.result;
-        
-        // 显示预览
-        const preview = document.getElementById('deepseek-image-preview');
-        const previewImg = document.getElementById('deepseek-preview-img');
-        if (preview && previewImg) {
-            previewImg.src = currentDeepSeekImage;
-            preview.style.display = 'block';
+    // 显示预览
+    const preview = document.getElementById('deepseek-image-preview');
+    const previewImg = document.getElementById('deepseek-preview-img');
+    const previewStatus = document.getElementById('deepseek-preview-status');
+    
+    if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentDeepSeekImage = e.target.result;
+            if (preview && previewImg) {
+                previewImg.src = currentDeepSeekImage;
+                preview.style.display = 'block';
+            }
+            if (previewStatus) previewStatus.textContent = '正在识别文字...';
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // 自动OCR识别并发送
+    showToast('正在识别图片中的文字...');
+    
+    var ocrText = null;
+    
+    // 尝试Tesseract.js OCR
+    if (typeof Tesseract !== 'undefined') {
+        try {
+            var imageDataUrl = currentDeepSeekImage;
+            if (!imageDataUrl && file.type.startsWith('image/')) {
+                // 如果currentDeepSeekImage还没设置（FileReader异步），等待一下
+                await new Promise(function(resolve) { setTimeout(resolve, 500); });
+                imageDataUrl = currentDeepSeekImage;
+            }
+            if (imageDataUrl) {
+                ocrText = await ocrExtractText(imageDataUrl);
+                if (ocrText && ocrText.length < 3) ocrText = null;
+            }
+        } catch(e) {
+            console.warn('OCR识别失败:', e.message);
+            ocrText = null;
         }
-        
-        showToast('图片已添加，输入问题后发送');
-        input.value = '';
-    };
-    reader.readAsDataURL(file);
+    }
+    
+    if (ocrText) {
+        // OCR成功，自动把识别文字填入输入框
+        var dsInput = document.getElementById('deepseek-input');
+        if (dsInput) {
+            dsInput.value = '请帮我分析以下图片中的内容：\n' + ocrText;
+        }
+        if (previewStatus) previewStatus.textContent = '✅ 识别成功，已自动填入';
+        showToast('✅ 文字识别成功，已自动填入输入框');
+        // 自动发送
+        setTimeout(function() { sendToDeepSeek(); }, 300);
+    } else {
+        // OCR失败
+        if (previewStatus) previewStatus.textContent = '⚠️ 识别失败，请手动输入';
+        showToast('⚠️ 图片文字识别失败，请手动输入问题后发送');
+    }
+    
+    input.value = '';
+}
+
+// V149兼容：保留旧函数名
+function handleDeepSeekImage(input) {
+    handleDeepSeekUpload(input, 'image');
 }
 
 function createAIInputHTML(inputId, sendCallback) {
@@ -888,8 +937,8 @@ function renderDeepseek(container) {
             <div class="chat-messages" id="deepseek-messages">
                 <div class="chat-msg"><div class="chat-avatar">🤖</div><div class="chat-bubble">你好！我是DeepSeek AI助手，有什么学习上的问题可以问我哦！你可以：
                     <br>• 文字输入问题
-                    <br>• 点击🎤语音输入
-                    <br>• 点击📷上传图片提问
+                    <br>• 📸拍照/🖼️相册/📎文件上传图片
+                    <br>• 图片会自动识别文字并分析
                 </div></div>
             </div>
             <div class="chat-input-area">
@@ -1001,6 +1050,7 @@ window.analyzeThinkingWithAI = analyzeThinkingWithAI;
 window.analyzePhotoWithAI = analyzePhotoWithAI;
 window.showPhotoPreview = showPhotoPreview;
 window.handleDeepSeekImage = handleDeepSeekImage;
+window.handleDeepSeekUpload = handleDeepSeekUpload;
 window.sendToDeepSeek = sendToDeepSeek;
 window.clearDeepSeekImage = clearDeepSeekImage;
 window.askTemplate = askTemplate;

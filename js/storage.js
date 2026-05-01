@@ -18,7 +18,7 @@ const DEFAULT_USER = {
     wrongNotes: [],
     completedTopics: [],
     studyDays: {},
-    todayStats: { date: new Date().toDateString(), questions: 0, correct: 0, minutes: 0 }
+    todayStats: { date: new Date().toISOString().split('T')[0], questions: 0, correct: 0, minutes: 0 }
 };
 
 function loadData() {
@@ -253,7 +253,7 @@ function syncData() {
 function syncTodayStats() {
     const user = getCurrentUserData();
     if (!user) return;
-    const today = new Date().toDateString();
+    const today = new Date().toISOString().split('T')[0];
     let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
     if (todayStats.date !== today) { 
         todayStats = { date: today, questions: 0, correct: 0, minutes: 0 }; 
