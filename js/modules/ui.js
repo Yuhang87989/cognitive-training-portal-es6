@@ -532,22 +532,14 @@ function doExitSystem() {
         gameArea.innerHTML = "";
     }
     
-    // 9. 重置页面状态 - 显示欢迎页面
+    // 9. 回到首页，保留用户数据
     showPage("home");
     
-    // 重置UI显示
+    // 重置UI显示（用户数据保留，直接显示当前用户信息）
     updateUI();
+    syncTodayStats();
     
-    // 10. 如果是PWA模式，尝试关闭窗口
-    if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
-        setTimeout(function() {
-            try { window.close(); } catch(e) {
-                setTimeout(function() { window.history.go(-999); }, 500);
-            }
-        }, 1000);
-    }
-    
-    console.log("系统已退出到未登录状态");
+    console.log("系统已退出，用户数据已保留");
 }
 
 // 辅助函数：收集并清除所有定时器
