@@ -3,7 +3,15 @@
 let currentTopicsGrade = 7;
 let currentTopicsSubject = 'math';
 let currentTopicsPage = 1;
-const topicsPerPage = 8;
+
+// 动态计算每页题目数量（根据屏幕高度）
+function getTopicsPerPage() {
+    const screenHeight = window.innerHeight || 667;
+    if (screenHeight < 600) return 5;  // 小屏手机
+    if (screenHeight < 800) return 6;  // 普通手机
+    if (screenHeight < 1000) return 8; // 大屏手机/平板
+    return 10; // 电脑/大屏
+}
 
 function renderTopics(container) {
     const currentUser = getCurrentUserData();
@@ -61,6 +69,7 @@ function loadTopicsList() {
     if (!container) return;
     
     const topicsList = getTopicsList();
+    const topicsPerPage = getTopicsPerPage();
     const total = topicsList.length;
     const totalPages = Math.ceil(total / topicsPerPage);
     const start = (currentTopicsPage - 1) * topicsPerPage;
@@ -109,7 +118,7 @@ function prevTopicsPage() {
 
 function nextTopicsPage() {
     const total = getTopicsList().length;
-    const totalPages = Math.ceil(total / topicsPerPage);
+    const totalPages = Math.ceil(total / getTopicsPerPage());
     if (currentTopicsPage < totalPages) {
         currentTopicsPage++;
         loadTopicsList();
