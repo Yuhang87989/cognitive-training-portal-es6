@@ -24,6 +24,34 @@ window.topicsMath5 = [
     {id:122,title:'数的整除',diff:3,q:'在1-100中，既能被3整除又能被5整除的数有？',a:'33,66,99',e:'能被15整除的数'},
     {id:123,title:'最大公因数应用',diff:4,q:'用正方形地砖铺房间，长36dm宽24dm，最小需几块？',a:'6块',e:'36和24的最大公因数是12'},
     {id:124,title:'分数比大小',diff:2,q:'比较大小：3/5 ○ 5/8',a:'3/5 < 5/8',e:'通分后比较'}
+
+    // ===== V144新增题目 =====
+    ,{id:125,title:'小数乘法竖式',diff:2,q:'计算：3.7×2.5=',a:'9.25',e:'按整数乘法计算后点小数点，共三位小数'}
+    ,{id:126,title:'小数除法竖式',diff:3,q:'计算：15.6÷0.24=',a:'65',e:'被除数和除数同时扩大100倍'}
+    ,{id:127,title:'解方程',diff:3,q:'解方程：3x-7=14',a:'x=7',e:'3x=21,x=7'}
+    ,{id:128,title:'列方程解应用',diff:3,q:'水果店卖出苹果x箱，梨比苹果少8箱，梨卖了15箱，求x',a:'x=23',e:'x-8=15,x=23'}
+    ,{id:129,title:'三角形面积',diff:3,q:'底12cm，高8cm的三角形面积是？',a:'48cm²',e:'12×8÷2=48'}
+    ,{id:130,title:'梯形面积',diff:3,q:'上底4cm，下底6cm，高5cm的梯形面积是？',a:'25cm²',e:'(4+6)×5÷2=25'}
+    ,{id:131,title:'组合图形面积',diff:4,q:'长方形长8cm宽6cm，中间挖去一个底4cm高3cm的三角形，剩余面积是？',a:'42cm²',e:'8×6-4×3÷2=48-6=42'}
+    ,{id:132,title:'2/3/5倍数',diff:2,q:'既是2的倍数又是3的倍数的最小三位数是？',a:'102',e:'6的倍数中找最小三位数'}
+    ,{id:133,title:'因数倍数',diff:3,q:'24的全部因数有哪些？',a:'1,2,3,4,6,8,12,24',e:'逐个列举'}
+    ,{id:134,title:'质数合数',diff:3,q:'20以内的质数有几个？分别是？',a:'8个，2,3,5,7,11,13,17,19',e:'只有1和本身两个因数'}
+    ,{id:135,title:'分数意义',diff:2,q:'把3块蛋糕平均分给4个人，每人分到几分之几块？',a:'3/4块',e:'总蛋糕÷人数'}
+    ,{id:136,title:'假分数带分数',diff:3,q:'把8/3化成带分数',a:'2又2/3',e:'8÷3=2余2'}
+    ,{id:137,title:'分数基本性质',diff:3,q:'把2/5的分子扩大3倍，分母应怎样变化才能等于原分数？',a:'分母也扩大3倍',e:'分子分母同乘以3'}
+    ,{id:138,title:'通分约分',diff:3,q:'比较3/8和5/12大小',a:'3/8 < 5/12',e:'通分后为9/24和10/24'}
+    ,{id:139,title:'分数加减法',diff:3,q:'计算：5/6 - 1/4 =',a:'7/12',e:'通分为20/24-6/24=14/24=7/12'}
+    ,{id:140,title:'位置与方向',diff:2,q:'在学校东偏南30度方向上，距离500米的地方是？',a:'书店',e:'根据给定条件判断'}
+    ,{id:141,title:'折线统计图',diff:3,q:'某公司员工2018年50人，2019年65人，2020年60人，2021年80人，增长最多的是？',a:'2021年',e:'计算每年增长：15,-5,20'}
+    ,{id:142,title:'长方体表面积',diff:3,q:'长8cm，宽5cm，高4cm的长方体表面积是？',a:'184cm²',e:'2×(8×5+8×4+5×4)=184'}
+    ,{id:143,title:'正方体体积',diff:3,q:'棱长6cm的正方体体积是？',a:'216cm³',e:'6³=216'}
+    ,{id:144,title:'容积单位',diff:2,q:'5升=多少毫升？',a:'5000毫升',e:'1升=1000毫升'}
+    ,{id:145,title:'容积应用',diff:3,q:'长方体鱼缸长60cm，宽40cm，高50cm，倒入多少升水，水深30cm？',a:'72升',e:'60×40×30÷1000=72'}
+    ,{id:146,title:'打电话问题',diff:4,q:'老师通知5个学生，每个学生再通知其他人，共通知12人至少需要几分钟？',a:'3分钟',e:'2的n次方=12，实际3分钟'}
+    ,{id:147,title:'找次品问题',diff:4,q:'9个零件中有1个次品(轻一些)，至少称几次保证找到？',a:'2次',e:'9→3→1，两次搞定'}
+    ,{id:148,title:'统筹优化',diff:4,q:'洗水壶1分钟，烧水8分钟，洗茶杯2分钟，泡茶1分钟，最少需要几分钟？',a:'9分钟',e:'烧水时同时洗茶杯'}
+    ,{id:149,title:'周期规律',diff:3,q:'1,4,2,8,5,7循环排列，第100个数字是？',a:'7',e:'周期6，100÷6=16余4'}
+    ,{id:150,title:'图形计数',diff:4,q:'每行3个正方形的网格中，共有多少个长方形？',a:'18个',e:'长方形数=C(4,2)×C(3,2)=18'}
 ];
 
 window.topicsEnglish5 = [
@@ -52,6 +80,34 @@ window.topicsEnglish5 = [
     {id:222,title:'一般现在时',diff:2,q:'She ___ breakfast every morning.',a:'eats',e:'第三人称单数用eats'},
     {id:223,title:'方位介词',diff:2,q:'The cat is ___ the table.',a:'under',e:'under表示在下面'},
     {id:224,title:'复数形式',diff:2,q:'How many ___ do you have?',a:'books',e:'book的复数是books'}
+
+    // ===== V144新增题目 =====
+    ,{id:225,title:'一般过去时',diff:2,q:'She ___ (go) to the park yesterday.',a:'went',e:'go的过去式是went'}
+    ,{id:226,title:'过去式规则',diff:2,q:'He ___ (play) football last weekend.',a:'played',e:'动词加ed'}
+    ,{id:227,title:'一般将来时',diff:2,q:'I ___ (visit) my grandparents tomorrow.',a:'will visit',e:'tomorrow用will'}
+    ,{id:228,title:'be going to',diff:2,q:'She ___ (see) a movie tonight.',a:'is going to see',e:'be going to表计划'}
+    ,{id:229,title:'形容词最高级',diff:3,q:'Tom is the ___ (tall) in our class.',a:'tallest',e:'最高级加est，前加the'}
+    ,{id:230,title:'名词所有格',diff:2,q:'___ (Tom) books are on the desk.',a:"Tom's",e:"名词所有格加's"}
+    ,{id:231,title:'介词综合',diff:2,q:'My birthday is ___ June.',a:'in',e:'月份前用in'}
+    ,{id:232,title:'代词综合',diff:2,q:'___ is my teacher. ___ name is Miss Li.',a:'She / Her',e:'主格/所有格'}
+    ,{id:233,title:'be动词用法',diff:1,q:'There ___ two cats on the bed.',a:'are',e:'复数用are'}
+    ,{id:234,title:'祈使句综合',diff:2,q:'___ (not run) in the hallway!',a:"Don't run",e:"否定祈使句用Don't"}
+    ,{id:235,title:'特殊疑问词辨析',diff:2,q:'___ is your favorite color?',a:'What',e:'What问事物'}
+    ,{id:236,title:'阅读理解基础',diff:3,q:'What does the underlined word mean in the passage?',a:'见上下文',e:'根据语境猜测词义'}
+    ,{id:237,title:'日常对话',diff:2,q:'How do you greet your teacher in the morning?',a:'Good morning, teacher!',e:'礼貌问候'}
+    ,{id:238,title:'食物词汇',diff:1,q:'I like ___ (apple).',a:'apples',e:'可数名词用复数'}
+    ,{id:239,title:'动物词汇',diff:1,q:'The ___ (fish) are swimming.',a:'fish',e:'fish单复数同形'}
+    ,{id:240,title:'颜色词汇',diff:1,q:'The sky is ___.',a:'blue',e:'天空是蓝色的'}
+    ,{id:241,title:'天气表达',diff:2,q:"What's the ___ like today?",a:'weather',e:'问天气用weather'}
+    ,{id:242,title:'家庭成员',diff:2,q:"My mother's sister is my ___.",a:'aunt',e:'亲戚称谓'}
+    ,{id:243,title:'身体部位',diff:1,q:'We have two ___ and ten ___ .',a:'eyes, fingers',e:'身体部位词汇'}
+    ,{id:244,title:'节日文化',diff:2,q:'We ___ (eat) mooncakes at Mid-Autumn Festival.',a:'eat',e:'节日习俗'}
+    ,{id:245,title:'时间介词',diff:2,q:"I get up ___ 6 o'clock ___ the morning.",a:'at / in',e:'at+时间点，in+早中晚'}
+    ,{id:246,title:'方位介词',diff:2,q:'The school is ___ the left of the park.',a:'on',e:'on the left在左边'}
+    ,{id:247,title:'数量表达',diff:2,q:'There is a ___ of milk in the fridge.',a:'bottle',e:'量词表达'}
+    ,{id:248,title:'动词第三人称',diff:2,q:'She usually ___ (watch) TV.',a:'watches',e:'第三人称单数加s/es'}
+    ,{id:249,title:'there be综合',diff:3,q:'___ a book and two pens on the desk.',a:'There is',e:'就近原则'}
+    ,{id:250,title:'情态动词should',diff:2,q:'You ___ (should) help your parents.',a:'should',e:'should表示建议'}
 ];
 
 window.topicsChinese5 = [

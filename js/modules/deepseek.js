@@ -179,6 +179,12 @@ async function sendToDeepSeek() {
             deepseekConversationHistory.push({role: 'assistant', content: responseContent});
             // 记录调用
             recordDeepSeekCall(Math.ceil(responseContent.length / 4));
+            // V145修复：增加AI对话计数
+            const dsUser = getCurrentUserData();
+            if (dsUser) {
+                dsUser.aiChatCount = (dsUser.aiChatCount || 0) + 1;
+                saveUserData(dsUser);
+            }
             // 自动朗读AI回复
             speakText(responseContent);
         }

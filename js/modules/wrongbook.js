@@ -1051,6 +1051,8 @@ function submitRetryChoiceAnswer(noteIndex) {
     if (submitBtn) {
         submitBtn.style.display = 'none';
     }
+    // V145修复：记录练习数据
+    if (window.recordPractice) window.recordPractice(1, isCorrect ? 1 : 0, 0.5);
 }
 
 // 提交填空/计算题答案（AI智能批改）
@@ -1145,6 +1147,8 @@ async function submitRetryTextAnswer(noteIndex) {
             showToast('太棒了！回答正确！');
         }
         syncUserData(user);
+        // V145修复：记录练习数据
+        if (window.recordPractice) window.recordPractice(1, isCorrect ? 1 : 0, 0.5);
         
     } catch(error) {
         console.error('AI批改失败:', error);
@@ -1166,6 +1170,8 @@ async function submitRetryTextAnswer(noteIndex) {
             note.reviewed = true;
         }
         syncUserData(user);
+        // V145修复：记录练习数据（catch块也记录）
+        if (window.recordPractice) window.recordPractice(1, isCorrect ? 1 : 0, 0.5);
     }
     
     // 禁用输入框和提交按钮

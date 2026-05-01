@@ -1,4 +1,4 @@
-// 版本: V144
+// 版本: V145
 
 const DEFAULT_USER = {
     id: 'user_default_qiuyufei',
@@ -265,7 +265,7 @@ function syncTodayStats() {
     const correctEl = document.getElementById('today-correct');
     const minutesEl = document.getElementById('today-minutes');
     const streakEl = document.getElementById('today-streak');
-    if (questionsEl) questionsEl.textContent = user.aiChatCount || 0;
+    if (questionsEl) questionsEl.textContent = todayStats.questions || 0;
     if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
     if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
     const studyDays = user.studyDays || {};
@@ -278,6 +278,42 @@ function syncTodayStats() {
     }
     if (streakEl) streakEl.textContent = streak;
 }
+
+// 记录练习数据 - V145修复
+window.recordPractice = function(questionCount, correctCount, minutesSpent) {
+    const user = getCurrentUserData();
+    if (!user) return;
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 初始化数据结构
+    if (!user.todayStats) user.todayStats = { date: today, questions: 0, correct: 0, minutes: 0 };
+    if (!user.stats) user.stats = { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0, lastActiveDate: null };
+    if (!user.studyDays) user.studyDays = {};
+    
+    // 重置今日统计（如果是新的一天）
+    if (user.todayStats.date !== today) {
+        user.todayStats = { date: today, questions: 0, correct: 0, minutes: 0 };
+    }
+    
+    // 更新今日统计
+    user.todayStats.questions += (questionCount || 0);
+    user.todayStats.correct += (correctCount || 0);
+    user.todayStats.minutes += (minutesSpent || 0);
+    
+    // 更新总统计
+    user.stats.totalQuestions += (questionCount || 0);
+    user.stats.correctAnswers += (correctCount || 0);
+    user.stats.totalMinutes += (minutesSpent || 0);
+    user.stats.lastActiveDate = new Date().toISOString();
+    
+    // 更新学习天数
+    user.studyDays[today] = true;
+    
+    // 保存并刷新UI
+    saveUserData(user);
+    if (typeof updateTodayStats === 'function') updateTodayStats();
+    if (typeof syncTodayStats === 'function') syncTodayStats();
+};
 
 function migrateData() {
     const currentData = localStorage.getItem(STORAGE_KEY);

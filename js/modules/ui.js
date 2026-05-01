@@ -1737,13 +1737,27 @@ function updateTodayStats() {
     if (!user) return;
     
     const today = new Date().toDateString();
-    const todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0, streak: 0 };
+    const todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
     
     // 如果不是今天，重置统计
     if (todayStats.date !== today) {
-        todayStats = { date: today, questions: 0, correct: 0, minutes: 0, streak: user.streak || 0 };
+        todayStats = { date: today, questions: 0, correct: 0, minutes: 0 };
         user.todayStats = todayStats;
         syncUserData(user);
+    }
+    
+    // 计算连续学习天数（基于studyDays）
+    const studyDays = user.studyDays || {};
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        if (studyDays[dateStr]) {
+            streak++;
+        } else if (i > 0) {
+            break;
+        }
     }
     
     // 更新显示
@@ -1752,10 +1766,10 @@ function updateTodayStats() {
     const minutesEl = document.getElementById('today-minutes');
     const streakEl = document.getElementById('today-streak');
     
-    if (questionsEl) questionsEl.textContent = todayStats.questions;
+    if (questionsEl) questionsEl.textContent = todayStats.questions || 0;
     if (correctEl) correctEl.textContent = todayStats.questions > 0 ? Math.round(todayStats.correct / todayStats.questions * 100) + '%' : '0%';
-    if (minutesEl) minutesEl.textContent = todayStats.minutes;
-    if (streakEl) streakEl.textContent = todayStats.streak || 0;
+    if (minutesEl) minutesEl.textContent = todayStats.minutes || 0;
+    if (streakEl) streakEl.textContent = streak;
 }
 
 // 应用初始化入口函数

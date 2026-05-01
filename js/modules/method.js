@@ -931,6 +931,8 @@ function rateMethodAnswer(methodId, isCorrect, questionIndex) {
     syncUserData(user);
     updateMethodStats();
     showToast(isCorrect ? '回答正确！' : '已加入错题本，继续加油！');
+    // V145修复：记录练习数据
+    if (window.recordPractice) window.recordPractice(1, isCorrect ? 1 : 0, 1);
 }
 
 // AI分析学霸方法题目
