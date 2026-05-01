@@ -6,12 +6,13 @@ var deepseekConversationHistory = [];
 // deepseekRecognition在audio.js中声明，此处直接使用
 
 
-// 视觉API - 图片理解（支持硅基流动等视觉模型，未配置则优雅降级）
+// 视觉API - 图片理解（优先用独立视觉API，否则回退到DeepSeek多模态）
 async function callVisionAPI(imageDataUrl, question) {
     var visionApiKey = typeof VISION_API_KEY !== 'undefined' ? VISION_API_KEY : '';
     var visionApiUrl = typeof VISION_API_URL !== 'undefined' ? VISION_API_URL : '';
     var visionModel = typeof VISION_MODEL !== 'undefined' ? VISION_MODEL : '';
     
+    // 优先使用独立视觉API
     if (visionApiKey && visionApiUrl) {
         try {
             var messages = [{
@@ -32,6 +33,29 @@ async function callVisionAPI(imageDataUrl, question) {
             }
         } catch(e) { console.warn('Vision API failed:', e.message); }
     }
+    
+    // 回退：使用DeepSeek多模态能力直接发图片
+    if (typeof DEEPSEEK_API_KEY !== 'undefined' && DEEPSEEK_API_KEY) {
+        try {
+            var dsMessages = [{
+                role: 'user',
+                content: [
+                    {type: 'image_url', image_url: {url: imageDataUrl}},
+                    {type: 'text', text: question || '请分析这张图片'}
+                ]
+            }];
+            var dsResponse = await fetch(DEEPSEEK_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + DEEPSEEK_API_KEY},
+                body: JSON.stringify({model: 'deepseek-chat', messages: dsMessages, max_tokens: 1000})
+            });
+            if (dsResponse.ok) {
+                var dsData = await dsResponse.json();
+                if (dsData.choices && dsData.choices[0]) return {success: true, content: dsData.choices[0].message.content};
+            }
+        } catch(e) { console.warn('DeepSeek Vision fallback failed:', e.message); }
+    }
+    
     return {success: false, content: ''};
 }
 
@@ -106,11 +130,11 @@ async function sendToDeepSeek() {
         if (visionResult.success) {
             userContent = '[AI图片分析：' + visionResult.content + ']\n\n' + (msg || '请基于以上图片分析进一步回答');
         } else if (msg) {
-            userContent = msg + '\n（已附上图片，但图片理解API未配置）';
-            showToast('💡 图片分析需配置VISION_API_KEY，已按文字处理');
+            userContent = msg + '\n（图片识别失败，已按文字处理）';
+            showToast('💡 图片识别失败，已按文字处理');
         } else {
             userContent = '请帮我分析这张图片';
-            showToast('⚠️ 请输入文字描述图片内容');
+            showToast('⚠️ 图片识别失败，请输入文字描述');
         }
     } else {
         userContent = msg;

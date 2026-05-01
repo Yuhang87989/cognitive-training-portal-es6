@@ -315,6 +315,7 @@ window.toggleDeepSeekVoice = toggleDeepSeekVoice;
 let voiceInputRecognition = null;
 let currentVoiceInputCallback = null;
 let currentVoiceInputBtn = null;
+let currentVoiceInputId = null; // 当前语音输入的目标inputId
 
 function toggleVoiceInput(btn, inputId) {
     const input = document.getElementById(inputId);
@@ -322,6 +323,10 @@ function toggleVoiceInput(btn, inputId) {
         showToast('输入框未找到');
         return;
     }
+    
+    // 更新当前目标inputId
+    currentVoiceInputId = inputId;
+    currentVoiceInputBtn = btn;
     
     // 检查浏览器支持
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
@@ -339,21 +344,22 @@ function toggleVoiceInput(btn, inputId) {
         
         voiceInputRecognition.onstart = function() {
             isRecording = true;
-            currentVoiceInputBtn = btn;
-            if (btn) btn.textContent = '🔴';
+            if (currentVoiceInputBtn) currentVoiceInputBtn.textContent = '🔴';
             showToast('正在聆听...');
         };
         
         voiceInputRecognition.onresult = function(event) {
             const transcript = event.results[0][0].transcript;
-            // 每次重新获取input，避免闭包引用已失效的DOM
-            const currentInput = document.getElementById(inputId);
-            if (currentInput) {
-                if (currentInput.value && !currentInput.value.endsWith(' ')) {
-                    currentInput.value += ' ';
+            // 用currentVoiceInputId而非闭包捕获的inputId，确保指向最新目标
+            const targetInput = document.getElementById(currentVoiceInputId);
+            if (targetInput) {
+                if (targetInput.value && !targetInput.value.endsWith(' ')) {
+                    targetInput.value += ' ';
                 }
-                currentInput.value += transcript;
-                currentInput.dispatchEvent(new Event('input', { bubbles: true }));
+                targetInput.value += transcript;
+                targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+                // 聚焦输入框，让用户看到文字
+                targetInput.focus();
             }
             if (currentVoiceInputBtn) currentVoiceInputBtn.textContent = '🎤';
             showToast('已识别: ' + transcript);
@@ -362,7 +368,7 @@ function toggleVoiceInput(btn, inputId) {
         voiceInputRecognition.onerror = function(event) {
             console.error('Speech recognition error:', event.error);
             isRecording = false;
-            if (btn) btn.textContent = '🎤';
+            if (currentVoiceInputBtn) currentVoiceInputBtn.textContent = '🎤';
             if (event.error !== 'no-speech' && event.error !== 'aborted') {
                 showToast('语音识别错误: ' + event.error);
             }
@@ -370,15 +376,30 @@ function toggleVoiceInput(btn, inputId) {
         
         voiceInputRecognition.onend = function() {
             isRecording = false;
-            currentVoiceInputBtn = null;
-            if (btn) btn.textContent = '🎤';
+            if (currentVoiceInputBtn) currentVoiceInputBtn.textContent = '🎤';
         };
     }
+    
+    // 每次调用都更新onresult，确保使用最新的currentVoiceInputId
+    voiceInputRecognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const targetInput = document.getElementById(currentVoiceInputId);
+        if (targetInput) {
+            if (targetInput.value && !targetInput.value.endsWith(' ')) {
+                targetInput.value += ' ';
+            }
+            targetInput.value += transcript;
+            targetInput.dispatchEvent(new Event('input', { bubbles: true }));
+            targetInput.focus();
+        }
+        if (currentVoiceInputBtn) currentVoiceInputBtn.textContent = '🎤';
+        showToast('已识别: ' + transcript);
+    };
     
     // 停止之前的 TTS
     stopTTSSpeech();
     
-    if (isRecording && currentVoiceInputBtn === btn) {
+    if (isRecording) {
         // 停止当前录音
         voiceInputRecognition.stop();
         isRecording = false;
