@@ -83,6 +83,8 @@ function quickLogin(userId) {
     if (!user) return;
     data.currentUser = userId;
     saveData(data);
+    
+    // 更新登录页元素
     const displayEl = document.getElementById('selected-user-display');
     const formEl = document.getElementById('login-form-section');
     const diffEl = document.getElementById('login-difficulty');
@@ -93,6 +95,11 @@ function quickLogin(userId) {
     if (diffEl) diffEl.value = user.difficulty || 1;
     if (btn) btn.dataset.userId = userId;
     if (dropdown) dropdown.classList.remove('show');
+    
+    // 刷新主界面UI（如果主界面已加载）
+    if (typeof updateUI === 'function') updateUI();
+    if (typeof syncTodayStats === 'function') syncTodayStats();
+    if (typeof renderUserList === 'function') renderUserList();
 }
 
 function openEditProfileModal() {
@@ -256,6 +263,92 @@ function closeCreateUserModal() { document.getElementById('create-user-modal').c
 
 function closeUserSwitchModal() { document.getElementById('user-switch-modal').classList.remove('show'); }
 
+function showDeleteUserModal() {
+    closeUserMenu();
+    var data = loadData();
+    
+    if (data.users.length === 0) {
+        showToast('暂无用户');
+        return;
+    }
+    
+    if (data.users.length === 1) {
+        showToast('只有一个用户，无法删除');
+        return;
+    }
+    
+    var container = document.getElementById('delete-user-list');
+    if (!container) {
+        showToast('页面加载异常');
+        return;
+    }
+    
+    var colors = ['#667eea', '#FF9A63', '#43E97B'];
+    var htmlContent = '';
+    
+    data.users.forEach(function(u, i) {
+        var isCurrent = u.id === data.currentUser;
+        htmlContent += '<div style="display:flex;align-items:center;gap:8px;padding:12px;background:' + (isCurrent ? '#f0f7ff' : 'white') + ';border-radius:12px;margin-bottom:8px;">';
+        htmlContent += '<div style="background:' + colors[i % 3] + ';color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;">' + u.name.charAt(0) + '</div>';
+        htmlContent += '<div style="flex:1;"><div style="font-weight:600;">' + u.name + (isCurrent ? ' (当前用户)' : '') + '</div>';
+        htmlContent += '<div style="font-size:12px;color:#999;">' + gradeNames[u.grade] + ' · Lv.' + u.difficulty + '</div></div>';
+        if (!isCurrent) {
+            htmlContent += '<button onclick="confirmDeleteUser(\'' + u.id + '\')" style="padding:6px 12px;background:#ff6b6b;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>';
+        } else {
+            htmlContent += '<span style="font-size:12px;color:#999;">不可删除</span>';
+        }
+        htmlContent += '</div>';
+    });
+    
+    container.innerHTML = htmlContent;
+    document.getElementById('delete-user-modal').classList.add('show');
+}
+
+function closeDeleteUserModal() { 
+    document.getElementById('delete-user-modal').classList.remove('show'); 
+}
+
+function confirmDeleteUser(userId) {
+    if (!confirm('确定要删除此用户吗？此操作不可恢复！')) return;
+    
+    var data = loadData();
+    var userIndex = data.users.findIndex(function(u) { return u.id === userId; });
+    
+    if (userIndex === -1) {
+        showToast('用户不存在');
+        return;
+    }
+    
+    var userName = data.users[userIndex].name;
+    data.users.splice(userIndex, 1);
+    
+    // 如果删除的是当前用户，切换到第一个用户
+    if (data.currentUser === userId) {
+        if (data.users.length > 0) {
+            data.currentUser = data.users[0].id;
+        } else {
+            data.currentUser = null;
+        }
+    }
+    
+    saveData(data);
+    
+    // 刷新UI
+    updateUI();
+    syncTodayStats();
+    renderUserList();
+    
+    // 如果只剩一个用户，关闭模态框
+    if (data.users.length <= 1) {
+        closeDeleteUserModal();
+        showToast('已删除用户: ' + userName);
+    } else {
+        // 刷新删除用户列表
+        showDeleteUserModal();
+        showToast('已删除用户: ' + userName);
+    }
+}
+
 function setDifficulty(level) {
     const userData = getCurrentUserData();
     if (userData) {
@@ -414,9 +507,12 @@ function openChangePasswordModal() {
 // Window exports for onclick handlers
 window.closeChangePasswordModal = closeChangePasswordModal;
 window.closeCreateUserModal = closeCreateUserModal;
+window.closeDeleteUserModal = closeDeleteUserModal;
 window.closeDifficultyModal = closeDifficultyModal;
 window.closeEditProfileModal = closeEditProfileModal;
+window.closeUserMenu = closeUserMenu; // 从ui.js导入
 window.closeUserSwitchModal = closeUserSwitchModal;
+window.confirmDeleteUser = confirmDeleteUser;
 window.createNewUser = createNewUser;
 window.openApiConfigModal = openApiConfigModal;
 window.openAvatarModal = openAvatarModal;
@@ -426,6 +522,7 @@ window.openEditProfileModal = openEditProfileModal;
 window.savePasswordChanges = savePasswordChanges;
 window.saveProfileChanges = saveProfileChanges;
 window.showCreateUserModal = showCreateUserModal;
+window.showDeleteUserModal = showDeleteUserModal;
 window.showUserSwitchModal = showUserSwitchModal;
 window.toggleUserMenu = toggleUserMenu;
 window.selectAvatar = selectAvatar;
