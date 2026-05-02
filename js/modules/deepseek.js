@@ -129,6 +129,17 @@ async function callDeepSeekAPI(messages, temperature) {
     }
 }
 
+// V151-2: 语音按钮点击 → 提示用键盘语音输入
+function tipKeyboardVoice() {
+    var input = document.getElementById('deepseek-input');
+    if (input) {
+        input.focus();
+        input.setAttribute('placeholder', '点击输入框后，用键盘🎤语音输入...');
+    }
+    showToast('🎤 请点击输入框，使用键盘上的语音按钮说话', 4000);
+}
+window.tipKeyboardVoice = tipKeyboardVoice;
+
 async function sendToDeepSeek() {
     const input = document.getElementById('deepseek-input');
     if (!input) return;
@@ -922,9 +933,8 @@ function clearDeepSeekImage() {
 }
 
 function renderDeepseek(container) {
-    // 检查浏览器是否支持语音识别
-    const supportsSpeechRecognition = ('webkitSpeechRecognition' in window) || ('SpeechRecognition' in window);
-    const voiceBtn = supportsSpeechRecognition ? '<button class="chat-voice-btn" id="deepseek-voice-btn" onclick="toggleDeepSeekVoice()" title="语音输入">🎤</button>' : '';
+    // V151-2: 语音按钮改为提示用键盘语音输入（国内SpeechRecognition不可用）
+    const voiceBtn = '<button class="chat-voice-btn" id="deepseek-voice-btn" onclick="tipKeyboardVoice()" title="语音输入">🎤</button>';
     
     // 获取用户上传的图片
     const user = getCurrentUserData() || {};
