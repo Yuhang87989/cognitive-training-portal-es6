@@ -856,33 +856,12 @@ function updateUI() {
     if (dropInfoEl) dropInfoEl.textContent = gradeNames[user.grade] + ' · Lv.' + user.difficulty;
     
     // 更新首页推荐卡片
-    updateRecommendCard();
 }
 
 // 更新首页推荐卡片 - 从播客课程中随机选取
 function updateRecommendCard() {
-    var titleEl = document.getElementById('recommend-title');
-    var subtitleEl = document.getElementById('recommend-subtitle');
-    var iconEl = document.getElementById('home-recommend-card');
-    
-    if (!titleEl || !subtitleEl) return;
-    
-    // 如果播客课程已加载，随机选取一个
-    if (typeof podcastCourses !== 'undefined' && podcastCourses.length > 0) {
-        var randomIndex = Math.floor(Math.random() * podcastCourses.length);
-        var course = podcastCourses[randomIndex];
-        titleEl.textContent = '🎧 ' + course.title;
-        subtitleEl.textContent = course.teacher + ' · ' + course.duration;
-        
-        // 如果有图标元素，更新图标
-        if (iconEl) {
-            var iconContainer = iconEl.querySelector('div:first-child');
-            if (iconContainer && course.icon) {
-                iconContainer.innerHTML = course.icon;
-                iconContainer.style.background = course.gradient;
-            }
-        }
-    }
+    // V151: 推荐卡片已禁用
+    return;
 }
 
 function toggleSettingsGroup(groupId) {
@@ -982,133 +961,6 @@ function renderSlide() {
     });
 }
 
-function loadTopicsList() {
-    const container = document.getElementById('topics-list-container');
-    if (!container) return;
-    
-    const topicsList = getTopicsList();
-    const total = topicsList.length;
-    const totalPages = Math.ceil(total / topicsPerPage);
-    const start = (currentTopicsPage - 1) * topicsPerPage;
-    const end = Math.min(start + topicsPerPage, total);
-    const pageTopics = topicsList.slice(start, end);
-    
-    if (total === 0) {
-        container.innerHTML = '<div class="card"><div style="text-align:center;padding:30px;color:#999;">暂无该科目题目</div></div>';
-        return;
-    }
-    
-    const gradients = ['gradient-blue', 'gradient-orange', 'gradient-green', 'gradient-purple', 'gradient-pink', 'gradient-cyan'];
-    
-    container.innerHTML = `
-        <div class="card" style="margin-bottom:12px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-                <span style="font-size:13px;color:#666;">共 ${total} 道母题</span>
-                <span style="font-size:12px;color:#999;">第 ${currentTopicsPage}/${totalPages} 页</span>
-            </div>
-        </div>
-        ${pageTopics.map((t, i) => `
-            <div class="topic-card" onclick="openTopicQuestion(${t.id})">
-                <div class="topic-header ${gradients[i % gradients.length]}">
-                    <div class="topic-title">${t.title}</div>
-                    <div class="topic-subtitle">难度: ${'⭐'.repeat(t.diff || 2)}</div>
-                </div>
-                <div class="topic-footer">
-                    <span class="topic-difficulty">ID: ${t.id}</span>
-                    <span style="color:#3377FF;">开始练习 →</span>
-                </div>
-            </div>
-        `).join('')}
-        <div style="display:flex;gap:12px;padding:12px;">
-            <button class="game-btn btn-orange" style="flex:1;" onclick="prevTopicsPage()" ${currentTopicsPage <= 1 ? 'disabled style="opacity:0.5;"' : ''}>上一页</button>
-            <button class="game-btn btn-blue" style="flex:1;" onclick="nextTopicsPage()" ${currentTopicsPage >= totalPages ? 'disabled style="opacity:0.5;"' : ''}>下一页</button>
-        </div>
-    `;
-}
-
-function nextTopicsPage() {
-    const total = getTopicsList().length;
-    const totalPages = Math.ceil(total / topicsPerPage);
-    if (currentTopicsPage < totalPages) {
-        currentTopicsPage++;
-        loadTopicsList();
-    }
-}
-
-function prevTopicsPage() {
-    if (currentTopicsPage > 1) {
-        currentTopicsPage--;
-        loadTopicsList();
-    }
-}
-
-function findTopic(topicId) {
-    for (let key in topics) {
-        const found = topics[key].find(t => t.id === topicId);
-        if (found) return found;
-    }
-    return null;
-}
-
-function filterMethod(category, btn) {
-    document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // 可以根据需要筛选显示
-}
-
-function filterPodcast(category, btn) {
-    document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    // 使用全局podcastCourses数组
-    const podcasts = podcastCourses;
-    const filtered = category === 'all' ? podcasts : podcasts.filter(p => p.category === category);
-    const list = document.getElementById('podcast-list');
-    
-    if (list) {
-        list.innerHTML = filtered.map(p => `
-            <div class="podcast-item" onclick="playPodcastCourse('${p.id}')">
-                <div class="podcast-thumb" style="background:${p.gradient};">${p.icon}</div>
-                <div class="podcast-info">${p.title}<div class="podcast-meta">${p.teacher} · ${p.duration} · ${p.category}</div></div>
-                <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;" onclick="event.stopPropagation();">
-                    ${p.shareUrl ? `<a href="${p.shareUrl}" target="_blank" style="font-size:11px;color:#3377FF;text-decoration:none;">🔗</a>` : ''}
-                    <label style="cursor:pointer;font-size:11px;color:#4CAF50;">📤<input type="file" accept="audio/mp3,audio/mpeg,.mp3" style="display:none;" onchange="uploadPodcastFile('${p.id}', this)"></label>
-                    <button onclick="downloadPodcastFromCoze('${p.id}')" style="font-size:11px;color:#FF6B6B;background:none;border:none;cursor:pointer;padding:0;">⬇️</button>
-                </div>
-            </div>
-        `).join('');
-    }
-}
-
-function showTopicDetail(id) { openTopicQuestion(id); }
-
-function selectGrade(btn, grade) {
-    document.querySelectorAll('.grade-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    showToast('已切换到' + (grade === 7 ? '初一' : grade === 8 ? '初二' : '初三') + '教材');
-}
-
-function selectSubject(btn, subject) {
-    document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    showToast('已切换到' + subject);
-}
-
-function selectTopicsGrade(btn, grade) {
-    document.querySelectorAll('.grade-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentTopicsGrade = grade;
-    currentTopicsPage = 1;
-    loadTopicsList();
-}
-
-function selectTopicsSubject(btn, subject) {
-    document.querySelectorAll('.subject-tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentTopicsSubject = subject;
-    currentTopicsPage = 1;
-    loadTopicsList();
-}
 
 function selectThinkingOpt(el, selectedIdx, questionIdx) {
     const parent = el.parentElement;
