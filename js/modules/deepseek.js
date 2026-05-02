@@ -1,4 +1,4 @@
-// 版本: V149 - DeepSeek核心API+图片上传+语音输入彻底修复
+// 版本: V151
 // V148-fix: callVisionAPI添加详细日志、图片格式处理、错误处理
 // V148-fix: toggleDeepSeekVoice添加微信浏览器检测
 // V147修复: 添加escapeHtml到window导出，确保全局可用

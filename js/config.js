@@ -1,4 +1,4 @@
-// 版本: V144
+// 版本: V151
 // 包含API配置、存储键名等全局常量
 
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';

@@ -1,4 +1,4 @@
-// 版本: V144 - 思维训练模块（从V144完整重建）
+// 版本: V151
 
 function renderThinking(container) {
     const user = getCurrentUserData();

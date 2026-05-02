@@ -1,4 +1,4 @@
-// 版本: V144
+// 版本: V151
 
 window.methodTrainingQuestions = {
     // 费曼学习法 - 用简单语言解释复杂概念
