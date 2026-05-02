@@ -225,6 +225,13 @@ function podcastPlay(podcast) {
                 }
             });
         }
+        
+        // 音频加载错误处理
+        audio.onerror = function() {
+            podcastPlayerState.isPlaying = false;
+            updatePodcastUI();
+            showToast('音频加载失败，请稍后重试');
+        };
     } else if (!podcast.url) {
         if (typeof showToast === 'function') {
             showToast('该播客暂无音频');
