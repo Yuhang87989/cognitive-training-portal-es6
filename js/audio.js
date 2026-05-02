@@ -249,12 +249,19 @@ function toggleDeepSeekVoice() {
     
     if (hasSpeechRecognition) {
         // 方案1：使用浏览器原生语音识别
-        if (!deepseekRecognition) {
-            var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            deepseekRecognition = new SpeechRecognition();
-            deepseekRecognition.lang = 'zh-CN';
-            deepseekRecognition.continuous = false;
-            deepseekRecognition.interimResults = false;
+        try {
+            if (!deepseekRecognition) {
+                var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                deepseekRecognition = new SpeechRecognition();
+                deepseekRecognition.lang = 'zh-CN';
+                deepseekRecognition.continuous = false;
+                deepseekRecognition.interimResults = false;
+            }
+        } catch(initErr) {
+            console.warn('SpeechRecognition初始化失败:', initErr);
+            showToast('🎤 语音识别初始化失败，请用键盘输入');
+            input.focus();
+            return;
         }
         
         // 每次点击都更新回调，确保获取最新DOM
