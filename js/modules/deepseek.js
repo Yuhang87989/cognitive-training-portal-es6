@@ -946,26 +946,35 @@ function renderDeepseek(container) {
             </div>
             <div class="chat-input-area">
                 ${voiceBtn}
-                <button class="chat-voice-btn" id="deepseek-image-btn" onclick="document.getElementById('deepseek-image-input').click()" title="上传图片">📷</button>
-                <input type="file" id="deepseek-image-input" accept="image/*" style="display:none" onchange="handleDeepSeekImage(this)"/>
+                <input type="file" id="ds-camera-input" accept="image/*" capture="environment" style="display:none" onchange="handleDeepSeekUpload(this,'camera')"/>
+                <input type="file" id="ds-album-input" accept="image/*" style="display:none" onchange="handleDeepSeekUpload(this,'album')"/>
+                <input type="file" id="ds-file-input" accept="image/*,.txt" style="display:none" onchange="handleDeepSeekUpload(this,'file')"/>
                 <input type="text" class="chat-input" id="deepseek-input" placeholder="输入问题..." onkeypress="if(event.key==='Enter')sendToDeepSeek()"/>
                 <button class="chat-send" onclick="sendToDeepSeek()">发送</button>
             </div>
+            <div style="display:flex;gap:6px;padding:4px 0;">
+                <button onclick="document.getElementById('ds-camera-input').click()" style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:#f0f4ff;border:none;border-radius:8px;font-size:12px;color:#667eea;cursor:pointer;">📸 拍照</button>
+                <button onclick="document.getElementById('ds-album-input').click()" style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:#f0f4ff;border:none;border-radius:8px;font-size:12px;color:#667eea;cursor:pointer;">🖼️ 相册</button>
+                <button onclick="document.getElementById('ds-file-input').click()" style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:#f0f4ff;border:none;border-radius:8px;font-size:12px;color:#667eea;cursor:pointer;">📎 文件</button>
+            </div>
+            <div style="text-align:center;font-size:11px;color:#999;">上传图片自动识别文字</div>
         </div>
+        
         <div id="deepseek-image-preview" style="display:none;padding:12px;background:#f5f7ff;border-radius:12px;margin-top:8px;">
             <div style="display:flex;align-items:center;gap:8px;">
                 <img id="deepseek-preview-img" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"/>
-                <span style="font-size:12px;color:#666;">图片已准备好</span>
+                <span id="deepseek-preview-status" style="font-size:12px;color:#666;">图片已准备好</span>
                 <button onclick="clearDeepSeekImage()" style="margin-left:auto;background:#ff6b6b;color:white;border:none;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">移除</button>
             </div>
         </div>
+        
         <div class="template-btns" style="margin-top:12px;">
             <button class="template-btn" onclick="askTemplate('帮我解释一下勾股定理')">勾股定理</button>
             <button class="template-btn" onclick="askTemplate('英语语法怎么学')">英语语法</button>
             <button class="template-btn" onclick="askTemplate('提高记忆力的方法')">记忆方法</button>
         </div>
     `;
-    
+
     // 进入模块时自动检查余额
     setTimeout(function() { refreshDeepSeekBalance(); }, 300);
 }
