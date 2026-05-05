@@ -2,11 +2,11 @@
 
 window.videoCourses = [
     {id:"video0",title:"🐻 小熊掉苹果",teacher:"测试视频",duration:"0:10",durationSec:10,category:"测试",gradient:"linear-gradient(135deg,#f5af19,#f12711)",icon:"🐻",url:"https://www.w3schools.com/html/mov_bbb.mp4",views:9999,isTest:true},
-    {id:"video1",title:"专注力训练",teacher:"认知训练",duration:"5:23",durationSec:323,category:"学习方法",gradient:"linear-gradient(135deg,#667eea,#764ba2)",icon:"🎯",url:"https://cdn.jsdelivr.net/gh/Yuhang87989/cognitive-training-portal@main/videos/%E4%B8%93%E6%B3%A8%E5%8A%9B%E8%AE%AD%E7%BB%83.mp4",views:5680},
-    {id:"video2",title:"学霸深度理解法",teacher:"认知训练",duration:"6:18",durationSec:378,category:"学习方法",gradient:"linear-gradient(135deg,#f093fb,#f5576c)",icon:"📚",url:"https://cdn.jsdelivr.net/gh/Yuhang87989/cognitive-training-portal@main/videos/%E5%AD%A6%E9%9C%B8%E6%B7%B1%E5%BA%A6%E7%90%86%E8%A7%A3%E6%B3%95_%E7%AC%AC1%E9%9B%86.mp4",views:4320},
-    {id:"video3",title:"数学抽象推理",teacher:"认知训练",duration:"5:06",durationSec:306,category:"数学",gradient:"linear-gradient(135deg,#4facfe,#00f2fe)",icon:"🔢",url:"https://cdn.jsdelivr.net/gh/Yuhang87989/cognitive-training-portal@main/videos/%E6%95%B0%E5%AD%A6%E6%8A%BD%E8%B1%A1%E6%8E%A8%E7%90%86.mp4",views:3890},
-    {id:"video4",title:"物理因果守恒",teacher:"认知训练",duration:"5:41",durationSec:341,category:"物理",gradient:"linear-gradient(135deg,#43e97b,#38f9d7)",icon:"⚡",url:"https://cdn.jsdelivr.net/gh/Yuhang87989/cognitive-training-portal@main/videos/%E7%89%A9%E7%90%86%E5%9B%A0%E6%9E%9C%E5%AE%88%E6%81%92_%E7%AC%AC1%E9%9B%86.mp4",views:2950},
-    {id:"video5",title:"逆向思维训练",teacher:"认知训练",duration:"3:27",durationSec:207,category:"思维训练",gradient:"linear-gradient(135deg,#fa709a,#fee140)",icon:"🧩",url:"https://cdn.jsdelivr.net/gh/Yuhang87989/cognitive-training-portal@main/videos/%E9%80%86%E5%90%91%E6%80%9D%E7%BB%B4%E8%AE%AD%E7%BB%83_%E7%AC%AC1%E9%9B%86.mp4",views:2150}
+    {id:"video1",title:"专注力训练",teacher:"认知训练",duration:"5:23",durationSec:323,category:"学习方法",gradient:"linear-gradient(135deg,#667eea,#764ba2)",icon:"🎯",url:"videos/专注力训练.mp4",views:5680},
+    {id:"video2",title:"学霸深度理解法",teacher:"认知训练",duration:"6:18",durationSec:378,category:"学习方法",gradient:"linear-gradient(135deg,#f093fb,#f5576c)",icon:"📚",url:"videos/学霸深度理解法_第1集.mp4",views:4320},
+    {id:"video3",title:"数学抽象推理",teacher:"认知训练",duration:"5:06",durationSec:306,category:"数学",gradient:"linear-gradient(135deg,#4facfe,#00f2fe)",icon:"🔢",url:"videos/数学抽象推理.mp4",views:3890},
+    {id:"video4",title:"物理因果守恒",teacher:"认知训练",duration:"5:41",durationSec:341,category:"物理",gradient:"linear-gradient(135deg,#43e97b,#38f9d7)",icon:"⚡",url:"videos/物理因果守恒_第1集.mp4",views:2950},
+    {id:"video5",title:"逆向思维训练",teacher:"认知训练",duration:"3:27",durationSec:207,category:"思维训练",gradient:"linear-gradient(135deg,#fa709a,#fee140)",icon:"🧩",url:"videos/逆向思维训练_第1集.mp4",views:2150}
 ];
 
 CTM.registerModule('video', {
