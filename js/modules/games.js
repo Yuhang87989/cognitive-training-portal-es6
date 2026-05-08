@@ -116,7 +116,7 @@ function startSchulte() {
     const board = document.getElementById('game-board');
     board.className = 'game-board size-'+size; 
     board.style.display = 'grid';
-    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:white;font-size:${28-size*2}px;font-weight:bold;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;">${n}</div>`).join('');
+    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-size:${30-size*2}px;font-weight:bold;cursor:pointer;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:55px;box-shadow:0 2px 8px rgba(102,126,234,0.3);">${n}</div>`).join('');
     schulteNext = 1; 
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
@@ -1102,7 +1102,7 @@ function startVisual() {
     const colors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFD93D'];
     const targetColor = colors[Math.floor(Math.random()*colors.length)];
     const baseColor = colors.filter(c=>c!==targetColor)[Math.floor(Math.random()*4)];
-    board.innerHTML = Array.from({length:16},(_,i)=>`<div class="game-cell" onclick="checkVisual(this,${i},${targetIdx},'${targetColor}')" style="background:${i===targetIdx?targetColor:baseColor};border-radius:8px;cursor:pointer;"></div>`).join('');
+    board.innerHTML = Array.from({length:16},(_,i)=>'<div class="game-cell" onclick="checkVisual(this,'+i+','+targetIdx+',\''+targetColor+'\')" style="background:'+(i===targetIdx?targetColor:baseColor)+';border-radius:10px;cursor:pointer;min-height:50px;box-shadow:0 2px 6px rgba(0,0,0,0.12);"></div>').join('');
     gameScore = 0; document.getElementById('game-score').textContent = '0';
 }
 
@@ -5330,7 +5330,7 @@ function startSchulte() {
     const board = document.getElementById('game-board');
     board.className = 'game-board size-'+size; 
     board.style.display = 'grid';
-    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:white;font-size:${28-size*2}px;font-weight:bold;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;">${n}</div>`).join('');
+    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-size:${30-size*2}px;font-weight:bold;cursor:pointer;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:55px;box-shadow:0 2px 8px rgba(102,126,234,0.3);">${n}</div>`).join('');
     schulteNext = 1; 
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
@@ -5935,7 +5935,7 @@ function startVisual() {
     const colors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFD93D'];
     const targetColor = colors[Math.floor(Math.random()*colors.length)];
     const baseColor = colors.filter(c=>c!==targetColor)[Math.floor(Math.random()*4)];
-    board.innerHTML = Array.from({length:16},(_,i)=>`<div class="game-cell" onclick="checkVisual(this,${i},${targetIdx},'${targetColor}')" style="background:${i===targetIdx?targetColor:baseColor};border-radius:8px;cursor:pointer;"></div>`).join('');
+    board.innerHTML = Array.from({length:16},(_,i)=>'<div class="game-cell" onclick="checkVisual(this,'+i+','+targetIdx+',\''+targetColor+'\')" style="background:'+(i===targetIdx?targetColor:baseColor)+';border-radius:10px;cursor:pointer;min-height:50px;box-shadow:0 2px 6px rgba(0,0,0,0.12);"></div>').join('');
     gameScore = 0; document.getElementById('game-score').textContent = '0';
 }
 

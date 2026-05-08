@@ -699,44 +699,30 @@ if('serviceWorker' in navigator){
 (function() {
     // 加载顺序必须与ui.js中的loadOrder一致
     const loadOrder = ['js/config.js', 'js/ctm.js', 'js/audio.js', 'js/storage.js', 'js/utils.js', 'js/user.js', 'js/data/week-plans.js', 'js/data/topics.js', 'js/data/podcasts.js', 'js/data/videos.js', 'js/data/games-config.js', 'js/modules/practice.js', 'js/modules/map.js', 'js/modules/plan.js', 'js/modules/topics.js', 'js/modules/method.js', 'js/modules/thinking.js', 'js/modules/podcast.js', 'js/modules/video.js', 'js/modules/player.js', 'js/modules/games.js', 'js/modules/ai.js', 'js/modules/deepseek.js', 'js/modules/wrongbook.js', 'js/modules/pomodoro.js', 'js/modules/ui.js'];
-    let loaded = 0;
-    function loadNext() {
-        if (loaded >= loadOrder.length) {
-            // All modules loaded, initialize app
-            if (typeof initPortal === 'function') {
-                initPortal();
-            }
-            // 初始化视频播放器
+    // 并行加载所有JS文件，大幅提升页面加载速度
+    const v = window.__APP_VERSION || Date.now();
+    let pending = loadOrder.length;
+    function onScriptLoaded() {
+        pending--;
+        if (pending <= 0) {
+            if (typeof initPortal === 'function') initPortal();
             setTimeout(function() {
                 if (typeof initEnhancedVideoPlayer === 'function' && window.videoCtx && !window.videoCtx.isInitialized) {
                     initEnhancedVideoPlayer();
-                    console.log('视频播放器已初始化');
                 }
             }, 50);
-            // Register Service Worker
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').then(function(reg) {
-                    console.log('SW registered:', reg);
-                }).catch(function(err) {
-                    console.log('SW registration failed:', err);
-                });
+                navigator.serviceWorker.register('./sw.js').catch(function(err) {});
             }
-            return;
         }
+    }
+    loadOrder.forEach(function(src) {
         const script = document.createElement('script');
-        script.src = loadOrder[loaded++] + '?v=20260502v151';
-        script.onload = loadNext;
-        script.onerror = function() {
-            console.warn('Failed to load:', script.src);
-            loadNext();
-        };
+        script.src = src + '?v=' + v;
+        script.onload = onScriptLoaded;
+        script.onerror = function() { console.warn('Failed to load:', src); onScriptLoaded(); };
         document.head.appendChild(script);
-    }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadNext);
-    } else {
-        loadNext();
-    }
+    });
 })();
 </script>
 <div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
