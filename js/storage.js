@@ -1,4 +1,4 @@
-// 版本: V151
+// 版本: V152
 
 const DEFAULT_USER = {
     id: 'user_default_qiuyufei',
@@ -23,6 +23,10 @@ const DEFAULT_USER = {
 
 function loadData() {
     try {
+        // 尝试从IndexedDB迁移（异步，首次可能还没完成）
+        if (window.DB) {
+            try { DB.checkAndMigrate(); } catch(e) {}
+        }
         // 尝试迁移旧数据
         migrateData();
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -78,6 +82,15 @@ function saveData(data) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch(e) {}
+    // IndexedDB双写
+    if (window.DB && data && data.users) {
+        try {
+            DB.saveAllUsers(data.users);
+            if (data.currentUser) DB.saveSetting('currentUser', data.currentUser);
+        } catch(e) {
+            console.warn('[Storage] IndexedDB写入失败:', e);
+        }
+    }
 }
 
 // 保存单个用户数据（更新到localStorage）
@@ -190,13 +203,26 @@ function confirmClearAllData() {
 
 function clearAllData() {
     if (!confirm('⚠️ 确定要清除所有数据吗？')) return;
-    localStorage.removeItem(STORAGE_KEY); location.reload();
+    localStorage.removeItem(STORAGE_KEY);
+    // IndexedDB清理
+    if (window.DB) {
+        try { DB.clearAll(); } catch(e) {
+            console.warn('[Storage] IndexedDB清理失败:', e);
+        }
+    }
+    location.reload();
 }
 
 function syncUserData(user) {
     const data = loadData();
     const idx = data.users.findIndex(u => u.id === user.id);
     if (idx >= 0) { data.users[idx] = user; saveData(data); }
+    // IndexedDB同步
+    if (window.DB) {
+        try { DB.saveUser(user); } catch(e) {
+            console.warn('[Storage] IndexedDB同步失败:', e);
+        }
+    }
 }
 
 function syncData() {

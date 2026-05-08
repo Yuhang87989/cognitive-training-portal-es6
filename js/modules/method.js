@@ -1007,3 +1007,71 @@ window.analyzeMethodWithAI = analyzeMethodWithAI;
 window.conserveAnswer = conserveAnswer;
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
+
+// 拍照出题：OCR识别图片文字 + AI生成题目
+async function photoToQuestion(imageData) {
+    var modal = document.getElementById('modal');
+    var content = document.getElementById('modal-content');
+    if (!modal || !content) return;
+    
+    content.innerHTML = '<div class="modal-title">📷 拍照出题</div>' +
+        '<div style="text-align:center;padding:20px;">' +
+            '<img src="' + imageData + '" style="max-width:200px;max-height:150px;border-radius:8px;margin-bottom:12px;"/>' +
+            '<div id="photo-ocr-status" style="font-size:13px;color:#666;">🔍 正在识别图片文字...</div>' +
+        '</div>';
+    modal.classList.add('show');
+    
+    try {
+        var ocrText = '';
+        if (typeof Tesseract !== 'undefined') {
+            var result = await Tesseract.recognize(imageData, 'chi_sim+eng', {});
+            ocrText = result.data.text.trim();
+        }
+        
+        if (!ocrText) {
+            document.getElementById('photo-ocr-status').innerHTML = '<span style="color:#ff6b6b;">❌ 未识别到文字，请重新拍照</span>';
+            return;
+        }
+        
+        document.getElementById('photo-ocr-status').innerHTML = '<span style="color:#43a047;">✅ 识别成功，正在生成题目...</span><br><div style="font-size:11px;color:#999;margin-top:4px;text-align:left;max-height:60px;overflow-y:auto;">' + ocrText.substring(0,300) + '</div>';
+        
+        // 用DeepSeek根据识别文字出题
+        var messages = [
+            {role: 'system', content: '你是一位专业的中学教师。根据学生上传的图片文字内容，出3道相关的练习题。每题包含题目、4个选项和正确答案。格式：\n1. 题目\nA. 选项A B. 选项B C. 选项C D. 选项D\n答案：X\n'},
+            {role: 'user', content: '图片中识别到的文字内容：\n' + ocrText + '\n\n请根据这些内容出3道选择题。'}
+        ];
+        
+        var dsResult = await callDeepSeekAPI(messages);
+        
+        if (dsResult.error) {
+            document.getElementById('photo-ocr-status').innerHTML = '<span style="color:#ff6b6b;">❌ AI出题失败: ' + (dsResult.message || '未知错误') + '</span>';
+            return;
+        }
+        
+        content.innerHTML = '<div class="modal-title">📷 拍照出题结果</div>' +
+            '<div style="padding:10px;font-size:13px;line-height:1.8;max-height:400px;overflow-y:auto;">' +
+                formatAIResponse(dsResult.content) +
+            '</div>' +
+            '<button onclick="closeModal()" class="login-btn login-btn-secondary" style="margin-top:8px;">关闭</button>';
+        
+    } catch(e) {
+        if (document.getElementById('photo-ocr-status')) {
+            document.getElementById('photo-ocr-status').innerHTML = '<span style="color:#ff6b6b;">❌ 识别失败: ' + e.message + '</span>';
+        }
+    }
+}
+window.photoToQuestion = photoToQuestion;
+
+function showGameOver(score, total) {
+    var modal = document.getElementById('modal');
+    var content = document.getElementById('modal-content');
+    if (!modal || !content) return;
+    content.innerHTML = '<div class="modal-title">🎮 游戏结束</div>' +
+        '<div style="text-align:center;padding:20px;">' +
+            '<div style="font-size:36px;font-weight:bold;color:#667eea;">' + score + ' / ' + total + '</div>' +
+            '<div style="font-size:14px;color:#666;margin-top:8px;">正确率: ' + (total > 0 ? Math.round(score/total*100) : 0) + '%</div>' +
+        '</div>' +
+        '<button onclick="closeModal()" class="login-btn login-btn-primary">确定</button>';
+    modal.classList.add('show');
+}
+window.showGameOver = showGameOver;

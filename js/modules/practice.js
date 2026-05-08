@@ -141,7 +141,7 @@ async function analyzePracticePhoto(imageData) {
         
         if (result.error) {
             if (result.type === 'balance') {
-                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showDeepSeekBalanceAlert()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
+                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showAPIRechargeModal()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
             } else {
                 resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">❌ 分析失败：' + escapeHtml(result.message) + '</div>';
             }
@@ -231,7 +231,7 @@ async function submitPracticeQuestion() {
         
         if (result.error) {
             if (result.type === 'balance') {
-                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showDeepSeekBalanceAlert()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
+                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showAPIRechargeModal()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
             } else {
                 resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;">❌ 解答失败：' + escapeHtml(result.message) + '</div>';
             }
@@ -283,7 +283,7 @@ async function askPracticeAI() {
         
         if (result.error) {
             if (result.type === 'balance') {
-                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showDeepSeekBalanceAlert()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
+                resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;text-align:center;">⚠️ DeepSeek余额不足<br><button onclick="showAPIRechargeModal()" style="margin-top:8px;padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;font-size:12px;cursor:pointer;">前往充值</button></div>';
             } else {
                 resultDiv.innerHTML = '<div style="padding:12px;background:#fff3f3;border-radius:8px;color:#ff6b6b;font-size:13px;">❌ 解说失败：' + escapeHtml(result.message) + '</div>';
             }
@@ -310,3 +310,9 @@ window.askPracticeAI = askPracticeAI;
 // ============================================================
 // Map - 地图模块
 // ============================================================
+async function handlePhotoToQuestion(imageData) {
+    // 复用photoToQuestion
+    if (typeof photoToQuestion === 'function') { photoToQuestion(imageData); }
+    else { showToast('拍照出题功能加载中，请稍后再试'); }
+}
+window.handlePhotoToQuestion = handlePhotoToQuestion;

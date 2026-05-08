@@ -462,6 +462,9 @@ function openApiConfigModal(type) {
                 <div style="font-size:11px;color:#999;margin-top:6px;">用于AI智能助手和所有AI功能</div>
             </div>
             <button onclick="saveApiConfigModal('deepseek')" class="login-btn login-btn-primary" style="margin-bottom:8px;">保存配置</button>
+            <div style="margin-top:8px;">
+                <button onclick="showAPIRechargeModal()" style="width:100%;padding:10px;background:linear-gradient(135deg,#667eea,#4facfe);color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">💳 API平台充值</button>
+            </div>
             <button onclick="closeApiConfigModal()" class="login-btn login-btn-secondary">取消</button>
         `;
     } else if (type === 'peerjs') {

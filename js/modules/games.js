@@ -12,100 +12,10 @@ var gameScore = 0;
 var gameLevel = 1;
 var gameStartTime = 0;
 var elimTimer = typeof elimTimer !== 'undefined' ? elimTimer : null;
+var elimColors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFD93D','#DDA0DD'];
 
 
-function startGame(type) {
-    gameType = type;
-    gameScore = 0;
-    gameLevel = 1;
-    
-    // 播放开始音效
-    SoundEffects.playClick();
-    
-    closeFullscreenPage();
-    
-    setTimeout(() => {
-        const gameFullscreen = document.getElementById('game-fullscreen-container');
-        if (gameFullscreen) gameFullscreen.style.display = 'flex';
-        
-        // 设置游戏主题色
-        const config = gameConfig[type];
-        const header = document.getElementById('game-header');
-        if (header && config) {
-            header.style.background = config.gradient;
-        }
-        
-        // 更新游戏标题
-        const titleEl = document.getElementById('game-title');
-        if (titleEl && config) titleEl.textContent = config.name;
-        
-        // 更新最高分
-        const user = getCurrentUserData();
-        const bestScore = user?.gameScores?.[type] || 0;
-        const bestScoreEl = document.getElementById('game-best-score');
-        if (bestScoreEl) bestScoreEl.textContent = bestScore;
-        
-        // 重置计时器
-        const timerEl = document.getElementById('game-timer');
-        if (timerEl) timerEl.textContent = '0s';
-        
-        // 更新关卡显示
-        updateGameLevelBadge();
-        
-        // 更新得分
-        const scoreEl = document.getElementById('game-score');
-        if (scoreEl) scoreEl.textContent = '0';
-        
-        // 启动计时器显示
-        gameStartTime = Date.now();
-        if (gameTimerDisplay) clearInterval(gameTimerDisplay);
-        gameTimerDisplay = setInterval(() => {
-            const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-            const timerEl = document.getElementById('game-timer');
-            if (timerEl) timerEl.textContent = elapsed + 's';
-        }, 1000);
-        
-        // 重置游戏容器
-        const gf = document.getElementById('game-fullscreen');
-        const gb = document.getElementById('game-board');
-        if (gf) { gf.style.display = 'none'; gf.innerHTML = ''; }
-        if (gb) { gb.style.display = 'flex'; gb.innerHTML = ''; }
-        // 启动对应游戏
-        switch(type) {
-            case 'schulte': startSchulte(); break;
-            case 'visual': startVisual(); break;
-            case 'digit': startDigit(); break;
-            case 'pattern': startPattern(); break;
-            case 'tap': startTap(); break;
-            case 'color': startColor(); break;
-            case 'diff': startDiff(); break;
-            case 'reason': startReason(); break;
-            case 'text': startTextMemory(); break;
-            case 'shape': startShapeReason(); break;
-            case 'math': startMathCalc(); break;
-            case 'space': startSpaceRotate(); break;
-            case 'audio': startAudioPosition(); break;
-            case 'word': startWordAssociation(); break;
-            case 'classify': startClassification(); break;
-            case 'attention': startAttentionTrack(); break;
-            case 'palace': startPalace(); break;
-            case 'stroop': startStroop(); break;
-            case 'numshape': startNumshape(); break;
-            case 'conserve': startConserve(); break;
-            case 'network': startNetwork(); break;
-            case 'reverse': startReverse(); break;
-            case 'experiment': startExperiment(); break;
-            case 'snake': startSnake(); break;
-            case 'tetris': startTetris(); break;
-            case 'flipcard': startFlipCard(); break;
-            case 'slide': startSlide(); break;
-            case 'g2048': start2048(); break;
-            case 'whack': startWhack(); break;
-            case 'linkup': startLinkUp(); break;
-            case 'eliminate': startEliminate(); break;
-        }
-    }, 100);
-}
+// startGame moved to end of file (with metacognitive prediction)
 
 function startSchulte() {
     const config = gameConfig['schulte'];
@@ -116,12 +26,12 @@ function startSchulte() {
     const board = document.getElementById('game-board');
     board.className = 'game-board size-'+size; 
     board.style.display = 'grid';
-    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-size:${30-size*2}px;font-weight:bold;cursor:pointer;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:55px;box-shadow:0 2px 8px rgba(102,126,234,0.3);">${n}</div>`).join('');
+    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:white;font-size:${28-size*2}px;font-weight:bold;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;">${n}</div>`).join('');
     schulteNext = 1; 
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
     gameTimer = setInterval(() => { 
-        if (Date.now()-gameStartTime > 30000) { 
+        if (Date.now()-gameStartTime > 20000) { 
             clearInterval(gameTimer); 
             endGame(); 
         } 
@@ -504,7 +414,7 @@ function startColor() {
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
     gameTimer = setInterval(() => {
-        if (Date.now()-gameStartTime > 30000) { clearInterval(gameTimer); endGame(); return; }
+        if (Date.now()-gameStartTime > 20000) { clearInterval(gameTimer); endGame(); return; }
         const word = colorWords[Math.floor(Math.random()*5)];
         const wrongColor = colorWords.filter(c=>c.c!==word.c)[Math.floor(Math.random()*4)];
         board.innerHTML = `
@@ -1102,7 +1012,7 @@ function startVisual() {
     const colors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFD93D'];
     const targetColor = colors[Math.floor(Math.random()*colors.length)];
     const baseColor = colors.filter(c=>c!==targetColor)[Math.floor(Math.random()*4)];
-    board.innerHTML = Array.from({length:16},(_,i)=>'<div class="game-cell" onclick="checkVisual(this,'+i+','+targetIdx+',\''+targetColor+'\')" style="background:'+(i===targetIdx?targetColor:baseColor)+';border-radius:10px;cursor:pointer;min-height:50px;box-shadow:0 2px 6px rgba(0,0,0,0.12);"></div>').join('');
+    board.innerHTML = Array.from({length:16},(_,i)=>`<div class="game-cell" onclick="checkVisual(this,${i},${targetIdx},'${targetColor}')" style="background:${i===targetIdx?targetColor:baseColor};border-radius:8px;cursor:pointer;"></div>`).join('');
     gameScore = 0; document.getElementById('game-score').textContent = '0';
 }
 
@@ -1127,11 +1037,11 @@ function startSpaceRotate() {
 function startEliminate() {
     document.getElementById('game-title').textContent = '💎 消消乐';
     const board = document.getElementById('game-board');
-    board.style.display = 'block';
-    board.innerHTML = '<div style="text-align:center;margin-bottom:12px;"><span id="elim-timer" style="font-size:24px;font-weight:bold;color:#F4511E;">60</span>秒 | <span id="elim-score" style="font-size:20px;font-weight:bold;">0</span>分</div><div id="elim-container" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px;max-width:340px;margin:0 auto;"></div>';
+    board.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;overflow:auto;min-height:0;';
+    board.innerHTML = '<div style="text-align:center;margin-bottom:8px;"><span id="elim-timer" style="font-size:20px;font-weight:bold;color:#F4511E;">30</span>秒 | <span id="elim-score" style="font-size:16px;font-weight:bold;">0</span>分</div><div id="elim-container" style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:6px;width:100%;max-width:300px;margin:0 auto;"></div>';
     
     elimScore = 0;
-    elimTime = 60;
+    elimTime = 30;
     elimSelected = null;
     elimBoard = [];
     
@@ -1608,7 +1518,7 @@ function renderElim() {
     container.innerHTML = '';
     elimBoard.forEach((c,i)=>{
         const cell = document.createElement('div');
-        cell.style.cssText = `width:50px;height:50px;background:${elimColors[c]};border-radius:8px;cursor:pointer;transition:transform 0.2s;`;
+        cell.style.cssText = `aspect-ratio:1;background:${elimColors[c]};border-radius:6px;cursor:pointer;transition:transform 0.2s;min-height:30px;`;
         cell.id = 'elim-'+i;
         cell.onclick = () => clickElim(i);
         container.appendChild(cell);
@@ -3926,7 +3836,7 @@ function renderElim() {
     container.innerHTML = '';
     elimBoard.forEach((c,i)=>{
         const cell = document.createElement('div');
-        cell.style.cssText = `width:50px;height:50px;background:${elimColors[c]};border-radius:8px;cursor:pointer;transition:transform 0.2s;`;
+        cell.style.cssText = `aspect-ratio:1;background:${elimColors[c]};border-radius:6px;cursor:pointer;transition:transform 0.2s;min-height:30px;`;
         cell.id = 'elim-'+i;
         cell.onclick = () => clickElim(i);
         container.appendChild(cell);
@@ -4681,7 +4591,7 @@ function startColor() {
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
     gameTimer = setInterval(() => {
-        if (Date.now()-gameStartTime > 30000) { clearInterval(gameTimer); endGame(); return; }
+        if (Date.now()-gameStartTime > 20000) { clearInterval(gameTimer); endGame(); return; }
         const word = colorWords[Math.floor(Math.random()*5)];
         const wrongColor = colorWords.filter(c=>c.c!==word.c)[Math.floor(Math.random()*4)];
         board.innerHTML = `
@@ -4754,11 +4664,11 @@ function startDigit() {
 function startEliminate() {
     document.getElementById('game-title').textContent = '💎 消消乐';
     const board = document.getElementById('game-board');
-    board.style.display = 'block';
-    board.innerHTML = '<div style="text-align:center;margin-bottom:12px;"><span id="elim-timer" style="font-size:24px;font-weight:bold;color:#F4511E;">60</span>秒 | <span id="elim-score" style="font-size:20px;font-weight:bold;">0</span>分</div><div id="elim-container" style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;padding:10px;max-width:340px;margin:0 auto;"></div>';
+    board.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;overflow:auto;min-height:0;';
+    board.innerHTML = '<div style="text-align:center;margin-bottom:8px;"><span id="elim-timer" style="font-size:20px;font-weight:bold;color:#F4511E;">30</span>秒 | <span id="elim-score" style="font-size:16px;font-weight:bold;">0</span>分</div><div id="elim-container" style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;padding:6px;width:100%;max-width:300px;margin:0 auto;"></div>';
     
     elimScore = 0;
-    elimTime = 60;
+    elimTime = 30;
     elimSelected = null;
     elimBoard = [];
     
@@ -4923,47 +4833,40 @@ function startGame(type) {
     
     closeFullscreenPage();
     
-    setTimeout(() => {
+    // 显示元认知预测弹窗
+    showMetacognitivePrediction(type, function() {
+        // 用户确认预测后启动游戏
         const gameFullscreen = document.getElementById('game-fullscreen-container');
         if (gameFullscreen) gameFullscreen.style.display = 'flex';
         
-        // 设置游戏主题色
         const config = gameConfig[type];
         const header = document.getElementById('game-header');
-        if (header && config) {
-            header.style.background = config.gradient;
-        }
+        if (header && config) header.style.background = config.gradient;
         
-        // 更新游戏标题
         const titleEl = document.getElementById('game-title');
         if (titleEl && config) titleEl.textContent = config.name;
         
-        // 更新最高分
         const user = getCurrentUserData();
         const bestScore = user?.gameScores?.[type] || 0;
         const bestScoreEl = document.getElementById('game-best-score');
         if (bestScoreEl) bestScoreEl.textContent = bestScore;
         
-        // 重置计时器
         const timerEl = document.getElementById('game-timer');
         if (timerEl) timerEl.textContent = '0s';
         
-        // 更新关卡显示
         updateGameLevelBadge();
         
-        // 更新得分
         const scoreEl = document.getElementById('game-score');
         if (scoreEl) scoreEl.textContent = '0';
         
-        // 启动计时器显示
         gameStartTime = Date.now();
         if (gameTimerDisplay) clearInterval(gameTimerDisplay);
         gameTimerDisplay = setInterval(() => {
             const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-            const timerEl = document.getElementById('game-timer');
-            if (timerEl) timerEl.textContent = elapsed + 's';
+            const timerEl2 = document.getElementById('game-timer');
+            if (timerEl2) timerEl2.textContent = elapsed + 's';
         }, 1000);
-        // 重置游戏容器
+        
         const gf = document.getElementById('game-fullscreen');
         const gb = document.getElementById('game-board');
         if (gf) { gf.style.display = 'none'; gf.innerHTML = ''; }
@@ -5003,7 +4906,7 @@ function startGame(type) {
             case 'linkup': startLinkUp(); break;
             case 'eliminate': startEliminate(); break;
         }
-    }, 100);
+    });
 }
 
 function startLinkUp() {
@@ -5330,12 +5233,12 @@ function startSchulte() {
     const board = document.getElementById('game-board');
     board.className = 'game-board size-'+size; 
     board.style.display = 'grid';
-    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;font-size:${30-size*2}px;font-weight:bold;cursor:pointer;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:55px;box-shadow:0 2px 8px rgba(102,126,234,0.3);">${n}</div>`).join('');
+    board.innerHTML = nums.map(n => `<div class="game-cell" onclick="checkSchulte(this,${n})" style="background:white;font-size:${28-size*2}px;font-weight:bold;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;">${n}</div>`).join('');
     schulteNext = 1; 
     gameStartTime = Date.now();
     if (gameTimer) clearInterval(gameTimer);
     gameTimer = setInterval(() => { 
-        if (Date.now()-gameStartTime > 30000) { 
+        if (Date.now()-gameStartTime > 20000) { 
             clearInterval(gameTimer); 
             endGame(); 
         } 
@@ -5935,7 +5838,7 @@ function startVisual() {
     const colors = ['#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFD93D'];
     const targetColor = colors[Math.floor(Math.random()*colors.length)];
     const baseColor = colors.filter(c=>c!==targetColor)[Math.floor(Math.random()*4)];
-    board.innerHTML = Array.from({length:16},(_,i)=>'<div class="game-cell" onclick="checkVisual(this,'+i+','+targetIdx+',\''+targetColor+'\')" style="background:'+(i===targetIdx?targetColor:baseColor)+';border-radius:10px;cursor:pointer;min-height:50px;box-shadow:0 2px 6px rgba(0,0,0,0.12);"></div>').join('');
+    board.innerHTML = Array.from({length:16},(_,i)=>`<div class="game-cell" onclick="checkVisual(this,${i},${targetIdx},'${targetColor}')" style="background:${i===targetIdx?targetColor:baseColor};border-radius:8px;cursor:pointer;"></div>`).join('');
     gameScore = 0; document.getElementById('game-score').textContent = '0';
 }
 
@@ -6231,3 +6134,78 @@ window.deleteMethodNote = deleteMethodNote;
 window.closeDetail = closeDetail;
 window.closeModal = closeModal;
 window.submitTopicAnswer = submitTopicAnswer;
+
+
+// ====== 元认知预测功能 ======
+var currentPrediction = 0;
+
+function showMetacognitivePrediction(gameType, callback) {
+    var user = getCurrentUserData();
+    var config = gameConfig[gameType];
+    var bestScore = (user && user.gameScores && user.gameScores[gameType]) || 0;
+    var gameCounts = (user && user.gameCounts && user.gameCounts[gameType]) || 0;
+    var isFirstTime = gameCounts === 0;
+    var predictions = (user && user.metacognitive && user.metacognitive.predictions) || [];
+    var lastPred = 50;
+    for (var i = predictions.length - 1; i >= 0; i--) {
+        if (predictions[i].gameType === gameType) { lastPred = predictions[i].predicted || 50; break; }
+    }
+    var avgScore = gameCounts > 0 ? Math.round(bestScore / Math.max(1, gameCounts)) : 0;
+    var gameName = (config && config.name) || '游戏';
+    
+    var overlay = document.createElement('div');
+    overlay.id = 'meta-predict-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:6000;display:flex;align-items:center;justify-content:center;';
+    
+    overlay.innerHTML = '<div style="background:white;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.3);">' +
+        '<div style="font-size:40px;margin-bottom:12px;">🧠</div>' +
+        '<div style="font-size:18px;font-weight:700;color:#333;margin-bottom:4px;">元认知预测</div>' +
+        '<div style="font-size:14px;color:#667eea;margin-bottom:20px;">' + gameName + '</div>' +
+        (isFirstTime ? '<div style="background:#fff8e1;border-radius:10px;padding:10px;margin-bottom:16px;font-size:13px;color:#f57c00;">🎯 首次挑战，大胆预测！</div>' : '') +
+        '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">' +
+        '<div style="background:#f0f4ff;border-radius:10px;padding:10px 8px;"><div style="font-size:11px;color:#999;">最高分</div><div style="font-size:18px;font-weight:700;color:#667eea;">' + bestScore + '</div></div>' +
+        '<div style="background:#f0fff4;border-radius:10px;padding:10px 8px;"><div style="font-size:11px;color:#999;">平均分</div><div style="font-size:18px;font-weight:700;color:#43e97b;">' + (avgScore || '-') + '</div></div>' +
+        '<div style="background:#fff0f6;border-radius:10px;padding:10px 8px;"><div style="font-size:11px;color:#999;">已玩</div><div style="font-size:18px;font-weight:700;color:#fa709a;">' + gameCounts + '次</div></div>' +
+        '</div>' +
+        '<div style="margin-bottom:24px;">' +
+        '<div style="font-size:13px;color:#666;margin-bottom:10px;">预测你这次能得多少分？</div>' +
+        '<input type="range" id="meta-prediction-input" min="0" max="500" value="' + lastPred + '" oninput="document.getElementById(\'meta-prediction-value\').textContent=this.value" style="width:100%;height:6px;-webkit-appearance:none;background:linear-gradient(90deg,#667eea,#fa709a);border-radius:3px;outline:none;">' +
+        '<div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="font-size:11px;color:#999;">0</span><span id="meta-prediction-value" style="font-size:20px;font-weight:700;color:#667eea;">' + lastPred + '</span><span style="font-size:11px;color:#999;">500</span></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:12px;">' +
+        '<button id="meta-skip-btn" style="flex:1;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">跳过</button>' +
+        '<button id="meta-confirm-btn" style="flex:1;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">开始挑战</button>' +
+        '</div></div>';
+    
+    document.body.appendChild(overlay);
+    
+    document.getElementById('meta-confirm-btn').onclick = function() {
+        var input = document.getElementById('meta-prediction-input');
+        currentPrediction = parseInt(input && input.value) || 0;
+        var ol = document.getElementById('meta-predict-overlay');
+        if (ol) ol.remove();
+        callback();
+    };
+    document.getElementById('meta-skip-btn').onclick = function() {
+        currentPrediction = 0;
+        var ol = document.getElementById('meta-predict-overlay');
+        if (ol) ol.remove();
+        callback();
+    };
+}
+window.showMetacognitivePrediction = showMetacognitivePrediction;
+window.currentPrediction = currentPrediction;
+
+function showGameOver(score, total) {
+    var modal = document.getElementById('modal');
+    var content = document.getElementById('modal-content');
+    if (!modal || !content) return;
+    content.innerHTML = '<div class="modal-title">🎮 游戏结束</div>' +
+        '<div style="text-align:center;padding:20px;">' +
+            '<div style="font-size:36px;font-weight:bold;color:#667eea;">' + score + ' / ' + total + '</div>' +
+            '<div style="font-size:14px;color:#666;margin-top:8px;">正确率: ' + (total > 0 ? Math.round(score/total*100) : 0) + '%</div>' +
+        '</div>' +
+        '<button onclick="closeModal()" class="login-btn login-btn-primary">确定</button>';
+    modal.classList.add('show');
+}
+window.showGameOver = showGameOver;

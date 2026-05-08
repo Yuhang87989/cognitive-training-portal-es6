@@ -59,9 +59,9 @@ function renderVideo(container) {
 }
 
 function renderLocalVideoList() {
-    var user = getCurrentUserData();
-    var localVideos = user && user.localVideos ? user.localVideos : [];
-    var listEl = document.getElementById('local-video-list');
+    const user = getCurrentUserData();
+    const localVideos = user?.localVideos || [];
+    const listEl = document.getElementById('local-video-list');
     
     if (!listEl) return;
     
@@ -70,35 +70,20 @@ function renderLocalVideoList() {
         return;
     }
     
-    var videoItems = localVideos.map(function(video) {
-        var sizeText = '';
-        if (video.compressed && video.originalSize) {
-            // 显示压缩前后的大小
-            var origSize = (video.originalSize / 1024 / 1024).toFixed(1);
-            var newSize = (video.size / 1024 / 1024).toFixed(1);
-            sizeText = video.duration + ' · ' + origSize + 'MB → ' + newSize + 'MB' + 
-                       ' <span style="color:#43E97B;">已压缩</span>';
-        } else {
-            sizeText = video.duration + ' · ' + (video.size / 1024 / 1024).toFixed(1) + 'MB';
-        }
-        
-        var reuploadBadge = video.needsReupload ? 
-            ' <span style="background:#ff6b6b;color:white;padding:2px 6px;border-radius:4px;font-size:10px;">需重新上传</span>' : '';
-        
-        return '<div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;">' +
-               '<div style="font-size:24px;">🎬</div>' +
-               '<div style="flex:1;">' +
-               '<div style="font-size:13px;font-weight:500;">' + video.title + reuploadBadge + '</div>' +
-               '<div style="font-size:11px;color:#999;">' + sizeText + '</div>' +
-               '</div>' +
-               '<button onclick="playLocalVideo(\'' + video.id + '\')" style="background:#1A6BFF;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">播放</button>' +
-               '<button onclick="deleteLocalVideo(\'' + video.id + '\')" style="background:#ff6b6b;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>' +
-               '</div>';
-    }).join('');
-    
-    listEl.innerHTML = '<div style="font-size:12px;color:#666;margin-bottom:8px;">📁 已上传 ' + localVideos.length + ' 个视频' +
-                       ' <span style="font-size:11px;color:#888;">（大视频自动压缩以节省存储）</span></div>' +
-                       videoItems;
+    listEl.innerHTML = `
+        <div style="font-size:12px;color:#666;margin-bottom:8px;">📁 已上传 ${localVideos.length} 个视频</div>
+        ${localVideos.map(video => `
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;">
+                <div style="font-size:24px;">🎬</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px;font-weight:500;">${video.title}</div>
+                    <div style="font-size:11px;color:#999;">${video.duration} · ${(video.size / 1024 / 1024).toFixed(1)}MB</div>
+                </div>
+                <button onclick="playLocalVideo('${video.id}')" style="background:#1A6BFF;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">播放</button>
+                <button onclick="deleteLocalVideo('${video.id}')" style="background:#ff6b6b;color:white;border:none;padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;">删除</button>
+            </div>
+        `).join('')}
+    `;
 }
 
 window.renderVideo = renderVideo;
@@ -145,6 +130,4 @@ window.filterVideoCourse = filterVideoCourse;
 window.playVideoFromList = playVideoFromList;
 window.playLocalVideo = playLocalVideo;
 window.deleteLocalVideo = deleteLocalVideo;
-window.renderLocalVideoList = renderLocalVideoList;
-window.compressVideo = compressVideo; // V152: 导出压缩函数
 

@@ -35,7 +35,7 @@ if('serviceWorker' in navigator){
 <link rel="stylesheet" href="css/style.css"/>
 <!-- PeerJS 音视频库 -->
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<!-- Tesseract.js OCR库（用于拍照识别文字） -->
+<!-- Tesseract.js OCR库（用于拍照识别文字，免费前端图片识别） -->
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
@@ -578,6 +578,70 @@ if('serviceWorker' in navigator){
     </div>
 </div>
 
+
+<!-- 元认知预测弹窗 -->
+<div id="metacognitive-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width:340px;padding:24px;">
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:28px;margin-bottom:8px;">🎯</div>
+            <div style="font-size:18px;font-weight:bold;color:#333;">预测你的得分</div>
+            <div style="font-size:14px;color:#666;margin-top:4px;" id="meta-game-name">游戏名称</div>
+        </div>
+        
+        <!-- 历史数据 -->
+        <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:20px;">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
+                <div>
+                    <div style="font-size:11px;color:#999;">历史最高</div>
+                    <div style="font-size:20px;font-weight:bold;color:#FF6B6B;" id="meta-best-score">0</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:#999;">历史平均</div>
+                    <div style="font-size:20px;font-weight:bold;color:#667eea;" id="meta-avg-score">-</div>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:#999;">游戏次数</div>
+                    <div style="font-size:20px;font-weight:bold;color:#43E97B;" id="meta-game-count">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 首次提示 -->
+        <div id="meta-first-time-tip" style="display:none;background:#FFF9E6;border:1px solid #FFD93D;border-radius:8px;padding:10px;margin-bottom:16px;text-align:center;">
+            <span style="font-size:13px;color:#B8860B;">🌟 首次挑战，大胆预测！</span>
+        </div>
+        
+        <!-- 预测输入 -->
+        <div style="margin-bottom:20px;">
+            <div style="text-align:center;margin-bottom:12px;">
+                <span style="font-size:36px;font-weight:bold;color:#1A6BFF;" id="meta-prediction-value">50</span>
+                <span style="font-size:14px;color:#666;margin-left:4px;">分</span>
+            </div>
+            <input type="range" id="meta-prediction-input" min="0" max="500" value="50" 
+                   style="width:100%;height:8px;-webkit-appearance:none;background:linear-gradient(to right,#667eea,#764ba2);border-radius:4px;outline:none;"
+                   oninput="updatePredictionDisplay(this.value)">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:4px;">
+                <span>0</span>
+                <span>100</span>
+                <span>200</span>
+                <span>300</span>
+                <span>400</span>
+                <span>500</span>
+            </div>
+        </div>
+        
+        <!-- 按钮 -->
+        <div style="display:flex;gap:10px;">
+            <button onclick="cancelPrediction()" style="flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:#f5f5f5;color:#666;">
+                取消
+            </button>
+            <button onclick="confirmPrediction()" style="flex:2;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#667eea,#764ba2);color:white;">
+                🎮 开始游戏
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- API配置模态框 -->
 <div id="api-config-modal" class="modal-overlay">
     <div class="modal-content" id="api-config-content" style="max-width:350px;"></div>
@@ -688,6 +752,27 @@ if('serviceWorker' in navigator){
     from { transform: translate(-50%,-50%) rotate(0deg); }
     to { transform: translate(-50%,-50%) rotate(360deg); }
 }
+
+/* 元认知预测滑块样式 */
+#meta-prediction-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 3px solid #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.4);
+}
+#meta-prediction-input::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 3px solid #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102,126,234,0.4);
+}
 </style>
 
 
@@ -698,7 +783,10 @@ if('serviceWorker' in navigator){
 <script>
 (function() {
     // 加载顺序必须与ui.js中的loadOrder一致
-    const loadOrder = ['js/config.js', 'js/ctm.js', 'js/audio.js', 'js/storage.js', 'js/utils.js', 'js/user.js', 'js/data/week-plans.js', 'js/data/topics.js', 'js/data/podcasts.js', 'js/data/videos.js', 'js/data/games-config.js', 'js/modules/practice.js', 'js/modules/map.js', 'js/modules/plan.js', 'js/modules/topics.js', 'js/modules/method.js', 'js/modules/thinking.js', 'js/modules/podcast.js', 'js/modules/video.js', 'js/modules/player.js', 'js/modules/games.js', 'js/modules/ai.js', 'js/modules/deepseek.js', 'js/modules/wrongbook.js', 'js/modules/pomodoro.js', 'js/modules/ui.js'];
+    // 自动版本号：基于时间戳，每次部署自动更新
+    window.__APP_VERSION = Date.now();
+    
+    const loadOrder = ['js/config.js', 'js/ctm.js', 'js/audio.js', 'js/db.js', 'js/storage.js', 'js/utils.js', 'js/user.js', 'js/data/week-plans.js', 'js/data/topics.js', 'js/data/podcasts.js', 'js/data/videos.js', 'js/data/games-config.js', 'js/modules/practice.js', 'js/modules/map.js', 'js/modules/plan.js', 'js/modules/topics.js', 'js/modules/method.js', 'js/modules/thinking.js', 'js/modules/podcast.js', 'js/modules/video.js', 'js/modules/player.js', 'js/modules/games.js', 'js/modules/ai.js', 'js/modules/deepseek.js', 'js/modules/wrongbook.js', 'js/modules/pomodoro.js', 'js/modules/ui.js'];
     // 并行加载所有JS文件，大幅提升页面加载速度
     const v = window.__APP_VERSION || Date.now();
     let pending = loadOrder.length;
@@ -725,12 +813,48 @@ if('serviceWorker' in navigator){
     });
 })();
 </script>
+<!-- 元认知预测弹窗 -->
+<div id="metacognitive-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:6000;display:none;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;">
+    <div style="font-size:40px;margin-bottom:12px;">🧠</div>
+    <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:4px;">元认知预测</div>
+    <div id="meta-game-name" style="font-size:14px;color:#667eea;margin-bottom:20px;">游戏名称</div>
+    <div id="meta-first-time-tip" style="background:#fff8e1;border-radius:10px;padding:10px;margin-bottom:16px;font-size:13px;color:#f57c00;display:none;">🎯 首次挑战，大胆预测！</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:#f0f4ff;border-radius:10px;padding:10px 8px;">
+        <div style="font-size:11px;color:#999;">最高分</div>
+        <div id="meta-best-score" style="font-size:18px;font-weight:700;color:#667eea;">0</div>
+      </div>
+      <div style="background:#f0fff4;border-radius:10px;padding:10px 8px;">
+        <div style="font-size:11px;color:#999;">平均分</div>
+        <div id="meta-avg-score" style="font-size:18px;font-weight:700;color:#43e97b;">-</div>
+      </div>
+      <div style="background:#fff0f6;border-radius:10px;padding:10px 8px;">
+        <div style="font-size:11px;color:#999;">已玩</div>
+        <div id="meta-game-count" style="font-size:18px;font-weight:700;color:#fa709a;">0次</div>
+      </div>
+    </div>
+    <div style="margin-bottom:24px;">
+      <div style="font-size:13px;color:#666;margin-bottom:10px;">预测你这次能得多少分？</div>
+      <input type="range" id="meta-prediction-input" min="0" max="500" value="50" oninput="updatePredictionDisplay(this.value)" style="width:100%;height:6px;-webkit-appearance:none;background:linear-gradient(90deg,#667eea,#fa709a);border-radius:3px;outline:none;">
+      <div style="display:flex;justify-content:space-between;margin-top:6px;">
+        <span style="font-size:11px;color:#999;">0</span>
+        <span id="meta-prediction-value" style="font-size:20px;font-weight:700;color:#667eea;">50</span>
+        <span style="font-size:11px;color:#999;">500</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <button onclick="cancelPrediction()" style="flex:1;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">跳过</button>
+      <button onclick="confirmPrediction()" style="flex:1;padding:12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">开始挑战</button>
+    </div>
+  </div>
+</div>
+<style>#metacognitive-modal.show{display:flex!important;}@keyframes slideIn{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}</style>
 <div id="game-fullscreen-container" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2e,#16213e);z-index:5000;display:none;flex-direction:column;overflow:hidden;">
     <div id="game-header" style="display:flex;align-items:center;padding:12px 16px;background:linear-gradient(135deg,#667eea,#764ba2);">
         <div onclick="exitGame()" style="color:white;font-size:24px;cursor:pointer;padding:8px;">←</div>
         <div id="game-title" style="flex:1;font-size:16px;font-weight:600;color:white;text-align:center;">游戏</div>
-        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:4px;">关卡 1</div>
-        <div onclick="resetGame()" style="color:white;font-size:20px;cursor:pointer;padding:8px;" title="重新开始">🔄</div>
+        <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
     </div>
     <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
         <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:10px;">得分</div><div id="game-score" style="color:white;font-size:20px;font-weight:bold;">0</div></div>
@@ -738,8 +862,8 @@ if('serviceWorker' in navigator){
         <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:10px;">用时</div><div id="game-timer" style="color:white;font-size:20px;font-weight:bold;">0s</div></div>
     </div>
     <div id="game-fullscreen" style="flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;"></div>
-    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto;min-height:0;max-height:calc(100vh - 200px);"></div>
-    <div style="padding:16px;background:rgba(0,0,0,0.3);display:flex;gap:12px;flex-shrink:0;">
+    <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:hidden;min-height:0;max-height:calc(100vh - 200px);"></div>
+    <div style="padding:10px 16px;background:rgba(0,0,0,0.3);display:flex;gap:10px;flex-shrink:0;position:sticky;bottom:0;">
         <button onclick="exitGame()" style="flex:1;padding:14px;background:rgba(255,255,255,0.1);border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">退出</button>
         <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
     </div>

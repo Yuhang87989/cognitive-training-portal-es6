@@ -1,8 +1,8 @@
 // Cognitive Training Manager - 模块注册与钩子系统
-// 版本: V144
+// 版本: V156
 
 const CTM = {
-    version: '1.0.0',
+    version: '1.5.6',
     modules: {},
     plans: {},
     games: {},

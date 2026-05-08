@@ -1,9 +1,13 @@
-// 版本: V151
-// 包含API配置、存储键名等全局常量
+// 版本: auto (基于部署时间戳)
+// V177修改: 图片识别改用Tesseract.js本地OCR，硅基流动作为备选
+// V177修改: DeepSeek文字/语音，Tesseract.js本地OCR+DeepSeek分析图片
 
+// DeepSeek API配置
 const DEEPSEEK_API_KEY = 'sk-8413f72a3f084fb08c84389555a76d37';
 const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-const DEEPSEEK_MODEL = 'deepseek-chat'; // DeepSeek模型，新用户有免费额度
+const DEEPSEEK_MODEL = 'deepseek-chat';
+
+// 存储键名
 const STORAGE_KEY = 'cognitive_training_v137';
 const API_CONFIG_KEY = 'cognitive_api_config';
 
@@ -26,12 +30,24 @@ const AVATAR_LIST = [
     { emoji: '🐰', gradient: 'linear-gradient(135deg,#f6d365,#fda085)' }
 ];
 
-// 视觉API配置（可选 - 用于图片理解功能）
-// 支持硅基流动(https://siliconflow.cn)的免费视觉模型
-// 注册后填入API Key即可启用图片理解功能
-const VISION_API_KEY = '';  // 硅基流动API Key
-const VISION_API_URL = '';  // 如: https://api.siliconflow.cn/v1/chat/completions
-const VISION_MODEL = '';    // 如: Qwen/Qwen2.5-VL-72B-Instruct
+// ============================================================
+// 视觉API配置 - V152新增
+// 支持DeepSeek视觉（如果可用）或硅基流动Qwen3-VL
+// ============================================================
+
+// 方案1: 硅基流动(推荐，国内速度快，支持Qwen3-VL)
+// 注册地址: https://cloud.siliconflow.com
+// 获取API Key后填入下方
+const VISION_SILICONFLOW_KEY = 'sk-upymyvbtqdunkmmksrmtqugootqqysvgevwkllyomqcvskrw';  // 硅基流动API Key
+const VISION_SILICONFLOW_URL = 'https://api.siliconflow.cn/v1/chat/completions';
+const VISION_SILICONFLOW_MODEL = 'Qwen/Qwen3-VL-30B-A3B-Instruct';  // 高性价比视觉模型
+
+// 方案2: DeepSeek视觉 (部分账号可能不支持)
+// 如果DeepSeek不支持视觉，会自动降级到硅基流动
+const VISION_DEEPSEEK_ENABLED = true;  // 硅基流动余额不足时fallback
+
+// 当前使用的视觉API类型: 'deepseek' | 'siliconflow'
+window.CURRENT_VISION_API = 'siliconflow';  // 默认使用硅基流动
 
 // ========== 全局共享变量 ==========
 window.QUESTIONS_PER_PAGE = 5;
