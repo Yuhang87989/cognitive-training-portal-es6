@@ -45,7 +45,7 @@ function renderVideo(container) {
             <div class="upload-zone" onclick="document.getElementById('video-upload-input').click()">
                 <div class="upload-icon">🎬</div>
                 <div class="upload-text">点击上传视频文件</div>
-                <div class="upload-hint">支持 MP4、WebM、MOV 格式（最大100MB）</div>
+                <div class="upload-hint">支持 MP4、WebM、MOV 格式（最大100MB，大视频自动压缩缓存）</div>
             </div>
             <input type="file" id="video-upload-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
             <div id="local-video-list" style="margin-top:12px;"></div>

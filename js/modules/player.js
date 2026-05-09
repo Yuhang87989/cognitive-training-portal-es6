@@ -605,14 +605,30 @@ function openEnhancedVideoPlayer(title, url, videoId) {
             videoEl.removeChild(videoEl.firstChild);
         }
         
-        // 创建source元素
-        var sourceEl = document.createElement('source');
-        sourceEl.src = url;
-        sourceEl.type = 'video/mp4';
-        videoEl.appendChild(sourceEl);
-        
-        // 同时设置src属性作为后备
-        videoEl.src = url;
+        // 优先使用本地缓存（减少网络请求，解决卡顿）
+        var finalUrl = url;
+        if (url && url.indexOf('http') === 0 && url.indexOf('blob:') === -1) {
+            getCachedVideo(url).then(function(cachedBlob) {
+                if (cachedBlob) {
+                    var cachedUrl = URL.createObjectURL(cachedBlob);
+                    var sourceEl = document.createElement('source');
+                    sourceEl.src = cachedUrl;
+                    sourceEl.type = 'video/mp4';
+                    videoEl.appendChild(sourceEl);
+                    videoEl.src = cachedUrl;
+                    console.log('使用缓存视频:', title);
+                } else {
+                    setVideoSourceFromUrl(videoEl, url);
+                    // 播放后缓存视频
+                    cacheVideoFromUrl(url);
+                }
+            }).catch(function() {
+                setVideoSourceFromUrl(videoEl, url);
+                cacheVideoFromUrl(url);
+            });
+        } else {
+            setVideoSourceFromUrl(videoEl, url);
+        }
         
         // 重置错误状态和重试计数
         videoEl.dataset.videoRetryCount = '0';
@@ -891,6 +907,198 @@ function handleAudioUpload(input) {
     renderLocalAudioList();
 }
 
+
+function setVideoSourceFromUrl(videoEl, url) {
+    var sourceEl = document.createElement('source');
+    sourceEl.src = url;
+    sourceEl.type = 'video/mp4';
+    videoEl.appendChild(sourceEl);
+    videoEl.src = url;
+}
+
+function cacheVideoFromUrl(url) {
+    if (!url || url.indexOf('http') !== 0) return;
+    fetch(url).then(function(r) {
+        if (r.ok) return r.blob();
+        throw new Error('fetch failed');
+    }).then(function(blob) {
+        cacheVideo(url, blob);
+    }).catch(function() {});
+}
+
+// ========== 视频压缩功能 ==========
+var VIDEO_COMPRESS_CONFIG = {
+    maxSize: 854,        // 最大宽度(480p)
+    videoBitrate: 800000, // 视频码率800kbps
+    audioBitrate: 128000, // 音频码率128kbps
+    minSize: 5 * 1024 * 1024, // 5MB以下不压缩
+    timeout: 30000        // 30秒超时
+};
+
+function compressVideo(file, callback) {
+    if (file.size < VIDEO_COMPRESS_CONFIG.minSize) {
+        callback(file);
+        return;
+    }
+    
+    showToast('正在压缩视频，请稍候...');
+    
+    var compressDiv = document.createElement('div');
+    compressDiv.id = 'compress-progress';
+    compressDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:white;padding:24px 32px;border-radius:16px;z-index:9999;text-align:center;';
+    compressDiv.innerHTML = '<div style="font-size:16px;margin-bottom:12px;">🎬 视频压缩中...</div><div style="background:#333;border-radius:8px;height:8px;width:200px;"><div id="compress-bar" style="background:#667eea;height:100%;border-radius:8px;width:0%;transition:width 0.3s;"></div></div><div id="compress-text" style="font-size:12px;color:#aaa;margin-top:8px;">0%</div>';
+    document.body.appendChild(compressDiv);
+    
+    var video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    var url = URL.createObjectURL(file);
+    video.src = url;
+    
+    var timeoutId = setTimeout(function() {
+        cleanup();
+        showToast('压缩超时，使用原视频');
+        callback(file);
+    }, VIDEO_COMPRESS_CONFIG.timeout);
+    
+    function cleanup() {
+        clearTimeout(timeoutId);
+        URL.revokeObjectURL(url);
+        var el = document.getElementById('compress-progress');
+        if (el) el.remove();
+    }
+    
+    video.onloadedmetadata = function() {
+        var w = video.videoWidth;
+        var h = video.videoHeight;
+        var scale = 1;
+        if (w > VIDEO_COMPRESS_CONFIG.maxSize) {
+            scale = VIDEO_COMPRESS_CONFIG.maxSize / w;
+        }
+        var nw = Math.round(w * scale);
+        var nh = Math.round(h * scale);
+        
+        var canvas = document.createElement('canvas');
+        canvas.width = nw;
+        canvas.height = nh;
+        var ctx = canvas.getContext('2d');
+        
+        var mimeType = 'video/webm;codecs=vp9,opus';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'video/webm;codecs=vp8,opus';
+        }
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'video/webm';
+        }
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'video/mp4';
+        }
+        
+        var recorder;
+        try {
+            recorder = new MediaRecorder(canvas.captureStream(30), {
+                mimeType: mimeType,
+                videoBitsPerSecond: VIDEO_COMPRESS_CONFIG.videoBitrate,
+                audioBitsPerSecond: VIDEO_COMPRESS_CONFIG.audioBitrate
+            });
+        } catch(e) {
+            cleanup();
+            showToast('浏览器不支持压缩，使用原视频');
+            callback(file);
+            return;
+        }
+        
+        var chunks = [];
+        recorder.ondataavailable = function(e) {
+            if (e.data && e.data.size > 0) chunks.push(e.data);
+        };
+        
+        recorder.onstop = function() {
+            var ext = mimeType.indexOf('mp4') > -1 ? 'video/mp4' : 'video/webm';
+            var compressed = new Blob(chunks, { type: ext });
+            
+            var barEl = document.getElementById('compress-bar');
+            var textEl = document.getElementById('compress-text');
+            if (barEl) barEl.style.width = '100%';
+            if (textEl) textEl.textContent = '完成！' + (file.size/1024/1024).toFixed(1) + 'MB → ' + (compressed.size/1024/1024).toFixed(1) + 'MB';
+            
+            setTimeout(function() {
+                cleanup();
+                if (compressed.size < file.size * 0.9) {
+                    showToast('压缩完成：' + (file.size/1024/1024).toFixed(1) + 'MB → ' + (compressed.size/1024/1024).toFixed(1) + 'MB');
+                    callback(compressed);
+                } else {
+                    showToast('压缩效果不明显，使用原视频');
+                    callback(file);
+                }
+            }, 500);
+        };
+        
+        recorder.start(1000);
+        video.play();
+        
+        var startTime = Date.now();
+        var duration = video.duration || 60;
+        
+        function drawFrame() {
+            if (video.ended || video.paused) {
+                recorder.stop();
+                return;
+            }
+            ctx.drawImage(video, 0, 0, nw, nh);
+            
+            var progress = Math.min(((Date.now() - startTime) / (duration * 1000)) * 100, 95);
+            var barEl = document.getElementById('compress-bar');
+            var textEl = document.getElementById('compress-text');
+            if (barEl) barEl.style.width = progress + '%';
+            if (textEl) textEl.textContent = Math.round(progress) + '%';
+            
+            requestAnimationFrame(drawFrame);
+        }
+        
+        video.onplay = function() {
+            drawFrame();
+        };
+        
+        video.onended = function() {
+            if (recorder.state === 'recording') {
+                recorder.stop();
+            }
+        };
+    };
+    
+    video.onerror = function() {
+        cleanup();
+        showToast('视频读取失败，使用原文件');
+        callback(file);
+    };
+}
+
+// ========== 视频缓存功能（Cache API）==========
+var VIDEO_CACHE_NAME = 'video-cache-v1';
+
+function cacheVideo(url, blob) {
+    if (!('caches' in window)) return Promise.resolve();
+    return caches.open(VIDEO_CACHE_NAME).then(function(cache) {
+        var response = new Response(blob, { headers: { 'Content-Type': blob.type || 'video/mp4' } });
+        return cache.put(url, response);
+    }).catch(function(e) {
+        console.warn('视频缓存失败:', e);
+    });
+}
+
+function getCachedVideo(url) {
+    if (!('caches' in window)) return Promise.resolve(null);
+    return caches.open(VIDEO_CACHE_NAME).then(function(cache) {
+        return cache.match(url);
+    }).then(function(response) {
+        if (response) return response.blob();
+        return null;
+    }).catch(function() {
+        return null;
+    });
+}
+
 function handleVideoUpload(input) {
     const file = input.files[0];
     if (!file) return;
@@ -943,15 +1151,22 @@ function handleVideoUpload(input) {
         URL.revokeObjectURL(tempUrl);
     };
     
-    // 将视频文件存入 IndexedDB（异步，不阻塞UI）
-    saveVideoFile(videoId, file).then(function() {
-        console.log('视频文件已持久化存储:', videoId);
-    }).catch(function(e) {
-        console.error('视频持久化存储失败:', e);
-        showToast('视频存储可能不稳定，请刷新重试');
+    // 压缩后存储
+    compressVideo(file, function(processedFile) {
+        videoData.size = processedFile.size;
+        videoData.type = processedFile.type || file.type;
+        syncUserData(user);
+        renderLocalVideoList();
+        
+        saveVideoFile(videoId, processedFile).then(function() {
+            console.log('视频文件已持久化存储:', videoId, '大小:', (processedFile.size/1024/1024).toFixed(1) + 'MB');
+        }).catch(function(e) {
+            console.error('视频持久化存储失败:', e);
+            showToast('视频存储可能不稳定，请刷新重试');
+        });
     });
     
-    showToast('视频上传成功！');
+    showToast('视频上传成功！' + (file.size > 5*1024*1024 ? ' 大视频将自动压缩' : ''));
     renderLocalVideoList();
 }
 
@@ -1143,4 +1358,7 @@ function updateVideoProgress() {
 // ========== 本地视频相关函数导出 ==========
 window.playLocalVideo = playLocalVideo;
 window.handleVideoUpload = handleVideoUpload;
+window.compressVideo = compressVideo;
+window.cacheVideo = cacheVideo;
+window.getCachedVideo = getCachedVideo;
 window.deleteLocalVideo = deleteLocalVideo;
