@@ -1,4 +1,4 @@
-// 版本: V151-2
+// 版本: V152
 
 window.week5Plan = {
     weekId:'week5',weekTitle:'Week5：系统性思维与守恒思维综合周',
@@ -347,6 +347,49 @@ window.week8Plan = {
 };
 CTM.registerPlan('week8', week8Plan);
 
+window.week9Plan = {
+    weekId:'week9',weekTitle:'Week9：元认知自动化与学业冲刺深化周',
+    weekDesc:'在Week8基础上实现元认知自动化运行+期末冲刺实战深化+个性化体系完善+长期学习规划的四维升级',
+    days:[
+        {day:1,title:'元认知自动化 - 预测预防的常态化运行',tasks:[
+            {id:'w9d1t1',title:'自动化触发条件设置 - 学习场景自动检查点',type:'practice',duration:15,completed:false},
+            {id:'w9d1t2',title:'预警阈值校准 - 根据个人特点调整敏感度',type:'planning',duration:15,completed:false},
+            {id:'w9d1t3',title:'条件反射建立 - 问题→预警→调节自动化',type:'writing',duration:10,completed:false}
+        ]},
+        {day:2,title:'期末冲刺策略深化 - 高效复习与提分技巧',tasks:[
+            {id:'w9d2t1',title:'提分目标精准化 - 确定重点提分科目知识点',type:'planning',duration:15,completed:false},
+            {id:'w9d2t2',title:'高效复习方法 - 重点突破与知识网络化',type:'practice',duration:20,completed:false},
+            {id:'w9d2t3',title:'错题利用最大化 - 分类重做与规律提炼',type:'review',duration:15,completed:false}
+        ]},
+        {day:3,title:'学业冲刺实战深化 - 真题模拟与应试策略',tasks:[
+            {id:'w9d3t1',title:'真题模拟训练 - 严格模拟真实考试场景',type:'practice',duration:30,completed:false},
+            {id:'w9d3t2',title:'应试策略优化 - 时间分配与答题顺序',type:'planning',duration:15,completed:false},
+            {id:'w9d3t3',title:'考试状态管理 - 考前考中状态调控',type:'relax',duration:15,completed:false}
+        ]},
+        {day:4,title:'个性化学习体系优化 - 持续改进与精准调整',tasks:[
+            {id:'w9d4t1',title:'体系运行评估 - 六大系统效果评估',type:'review',duration:20,completed:false},
+            {id:'w9d4t2',title:'瓶颈问题识别 - 根因分析与影响评估',type:'practice',duration:20,completed:false},
+            {id:'w9d4t3',title:'精准优化调整 - 短期中期长期优化方案',type:'creative',duration:15,completed:false}
+        ]},
+        {day:5,title:'长期学习规划能力 - 学期目标与假期规划',tasks:[
+            {id:'w9d5t1',title:'学期目标制定 - SMART原则应用',type:'planning',duration:20,completed:false},
+            {id:'w9d5t2',title:'目标分解方法 - 金字塔分解与月周里程碑',type:'practice',duration:15,completed:false},
+            {id:'w9d5t3',title:'假期学习规划 - 三三制与劳逸结合',type:'creative',duration:15,completed:false}
+        ]},
+        {day:6,title:'冲刺阶段学习方法应用',tasks:[
+            {id:'w9d6t1',title:'数学物理冲刺思维 - 题型归类与快速破题',type:'practice',duration:25,completed:false},
+            {id:'w9d6t2',title:'考试时间管理 - 如何做到既快又准',type:'planning',duration:15,completed:false},
+            {id:'w9d6t3',title:'难题抢分技巧 - 不会做也能拿步骤分',type:'review',duration:10,completed:false}
+        ]},
+        {day:7,title:'Week9总结与未来展望',tasks:[
+            {id:'w9d7t1',title:'Week9复盘报告生成',type:'writing',duration:15,completed:false},
+            {id:'w9d7t2',title:'9周训练成果总结与能力评估',type:'review',duration:15,completed:false},
+            {id:'w9d7t3',title:'制定下阶段深度学习目标',type:'planning',duration:10,completed:false}
+        ]}
+    ]
+};
+CTM.registerPlan('week9', week9Plan);
+
 
 // ===== Week Plans 映射 =====
 window.weekPlans = {
@@ -357,7 +400,8 @@ window.weekPlans = {
     week5: week5Plan,
     week6: week6Plan,
     week7: week7Plan,
-    week8: week8Plan
+    week8: week8Plan,
+    week9: week9Plan
 };
 
 
