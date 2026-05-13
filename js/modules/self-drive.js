@@ -63,19 +63,23 @@ window.renderSelfDrive = function(container) {
         
         <!-- 功能入口 -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-            <button onclick="renderGoalPage()" style="padding:20px 12px;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
+            <button onclick="renderGoalPage()" style="padding:16px 12px;background:linear-gradient(135deg,#4facfe,#00f2fe);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">
                 🎯 目标设定
             </button>
-            <button onclick="renderHabitPage()" style="padding:20px 12px;background:linear-gradient(135deg,#43e97b,#38f9d7);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
+            <button onclick="renderHabitPage()" style="padding:16px 12px;background:linear-gradient(135deg,#43e97b,#38f9d7);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">
                 📅 习惯追踪
             </button>
-            <button onclick="renderAchievementPage()" style="padding:20px 12px;background:linear-gradient(135deg,#fa709a,#fee140);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
+            <button onclick="renderAchievementPage()" style="padding:16px 12px;background:linear-gradient(135deg,#fa709a,#fee140);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">
                 🏆 成就墙
             </button>
-            <button onclick="renderDiaryPage()" style="padding:20px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;">
+            <button onclick="renderDiaryPage()" style="padding:16px 12px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">
                 📝 每日反思
             </button>
         </div>
+        
+        <button onclick="renderMethodPage()" style="width:100%;padding:16px;background:linear-gradient(135deg,#FF6B6B,#FF9A63);color:white;border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">
+            📚 科学训练方法
+        </button>
         
         <!-- 成就概览 -->
         <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
@@ -390,6 +394,100 @@ function deleteDiary(index) {
     SelfDrive.diary.splice(index, 1);
     SelfDrive.save();
     renderDiaryPage();
+}
+
+
+// 训练方法库页面
+function renderMethodPage() {
+    const container = document.getElementById('detail-content') || document.body;
+    const modal = document.getElementById('detail-modal');
+    if (modal) modal.classList.add('show');
+    
+    const methods = [
+        {
+            icon: '🎯',
+            title: '1. 强化"自主感"',
+            desc: '把"我必须做"转变为"我选择做"',
+            tips: [
+                '改变语言：不说"我得去运动"，而说"我选择运动，因为它让我精力更好"',
+                '给选项：不想写作业？可以"先写10分钟"或"先列大纲"。选其一，立刻行动'
+            ]
+        },
+        {
+            icon: '💪',
+            title: '2. 制造"胜任感"',
+            desc: '动力来源于"我能做好"的预期',
+            tips: [
+                '拆解任务：把大目标分解到"不可能失败"的小步骤（如"背1个单词"）',
+                '记录成就：每天写下3件完成的小事，哪怕只是"准时起床"'
+            ]
+        },
+        {
+            icon: '💡',
+            title: '3. 连接"价值感"',
+            desc: '明确"为什么做"比"怎么做"更能激发持久动力',
+            tips: [
+                '追问5层：针对目标连续追问"为什么"，直到触及内在价值观',
+                '视觉化结果：想象完成任务后的具体感受（如成就感、自由感），并写下来'
+            ]
+        },
+        {
+            icon: '🌱',
+            title: '4. 设计"低阻力"环境',
+            desc: '自驱力脆弱时，环境是关键推手',
+            tips: [
+                '降低启动成本：想看书就把书放在枕头边；想学习就提前把文具准备好',
+                '移除诱惑：学习时把手机放在另一个房间'
+            ]
+        },
+        {
+            icon: '❓',
+            title: '5. 用"好奇心"驱动探索',
+            desc: '内驱力常源于未知。对过程而非结果好奇',
+            tips: [
+                '问"如果……会怎样"：如"如果我每天写100字，一个月后会写出什么？"',
+                '允许无目的尝试：每周花1小时纯粹因为"觉得有趣"做一件事，不设目标'
+            ]
+        },
+        {
+            icon: '🔄',
+            title: '6. 建立正向反馈闭环',
+            desc: '大脑依赖多巴胺维持动力',
+            tips: [
+                '即时奖励：完成任务后立即给自己一个小奖励（如听一首喜欢的歌）',
+                '追踪进度：用可视化方式（如进度条、打卡记录）让成长"被看见"'
+            ]
+        },
+        {
+            icon: '⚡',
+            title: '7. 管理"认知资源"',
+            desc: '自驱力像肌肉会疲劳，需要节能和恢复',
+            tips: [
+                '意志力配额：把最重要的决策放在精力最好的时段做',
+                '主动休息：每45-90分钟强制休息，避免意志力耗尽'
+            ]
+        }
+    ];
+    
+    container.innerHTML = `
+    <div style="padding:20px;">
+        <h3 style="margin:0 0 20px 0;font-size:18px;">📚 自驱力科学训练方法</h3>
+        <div style="font-size:12px;color:#666;margin-bottom:16px;">核心：由内在需求或兴趣驱动的行动力，而非依赖外部奖励或压力</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            ${methods.map(m => `
+                <div style="background:white;padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                        <span style="font-size:20px;">${m.icon}</span>
+                        <span style="font-size:14px;font-weight:600;color:#333;">${m.title}</span>
+                    </div>
+                    <div style="font-size:12px;color:#667eea;margin-bottom:8px;">${m.desc}</div>
+                    <div style="padding-left:28px;">
+                        ${m.tips.map(t => `<div style="font-size:12px;color:#666;margin-bottom:4px;">• ${t}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    </div>`;
 }
 
 // 注册模块
