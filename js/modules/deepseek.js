@@ -736,6 +736,15 @@ function renderDeepseek(contentEl) {
         '</div>' +
         // 聊天区
         '<div id="deepseek-messages" style="flex:1;overflow-y:auto;padding:10px;font-size:13px;"></div>' +
+        // 模式切换按钮
+        '<div style="padding:6px 10px;background:#f9f9f9;border-top:1px solid #eee;display:flex;gap:8px;flex-shrink:0;">' +
+        '  <button class="ds-mode-btn" data-mode="fast" onclick="toggleDeepseekMode(\'fast\')" style="flex:1;padding:6px 12px;border:none;border-radius:16px;font-size:11px;cursor:pointer;background:#667eea;color:white;transition:all 0.2s;">' +
+        '    🚀 快速模式' +
+        '  </button>' +
+        '  <button class="ds-mode-btn" data-mode="expert" onclick="toggleDeepseekMode(\'expert\')" style="flex:1;padding:6px 12px;border:none;border-radius:16px;font-size:11px;cursor:pointer;background:#f5f5f5;color:#666;transition:all 0.2s;">' +
+        '    💎 专家模式' +
+        '  </button>' +
+        '</div>' +
         // 输入区
         '<div style="padding:6px 8px;border-top:1px solid #eee;display:flex;gap:4px;align-items:center;background:white;flex-shrink:0;">' +
             '<button onclick="triggerDeepSeekImage()" style="width:28px;height:28px;border:none;background:#667eea;color:white;border-radius:6px;font-size:12px;cursor:pointer;flex-shrink:0;">📷</button>' +
@@ -761,6 +770,16 @@ function renderDeepseek(contentEl) {
     
     // 查询余额
     updateDeepSeekBalance();
+    
+    // 初始化模式按钮状态
+    setTimeout(function() {
+        if (typeof window.deepseekMode !== 'undefined') {
+            document.querySelectorAll('.ds-mode-btn').forEach(btn => {
+                btn.style.background = btn.dataset.mode === window.deepseekMode ? '#667eea' : '#f5f5f5';
+                btn.style.color = btn.dataset.mode === window.deepseekMode ? 'white' : '#666';
+            });
+        }
+    }, 50);
 }
 window.renderDeepseek = renderDeepseek;
 

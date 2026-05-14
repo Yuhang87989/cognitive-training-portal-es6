@@ -604,15 +604,15 @@ window.renderMyPage = function(container) {
                 <div class="quick-card-icon">📝</div>
                 <div class="quick-card-title">错题本</div>
             </div>
-            <div class="quick-card" onclick="openSelfDrivePage()">
+            <div class="quick-card" onclick="openFullscreenPage('selfdrive')">
                 <div class="quick-card-icon">💪</div>
                 <div class="quick-card-title">自驱力训练</div>
             </div>
-            <div class="quick-card" onclick="doBackup()">
+            <div class="quick-card" onclick="openFullscreenPage('backup')">
                 <div class="quick-card-icon">💾</div>
                 <div class="quick-card-title">数据备份</div>
             </div>
-            <div class="quick-card" onclick="openSystemSettings()">
+            <div class="quick-card" onclick="openSettingsPanel()">
                 <div class="quick-card-icon">⚙️</div>
                 <div class="quick-card-title">设置</div>
             </div>
@@ -660,7 +660,7 @@ window.renderMyPage = function(container) {
             </div>
             <div id="accordion-data" class="accordion-content" style="max-height:${window.accordionState.data ? '500px' : '0'};opacity:${window.accordionState.data ? 1 : 0};">
                 <div class="accordion-content-inner">
-                    <button class="foldable-btn" onclick="doBackup()">
+                    <button class="foldable-btn" onclick="openFullscreenPage('backup')">
                         <span>📤</span> 导出备份
                     </button>
                     <button class="foldable-btn" onclick="doRestore()">
