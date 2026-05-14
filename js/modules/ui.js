@@ -361,6 +361,7 @@ function openFullscreenPage(module) {
         case 'deepseek': renderDeepseek(contentEl); break;
         case 'wrongbook': renderWrongbook(contentEl); break;
         case 'pomodoro': renderPomodoro(contentEl); break;
+        case 'settings': openSettingsPanel(); closeFullscreenPage(); return; break;
         case 'my': renderMyPage(contentEl); break;
         case 'selfdrive': renderSelfDrive(contentEl); break;
         case 'backup': renderBackupManager(contentEl); break;
