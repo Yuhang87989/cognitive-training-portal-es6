@@ -41,6 +41,16 @@ function recordDeepSeekCall(tokens) {
 }
 window.recordDeepSeekCall = recordDeepSeekCall;
 
+// 记录详细的DeepSeek使用统计
+function recordDetailedUsage(inputTokens, outputTokens, questionSummary, model) {
+    if (window.UsageStatsModule) {
+        window.UsageStatsModule.recordUsage(inputTokens, outputTokens, questionSummary, model);
+    }
+    // 同时保持原有统计
+    recordDeepSeekCall((inputTokens || 0) + (outputTokens || 0));
+}
+window.recordDetailedUsage = recordDetailedUsage;
+
 function escapeHtml(text) {
     if (!text) return '';
     var d = document.createElement('div'); d.textContent = text; return d.innerHTML;
@@ -192,7 +202,27 @@ async function callVisionAPIEndpoint(messages, temperature, apiType) {
         }
         var data = await response.json();
         var content = data.choices[0].message.content;
-        if (data.usage) recordDeepSeekCall(data.usage.total_tokens);
+        if (data.usage) {
+            // 提取问题摘要
+            var questionSummary = '';
+            if (messages && messages.length > 0) {
+                var lastUserMsg = messages.filter(function(m) { return m.role === 'user'; }).pop();
+                if (lastUserMsg) {
+                    if (typeof lastUserMsg.content === 'string') {
+                        questionSummary = lastUserMsg.content;
+                    } else if (Array.isArray(lastUserMsg.content)) {
+                        var textPart = lastUserMsg.content.find(function(p) { return p.type === 'text'; });
+                        if (textPart) questionSummary = textPart.text;
+                    }
+                }
+            }
+            recordDetailedUsage(
+                data.usage.prompt_tokens || data.usage.input_tokens || 0,
+                data.usage.completion_tokens || data.usage.output_tokens || 0,
+                questionSummary,
+                model || DEEPSEEK_MODEL
+            );
+        }
         return {success: true, content: content};
     } catch (error) {
         if (error.message === 'unsupported') {
@@ -260,7 +290,27 @@ async function callDeepSeekAPI(messages, temperature) {
         }
         var data = await response.json();
         var content = data.choices[0].message.content;
-        if (data.usage) recordDeepSeekCall(data.usage.total_tokens);
+        if (data.usage) {
+            // 提取问题摘要
+            var questionSummary = '';
+            if (messages && messages.length > 0) {
+                var lastUserMsg = messages.filter(function(m) { return m.role === 'user'; }).pop();
+                if (lastUserMsg) {
+                    if (typeof lastUserMsg.content === 'string') {
+                        questionSummary = lastUserMsg.content;
+                    } else if (Array.isArray(lastUserMsg.content)) {
+                        var textPart = lastUserMsg.content.find(function(p) { return p.type === 'text'; });
+                        if (textPart) questionSummary = textPart.text;
+                    }
+                }
+            }
+            recordDetailedUsage(
+                data.usage.prompt_tokens || data.usage.input_tokens || 0,
+                data.usage.completion_tokens || data.usage.output_tokens || 0,
+                questionSummary,
+                model || DEEPSEEK_MODEL
+            );
+        }
         return {success: true, content: content};
     } catch (error) {
         return {error: true, type: 'network', message: error.message};

@@ -1,16 +1,15 @@
 // ==========================================
-// V195 我的 - 个人中心页面
-// 折叠菜单式布局重构
+// V199 我的 - 个人中心页面
+// 功能：2x2快捷功能卡片 + 5个折叠分区
 // ==========================================
 
 // 全局状态：记录各折叠面板展开状态
 window.accordionState = {
-    'basic': true,      // 默认展开第一个
-    'learning': false,
-    'ai': false,
+    'study': true,      // 默认展开第一个
     'data': false,
-    'api': false,
-    'system': false
+    'tools': false,
+    'user': false,
+    'about': false
 };
 
 // 切换折叠面板
@@ -89,6 +88,15 @@ window.clearAIContext = function() {
         clearDeepSeekConversation();
     }
     showToast('AI上下文已清除');
+};
+
+// 打开AI使用统计
+window.openUsageStats = function() {
+    if (window.UsageStatsModule) {
+        window.UsageStatsModule.openUsageStatsModal();
+    } else {
+        showToast('使用统计模块加载中，请稍后再试');
+    }
 };
 
 // DeepSeek帮助文档模态框
@@ -262,7 +270,101 @@ window.clearAppCache = function() {
 
 // 显示关于信息
 window.showAbout = function() {
-    alert('认知训练门户 V195\n\n一个专注于提升认知能力的训练平台。\n包含多种思维训练游戏、AI辅导、错题管理等功能。\n\n© 2024 认知训练团队');
+    alert('认知训练门户 V199\n\n一个专注于提升认知能力的训练平台。\n包含多种思维训练游戏、AI辅导、错题管理等功能。\n\n© 2024 认知训练团队');
+};
+
+// 打开设置页面
+window.openSystemSettings = function() {
+    showToast('设置功能开发中，敬请期待');
+};
+
+// 打开自驱力训练
+window.openSelfDrivePage = function() {
+    const modal = document.getElementById('fullscreen-page');
+    const content = document.getElementById('fullscreen-content');
+    const title = document.getElementById('fullscreen-title');
+    
+    if (modal && content) {
+        modal.classList.add('show');
+        title.textContent = '💪 自驱力训练';
+        if (typeof renderSelfDriveContent === 'function') {
+            renderSelfDriveContent(content);
+        } else {
+            content.innerHTML = '<div style="padding:20px;text-align:center;"><h3>💪 自驱力训练</h3><p>功能开发中...</p></div>';
+        }
+    }
+};
+
+// 打开番茄钟
+window.openPomodoro = function() {
+    const modal = document.getElementById('fullscreen-page');
+    const content = document.getElementById('fullscreen-content');
+    const title = document.getElementById('fullscreen-title');
+    
+    if (modal && content) {
+        modal.classList.add('show');
+        title.textContent = '🍅 番茄钟';
+        if (typeof renderPomodoroContent === 'function') {
+            renderPomodoroContent(content);
+        } else {
+            content.innerHTML = '<div style="padding:20px;text-align:center;"><h3>🍅 番茄钟</h3><p>功能开发中...</p></div>';
+        }
+    }
+};
+
+// 打开计算器
+window.openCalculator = function() {
+    showToast('计算器功能开发中');
+};
+
+// 打开记事本
+window.openNotepad = function() {
+    showToast('记事本功能开发中');
+};
+
+// 打开修改资料
+window.openEditProfileModal = function() {
+    showToast('修改资料功能开发中');
+};
+
+// 打开更换头像
+window.openAvatarModal = function() {
+    showToast('更换头像功能开发中');
+};
+
+// 打开难度设置
+window.openDifficultyModal = function() {
+    showToast('难度设置功能开发中');
+};
+
+// 打开使用帮助
+window.openHelp = function() {
+    showToast('帮助文档开发中');
+};
+
+// 打开意见反馈
+window.openFeedback = function() {
+    showToast('意见反馈功能开发中');
+};
+
+// 打开每周回顾
+window.openWeeklyReview = function() {
+    showToast('每周回顾功能开发中');
+};
+
+// 打开进步曲线
+window.openProgressChart = function() {
+    showToast('进步曲线功能开发中');
+};
+
+// 数据同步
+window.syncData = function() {
+    showToast('数据同步功能开发中');
+};
+
+// 显示数据报告
+window.showDataStatsModal = function() {
+    showToast('数据报告功能开发中');
 };
 
 window.renderMyPage = function(container) {
@@ -274,8 +376,41 @@ window.renderMyPage = function(container) {
     const deepseekMode = localStorage.getItem('deepseek_mode') || 'fast';
     const customApiKey = localStorage.getItem('deepseek_api_key') || '';
     
-    // 折叠面板通用CSS
-    const accordionStyle = `
+    // 折叠面板和快捷卡片CSS
+    const myPageStyle = `
+        .quick-cards-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .quick-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .quick-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .quick-card:active {
+            transform: translateY(0);
+        }
+        .quick-card-icon {
+            font-size: 32px;
+        }
+        .quick-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
         .accordion-section {
             background: white;
             border-radius: 12px;
@@ -409,10 +544,32 @@ window.renderMyPage = function(container) {
             outline: none;
             border-color: #667eea;
         }
+        .foldable-btn {
+            width: 100%;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            text-align: left;
+            transition: background 0.2s;
+        }
+        .foldable-btn:hover {
+            background: #e9ecef;
+        }
+        .foldable-btn:last-child {
+            margin-bottom: 0;
+        }
     `;
     
     container.innerHTML = `
-    <style>${accordionStyle}</style>
+    <style>${myPageStyle}</style>
     <div style="padding:16px;">
         <!-- 用户信息卡片 -->
         <div style="background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;padding:20px;color:white;margin-bottom:16px;">
@@ -441,17 +598,128 @@ window.renderMyPage = function(container) {
             </div>
         </div>
         
-        <!-- 基础设置 -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('basic')">
-                <div class="accordion-title">
-                    <span>⚙️</span>
-                    <span>基础设置</span>
-                </div>
-                <span id="accordion-icon-basic" class="accordion-icon" style="transform:rotate(${window.accordionState.basic ? 180 : 0}deg);">▼</span>
+        <!-- 2x2 快捷功能卡片 -->
+        <div class="quick-cards-section">
+            <div class="quick-card" onclick="openFullscreenPage('wrongbook')">
+                <div class="quick-card-icon">📝</div>
+                <div class="quick-card-title">错题本</div>
             </div>
-            <div id="accordion-basic" class="accordion-content" style="max-height:${window.accordionState.basic ? '500px' : '0'};opacity:${window.accordionState.basic ? 1 : 0};">
+            <div class="quick-card" onclick="openSelfDrivePage()">
+                <div class="quick-card-icon">💪</div>
+                <div class="quick-card-title">自驱力训练</div>
+            </div>
+            <div class="quick-card" onclick="doBackup()">
+                <div class="quick-card-icon">💾</div>
+                <div class="quick-card-title">数据备份</div>
+            </div>
+            <div class="quick-card" onclick="openSystemSettings()">
+                <div class="quick-card-icon">⚙️</div>
+                <div class="quick-card-title">设置</div>
+            </div>
+        </div>
+        
+        <!-- 折叠分区1: 📊 学习统计 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('study')">
+                <div class="accordion-title">
+                    <span>📊</span>
+                    <span>学习统计</span>
+                </div>
+                <span id="accordion-icon-study" class="accordion-icon" style="transform:rotate(${window.accordionState.study ? 180 : 0}deg);">▼</span>
+            </div>
+            <div id="accordion-study" class="accordion-content" style="max-height:${window.accordionState.study ? '500px' : '0'};opacity:${window.accordionState.study ? 1 : 0};">
                 <div class="accordion-content-inner">
+                    <button class="foldable-btn" onclick="showDataStatsModal()">
+                        <span>📈</span> 学习数据报告
+                    </button>
+                    <button class="foldable-btn" onclick="openWeeklyReview()">
+                        <span>📅</span> 每周回顾
+                    </button>
+                    <button class="foldable-btn" onclick="openProgressChart()">
+                        <span>📉</span> 进步曲线
+                    </button>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">错题数量</div>
+                            <div class="setting-desc">待复习的错题</div>
+                        </div>
+                        <span style="font-size:18px;font-weight:600;color:${wrongCount > 0 ? '#ff4757' : '#52c41a'};">${wrongCount} 道</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 折叠分区2: 💾 数据管理 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('data')">
+                <div class="accordion-title">
+                    <span>💾</span>
+                    <span>数据管理</span>
+                </div>
+                <span id="accordion-icon-data" class="accordion-icon" style="transform:rotate(${window.accordionState.data ? 180 : 0}deg);">▼</span>
+            </div>
+            <div id="accordion-data" class="accordion-content" style="max-height:${window.accordionState.data ? '500px' : '0'};opacity:${window.accordionState.data ? 1 : 0};">
+                <div class="accordion-content-inner">
+                    <button class="foldable-btn" onclick="doBackup()">
+                        <span>📤</span> 导出备份
+                    </button>
+                    <button class="foldable-btn" onclick="doRestore()">
+                        <span>📥</span> 导入恢复
+                    </button>
+                    <button class="foldable-btn" onclick="syncData()">
+                        <span>🔄</span> 数据同步
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 折叠分区3: 🛠️ 实用工具 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('tools')">
+                <div class="accordion-title">
+                    <span>🛠️</span>
+                    <span>实用工具</span>
+                </div>
+                <span id="accordion-icon-tools" class="accordion-icon" style="transform:rotate(${window.accordionState.tools ? 180 : 0}deg);">▼</span>
+            </div>
+            <div id="accordion-tools" class="accordion-content" style="max-height:${window.accordionState.tools ? '500px' : '0'};opacity:${window.accordionState.tools ? 1 : 0};">
+                <div class="accordion-content-inner">
+                    <button class="foldable-btn" onclick="openPomodoro()">
+                        <span>🍅</span> 番茄钟
+                    </button>
+                    <button class="foldable-btn" onclick="openCalculator()">
+                        <span>🔢</span> 计算器
+                    </button>
+                    <button class="foldable-btn" onclick="openNotepad()">
+                        <span>📝</span> 记事本
+                    </button>
+                    <button class="foldable-btn" onclick="openUsageStats()">
+                        <span>📊</span> AI使用统计
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 折叠分区4: 👥 用户设置 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion('user')">
+                <div class="accordion-title">
+                    <span>👥</span>
+                    <span>用户设置</span>
+                </div>
+                <span id="accordion-icon-user" class="accordion-icon" style="transform:rotate(${window.accordionState.user ? 180 : 0}deg);">▼</span>
+            </div>
+            <div id="accordion-user" class="accordion-content" style="max-height:${window.accordionState.user ? '500px' : '0'};opacity:${window.accordionState.user ? 1 : 0};">
+                <div class="accordion-content-inner">
+                    <button class="foldable-btn" onclick="openEditProfileModal()">
+                        <span>✏️</span> 修改资料
+                    </button>
+                    <button class="foldable-btn" onclick="openAvatarModal()">
+                        <span>🎨</span> 更换头像
+                    </button>
+                    <button class="foldable-btn" onclick="openDifficultyModal()">
+                        <span>⚙️</span> 难度设置
+                    </button>
                     <div class="setting-row">
                         <div>
                             <div class="setting-label">难度级别</div>
@@ -483,49 +751,29 @@ window.renderMyPage = function(container) {
             </div>
         </div>
         
-        <!-- 学习管理 -->
+        <!-- 折叠分区5: ℹ️ 关于帮助 -->
         <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('learning')">
+            <div class="accordion-header" onclick="toggleAccordion('about')">
                 <div class="accordion-title">
-                    <span>📚</span>
-                    <span>学习管理</span>
+                    <span>ℹ️</span>
+                    <span>关于帮助</span>
                 </div>
-                <span id="accordion-icon-learning" class="accordion-icon" style="transform:rotate(${window.accordionState.learning ? 180 : 0}deg);">▼</span>
+                <span id="accordion-icon-about" class="accordion-icon" style="transform:rotate(${window.accordionState.about ? 180 : 0}deg);">▼</span>
             </div>
-            <div id="accordion-learning" class="accordion-content" style="max-height:${window.accordionState.learning ? '500px' : '0'};opacity:${window.accordionState.learning ? 1 : 0};">
+            <div id="accordion-about" class="accordion-content" style="max-height:${window.accordionState.about ? '600px' : '0'};opacity:${window.accordionState.about ? 1 : 0};">
                 <div class="accordion-content-inner">
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">错题数量</div>
-                            <div class="setting-desc">待复习的错题</div>
-                        </div>
-                        <span style="font-size:18px;font-weight:600;color:${wrongCount > 0 ? '#ff4757' : '#52c41a'};">${wrongCount} 道</span>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">错题本操作</div>
-                            <div class="setting-desc">管理错题记录</div>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button class="btn-small btn-primary" onclick="openFullscreenPage('wrongbook')">查看</button>
-                            <button class="btn-small btn-danger" onclick="clearWrongBook()">清空</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- AI能力 -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('ai')">
-                <div class="accordion-title">
-                    <span>🤖</span>
-                    <span>AI能力</span>
-                </div>
-                <span id="accordion-icon-ai" class="accordion-icon" style="transform:rotate(${window.accordionState.ai ? 180 : 0}deg);">▼</span>
-            </div>
-            <div id="accordion-ai" class="accordion-content" style="max-height:${window.accordionState.ai ? '500px' : '0'};opacity:${window.accordionState.ai ? 1 : 0};">
-                <div class="accordion-content-inner">
+                    <button class="foldable-btn" onclick="showAbout()">
+                        <span>📋</span> 版本信息
+                    </button>
+                    <button class="foldable-btn" onclick="openHelp()">
+                        <span>❓</span> 使用帮助
+                    </button>
+                    <button class="foldable-btn" onclick="openFeedback()">
+                        <span>💬</span> 意见反馈
+                    </button>
+                    <button class="foldable-btn" onclick="openDeepseekHelpModal()">
+                        <span>🔮</span> DeepSeek帮助文档
+                    </button>
                     <div class="setting-row">
                         <div>
                             <div class="setting-label">DeepSeek模式</div>
@@ -536,64 +784,6 @@ window.renderMyPage = function(container) {
                             <button class="mode-btn ${deepseekMode === 'expert' ? 'active' : ''}" onclick="toggleDeepSeekMode('expert')">专家</button>
                         </div>
                     </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">上下文管理</div>
-                            <div class="setting-desc">清除AI对话历史</div>
-                        </div>
-                        <button class="btn-small btn-secondary" onclick="clearAIContext()">清除上下文</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 数据管理 -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('data')">
-                <div class="accordion-title">
-                    <span>💾</span>
-                    <span>数据管理</span>
-                </div>
-                <span id="accordion-icon-data" class="accordion-icon" style="transform:rotate(${window.accordionState.data ? 180 : 0}deg);">▼</span>
-            </div>
-            <div id="accordion-data" class="accordion-content" style="max-height:${window.accordionState.data ? '500px' : '0'};opacity:${window.accordionState.data ? 1 : 0};">
-                <div class="accordion-content-inner">
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">数据备份</div>
-                            <div class="setting-desc">导出数据到本地</div>
-                        </div>
-                        <button class="btn-small btn-primary" onclick="doBackup()">立即备份</button>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">数据恢复</div>
-                            <div class="setting-desc">从备份文件恢复</div>
-                        </div>
-                        <button class="btn-small btn-secondary" onclick="doRestore()">导入恢复</button>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">更多选项</div>
-                            <div class="setting-desc">完整备份管理器</div>
-                        </div>
-                        <button class="btn-small btn-secondary" onclick="openFullscreenPage('backup')">打开</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- API配置 -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('api')">
-                <div class="accordion-title">
-                    <span>🔑</span>
-                    <span>API配置</span>
-                </div>
-                <span id="accordion-icon-api" class="accordion-icon" style="transform:rotate(${window.accordionState.api ? 180 : 0}deg);">▼</span>
-            </div>
-            <div id="accordion-api" class="accordion-content" style="max-height:${window.accordionState.api ? '500px' : '0'};opacity:${window.accordionState.api ? 1 : 0};">
-                <div class="accordion-content-inner">
                     <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
                         <div>
                             <div class="setting-label">DeepSeek API Key</div>
@@ -604,48 +794,12 @@ window.renderMyPage = function(container) {
                             <button class="btn-small btn-primary" onclick="saveApiKey()">保存</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 系统操作 -->
-        <div class="accordion-section">
-            <div class="accordion-header" onclick="toggleAccordion('system')">
-                <div class="accordion-title">
-                    <span>🛠️</span>
-                    <span>系统操作</span>
-                </div>
-                <span id="accordion-icon-system" class="accordion-icon" style="transform:rotate(${window.accordionState.system ? 180 : 0}deg);">▼</span>
-            </div>
-            <div id="accordion-system" class="accordion-content" style="max-height:${window.accordionState.system ? '500px' : '0'};opacity:${window.accordionState.system ? 1 : 0};">
-                <div class="accordion-content-inner">
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">版本信息</div>
-                            <div class="setting-desc">当前应用版本</div>
-                        </div>
-                        <span style="font-size:14px;color:#667eea;font-weight:600;">V195</span>
-                    </div>
                     <div class="setting-row">
                         <div>
                             <div class="setting-label">清除缓存</div>
                             <div class="setting-desc">重置所有本地数据</div>
                         </div>
                         <button class="btn-small btn-danger" onclick="clearAppCache()">清除</button>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">关于</div>
-                            <div class="setting-desc">应用信息</div>
-                        </div>
-                        <button class="btn-small btn-secondary" onclick="showAbout()">查看</button>
-                    </div>
-                    <div class="setting-row">
-                        <div>
-                            <div class="setting-label">🔮 DeepSeek帮助文档</div>
-                            <div class="setting-desc">快速模式/专家模式、Token消耗、API Key配置</div>
-                        </div>
-                        <button class="btn-small btn-primary" onclick="openDeepseekHelpModal()">查看</button>
                     </div>
                 </div>
             </div>
@@ -656,6 +810,9 @@ window.renderMyPage = function(container) {
             <div style="font-size:12px;color:#43e97b;font-weight:600;margin-bottom:8px;">✨ 今日能量</div>
             <div style="font-size:14px;color:#333;line-height:1.6;">${typeof SelfDrive !== 'undefined' && SelfDrive.getRandomQuote ? SelfDrive.getRandomQuote() : '持续学习，每天进步一点点！'}</div>
         </div>
+        
+        <!-- 底部间距 -->
+        <div style="height: 80px;"></div>
     </div>`;
 };
 
@@ -672,36 +829,4 @@ function openBackupPage() {
     }
 }
 
-// 注册自驱力训练全屏页面
-function openSelfDrivePage() {
-    const modal = document.getElementById('fullscreen-page');
-    const content = document.getElementById('fullscreen-content');
-    const title = document.getElementById('fullscreen-title');
-    
-    if (modal && content) {
-        modal.classList.add('show');
-        title.textContent = '💪 自驱力训练';
-        renderSelfDrive(content);
-    }
-}
-
-// 注册到CTM
-if (typeof CTM !== 'undefined') {
-    CTM.registerModule('my', {
-        name: '我的',
-        icon: '👤',
-        render: renderMyPage
-    });
-    
-    CTM.registerModule('backup', {
-        name: '数据备份',
-        icon: '💾',
-        render: renderBackupManager
-    });
-    
-    CTM.registerModule('selfdrive', {
-        name: '自驱力训练',
-        icon: '💪',
-        render: renderSelfDrive
-    });
-}
+console.log('✅ V199 my-page.js 已加载 - 2x2快捷功能卡片 + 5个折叠分区');
