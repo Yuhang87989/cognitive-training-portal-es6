@@ -291,5 +291,173 @@ window.toggleSettingsGroup = toggleSettingsGroup;
 
 
 // ============================================================
+// V224: 第三方库按需加载
+// ============================================================
+
+// 动态加载脚本通用函数
+function loadScript(url, callback, onerror) {
+    const existing = document.querySelector(`script[src="${url}"]`);
+    if (existing) {
+        if (callback) callback();
+        return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = function() {
+        console.log('[按需加载] 已加载:', url);
+        if (callback) callback();
+    };
+    script.onerror = function() {
+        console.error('[按需加载] 加载失败:', url);
+        if (onerror) onerror();
+    };
+    document.head.appendChild(script);
+}
+
+// PeerJS 动态加载
+let peerJsLoading = false;
+let peerJsLoaded = false;
+const peerJsCallbacks = [];
+
+function loadPeerJS(callback) {
+    if (typeof Peer !== 'undefined') {
+        if (callback) callback();
+        return;
+    }
+    
+    if (peerJsLoaded) {
+        if (callback) callback();
+        return;
+    }
+    
+    if (callback) peerJsCallbacks.push(callback);
+    
+    if (peerJsLoading) {
+        return;
+    }
+    
+    peerJsLoading = true;
+    showToast('正在加载音视频库...', 1000);
+    
+    loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js', function() {
+        peerJsLoading = false;
+        peerJsLoaded = true;
+        peerJsCallbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+        peerJsCallbacks.length = 0;
+    }, function() {
+        peerJsLoading = false;
+        showToast('音视频库加载失败', 2000);
+    });
+}
+window.loadPeerJS = loadPeerJS;
+
+// Tesseract.js 动态加载
+let tesseractLoading = false;
+let tesseractLoaded = false;
+const tesseractCallbacks = [];
+
+function loadTesseract(callback) {
+    if (typeof Tesseract !== 'undefined') {
+        if (callback) callback();
+        return;
+    }
+    
+    if (tesseractLoaded) {
+        if (callback) callback();
+        return;
+    }
+    
+    if (callback) tesseractCallbacks.push(callback);
+    
+    if (tesseractLoading) {
+        return;
+    }
+    
+    tesseractLoading = true;
+    showToast('正在加载OCR识别库...', 1000);
+    
+    loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js', function() {
+        tesseractLoading = false;
+        tesseractLoaded = true;
+        tesseractCallbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+        tesseractCallbacks.length = 0;
+    }, function() {
+        tesseractLoading = false;
+        showToast('OCR识别库加载失败', 2000);
+    });
+}
+window.loadTesseract = loadTesseract;
+
+
+// ============================================================
+// V224: 数据文件按需加载
+// ============================================================
+
+// 已加载的数据模块缓存
+const loadedDataModules = {};
+
+// 数据模块URL映射
+const dataModuleUrls = {
+    'week-plans': 'js/data/week-plans.js',
+    'topics': 'js/data/topics.js',
+    'podcasts': 'js/data/podcasts.js',
+    'videos': 'js/data/videos.js',
+    'games-config': 'js/data/games-config.js'
+};
+
+// 加载中的回调队列
+const dataLoadingCallbacks = {};
+
+function loadModuleData(moduleName, callback) {
+    // 如果已加载，直接回调
+    if (loadedDataModules[moduleName]) {
+        if (callback) callback();
+        return;
+    }
+    
+    const url = dataModuleUrls[moduleName];
+    if (!url) {
+        console.error('[数据加载] 未知模块:', moduleName);
+        if (callback) callback();
+        return;
+    }
+    
+    // 如果正在加载，加入回调队列
+    if (dataLoadingCallbacks[moduleName]) {
+        if (callback) dataLoadingCallbacks[moduleName].push(callback);
+        return;
+    }
+    
+    // 初始化回调队列
+    dataLoadingCallbacks[moduleName] = [];
+    if (callback) dataLoadingCallbacks[moduleName].push(callback);
+    
+    showToast('正在加载数据...', 800);
+    
+    loadScript(url, function() {
+        loadedDataModules[moduleName] = true;
+        const callbacks = dataLoadingCallbacks[moduleName] || [];
+        delete dataLoadingCallbacks[moduleName];
+        callbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+    }, function() {
+        const callbacks = dataLoadingCallbacks[moduleName] || [];
+        delete dataLoadingCallbacks[moduleName];
+        showToast('数据加载失败', 2000);
+        callbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+    });
+}
+window.loadModuleData = loadModuleData;
+
+
+// ============================================================
 // User - 用户管理
 // ============================================================

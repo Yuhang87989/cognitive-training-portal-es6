@@ -27,16 +27,59 @@ if('serviceWorker' in navigator){
 <meta name="theme-color" content="#3377FF"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>认知训练 V222</title>
+<title>认知训练 V224</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+<style>
+/* V224: 首页核心CSS内联，提升首屏渲染速度 */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--white:#FFFFFF;--bg-page:#F5F6FA;--text-dark:#333;--text-gray:#666;--text-light:#999;--border-gray:#F2F4F7;--gradient-orange:linear-gradient(135deg,#FF9A63,#E87A4E);--gradient-blue:linear-gradient(135deg,#3377FF,#4A80F5);--gradient-purple:linear-gradient(135deg,#667eea,#764ba2);--gradient-green:linear-gradient(135deg,#43E97B,#38F9D7);--card-shadow:0 4px 16px rgba(0,0,0,0.05);--blue:#3377FF;--orange:#E87A4E}
+body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue',Arial,sans-serif;background:var(--bg-page);min-height:100vh;color:var(--text-dark);padding-bottom:80px;max-width:480px;margin:0 auto}
+.page{display:none;min-height:100vh;background:var(--bg-page);padding-bottom:80px}
+.page.active{display:block}
+#page-login{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);padding-bottom:0}
+#page-login.active{display:flex}
+.login-page{display:flex;min-height:100vh;background:linear-gradient(180deg,#E8F4FF,#f0f4ff);flex-direction:column;align-items:center;padding:20px}
+.login-header-bg{width:100%;height:160px;background:linear-gradient(135deg,#3377FF,#00D2FF);border-radius:0 0 40px 40px;position:absolute;top:0;left:50%;transform:translateX(-50%);width:480px;max-width:100vw}
+.login-content{width:100%;max-width:360px;padding:0 20px;margin-top:120px;position:relative;z-index:10}
+.login-logo-area{text-align:center;margin-bottom:24px}
+.login-avatar{width:80px;height:80px;background:white;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+.login-title{font-size:24px;font-weight:bold;color:#1a1a2e;margin-bottom:4px}
+.login-subtitle{font-size:13px;color:#666}
+.login-card{background:white;border-radius:20px;padding:24px;box-shadow:0 4px 20px rgba(51,119,255,0.15);margin-bottom:16px}
+.home-header{background:linear-gradient(135deg,#E8F4FF,#D4ECFF);padding:16px 16px 20px;border-radius:0 0 24px 24px;position:relative}
+.header-top{display:flex;justify-content:space-between;align-items:center}
+.app-logo{width:44px;height:44px;background:linear-gradient(135deg,#3377FF,#FF9A63);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.app-logo-img{width:44px;height:44px;border-radius:12px;object-fit:cover;}
+.app-title{font-size:18px;font-weight:bold;color:#333;margin-left:8px}
+.header-right{display:flex;align-items:center;gap:8px}
+.difficulty-tag{background:rgba(255,149,0,0.1);padding:6px 12px;border-radius:18px;font-size:12px;color:var(--orange);cursor:pointer;transition:all 0.2s}
+.user-avatar-circle{width:42px;height:42px;background:linear-gradient(135deg,#FFD4B8,#FFB6C1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#fff;cursor:pointer;transition:transform 0.2s}
+.module-section{padding:16px 12px 0}
+.module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.module-btn{display:flex;flex-direction:column;align-items:center;padding:14px 6px 10px;border-radius:16px;border:none;cursor:pointer;transition:transform 0.2s;box-shadow:0 2px 8px rgba(0,0,0,0.08);position:relative;min-height:90px}
+.module-icon{font-size:26px;margin-bottom:6px}
+.module-name{font-size:12px;font-weight:bold;color:white;margin-bottom:2px;text-align:center}
+.module-desc{font-size:9px;color:rgba(255,255,255,0.9);text-align:center}
+.gradient-blue{background:linear-gradient(135deg,#3377FF,#4A80F5)}
+.gradient-orange{background:linear-gradient(135deg,#FF9A63,#E87A4E)}
+.gradient-green{background:linear-gradient(135deg,#43E97B,#38F9D7)}
+.gradient-purple{background:linear-gradient(135deg,#667eea,#764ba2)}
+.gradient-pink{background:linear-gradient(135deg,#FFB6C1,#FF9A63)}
+.gradient-cyan{background:linear-gradient(135deg,#4facfe,#00f2fe)}
+.today-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.stat-item{background:white;border-radius:12px;padding:10px 6px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+.stat-value{font-size:18px;font-weight:bold;color:var(--blue)}
+.stat-label{font-size:10px;color:var(--text-light);margin-top:2px}
+.bottom-nav{position:fixed;bottom:0;left:0;width:100%;max-width:480px;left:50%;transform:translateX(-50%);background:white;border-top:1px solid #f0f0f0;display:flex;padding:8px 0;z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px;cursor:pointer;color:var(--text-light);transition:all 0.2s}
+.nav-item.active{color:var(--blue)}
+.nav-icon{font-size:22px;margin-bottom:2px}
+.nav-label{font-size:10px}
+</style>
 <link rel="stylesheet" href="css/style.css"/>
-<!-- PeerJS 音视频库 -->
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-<!-- Tesseract.js OCR库（用于拍照识别文字，免费前端图片识别） -->
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 
@@ -809,13 +852,9 @@ if('serviceWorker' in navigator){
     ];
     
     // 延迟加载模块：非首页必须，后台并行加载
+    // V224: 数据文件改为按需加载，进入对应页面时才加载
     const lazyModules = [
         'js/audio.js',
-        'js/data/week-plans.js',
-        'js/data/topics.js',
-        'js/data/podcasts.js',
-        'js/data/videos.js',
-        'js/data/games-config.js',
         'js/modules/practice.js',
         'js/modules/map.js',
         'js/modules/plan.js',

@@ -68,6 +68,17 @@ function loadTopicsList() {
     const container = document.getElementById('topics-list-container');
     if (!container) return;
     
+    // V224: 按需加载母题数据
+    if (typeof topics === 'undefined') {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载题目数据...</div></div>';
+        if (typeof loadModuleData === 'function') {
+            loadModuleData('topics', function() {
+                loadTopicsList();
+            });
+        }
+        return;
+    }
+    
     const topicsList = getTopicsList();
     const topicsPerPage = getTopicsPerPage();
     const total = topicsList.length;

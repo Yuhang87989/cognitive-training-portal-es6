@@ -440,6 +440,15 @@ async function ocrImageAndSend(base64) {
     
     try {
         var ocrText = '';
+        // V224: 按需加载Tesseract.js
+        await new Promise(function(resolve) {
+            if (typeof loadTesseract === 'function') {
+                loadTesseract(resolve);
+            } else {
+                resolve();
+            }
+        });
+        
         // 尝试用Tesseract.js识别
         if (typeof Tesseract !== 'undefined') {
             var result = await Tesseract.recognize(base64, 'chi_sim+eng', {

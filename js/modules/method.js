@@ -1023,6 +1023,15 @@ async function photoToQuestion(imageData) {
     
     try {
         var ocrText = '';
+        // V224: 按需加载Tesseract.js
+        await new Promise(function(resolve) {
+            if (typeof loadTesseract === 'function') {
+                loadTesseract(resolve);
+            } else {
+                resolve();
+            }
+        });
+        
         if (typeof Tesseract !== 'undefined') {
             var result = await Tesseract.recognize(imageData, 'chi_sim+eng', {});
             ocrText = result.data.text.trim();

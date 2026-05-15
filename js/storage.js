@@ -193,7 +193,27 @@ function getMethodTraining(methodId) {
 
 // getTopicsList moved to topics.js module
 
-function getWeekPlan(weekId) { return weekPlans[weekId] || null; }
+// V224: 支持数据文件按需加载的版本
+function getWeekPlan(weekId, callback) {
+    // 如果数据已加载，直接返回
+    if (typeof weekPlans !== 'undefined') {
+        const result = weekPlans[weekId] || null;
+        if (callback) callback(result);
+        return result;
+    }
+    
+    // 如果有回调函数，异步加载后返回
+    if (callback && typeof loadModuleData === 'function') {
+        loadModuleData('week-plans', function() {
+            const result = typeof weekPlans !== 'undefined' ? (weekPlans[weekId] || null) : null;
+            callback(result);
+        });
+        return null;
+    }
+    
+    // 兼容旧调用方式（同步）
+    return null;
+}
 
 function confirmClearAllData() {
     if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {

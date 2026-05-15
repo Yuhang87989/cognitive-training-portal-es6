@@ -14,6 +14,17 @@ function renderPlan(container) {
     if (!window._planWeek) window._planWeek = currentWeek;
     if (!window._planDay) window._planDay = today;
     
+    // V224: 按需加载周计划数据
+    if (typeof weekPlans === 'undefined') {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载周计划数据...</div></div>';
+        if (typeof loadModuleData === 'function') {
+            loadModuleData('week-plans', function() {
+                renderPlan(container);
+            });
+        }
+        return;
+    }
+    
     const plan = getWeekPlan('week' + window._planWeek);
     const userTasks = (user.weekTasks || {});
     
