@@ -220,6 +220,7 @@ window.openDeepseekHelpModal = function() {
     `;
     
     document.body.appendChild(modal);
+    modal.classList.add("show");
 };
 
 // 数据备份
@@ -442,6 +443,7 @@ window.renderMyPage = function(container) {
                 </div>
             `;
             
+            modal.classList.add("show");
             document.body.appendChild(modal);
         };
     }

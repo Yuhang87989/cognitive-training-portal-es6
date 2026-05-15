@@ -577,6 +577,7 @@ var UsageStatsModule = {
     `;
     
     document.body.appendChild(modal);
+    modal.classList.add("show");
     renderRecordsList();
   }
 };
