@@ -461,3 +461,27 @@ window.loadModuleData = loadModuleData;
 // ============================================================
 // User - 用户管理
 // ============================================================
+// ============================================================
+// ES6 Module Export - V225 ES6改造
+// ============================================================
+export {
+    showToast,
+    cleanupModuleState,
+    loadScript,
+    loadScripts,
+    debounce,
+    throttle,
+    formatTime,
+    formatDate,
+    formatNumber,
+    generateId,
+    deepClone,
+    getRandomInt,
+    shuffleArray,
+    storageAvailable,
+    safeJsonParse,
+    safeJsonStringify,
+    retry,
+    wait,
+    loadModuleData
+};

@@ -27,7 +27,7 @@ if('serviceWorker' in navigator){
 <meta name="theme-color" content="#3377FF"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>认知训练 V224</title>
+<title>认知训练 V225</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
@@ -833,8 +833,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 
 
 <script>
+// V225: ES6 Module改造 - 优先使用ES6 Module，保留传统加载作为降级方案
 (function() {
+    // V225: ES6 Module 标志位
+    window.ES6_MODULE_FALLBACK = false;
+
     // V222: 关键路径并行加载优化
+    // ==================== V225: 优先使用ES6 Module加载 ====================
+    function loadES6Modules() {
+        return new Promise(function(resolve, reject) {
+            // 检查浏览器是否支持ES6 Module
+            const checkModule = document.createElement("script");
+            checkModule.type = "module";
+            if (!("noModule" in checkModule)) {
+                console.log("[V225] 浏览器不支持ES6 Module，使用传统加载方式");
+                reject(new Error("ES6 Module not supported"));
+                return;
+            }
+            
+            // 加载ES6 Module入口文件
+            const moduleScript = document.createElement("script");
+            moduleScript.type = "module";
+            moduleScript.src = "js/main.js?v=" + v;
+            moduleScript.onload = function() {
+                console.log("[V225] ES6 Module入口文件加载成功");
+                resolve();
+            };
+            moduleScript.onerror = function(e) {
+                console.warn("[V225] ES6 Module加载失败，切换到传统方式:", e);
+                reject(e);
+            };
+            document.head.appendChild(moduleScript);
+        });
+    }
+
+    // ==================== 模块划分 ====================
+    // 关键模块：首页必须，并行加载
+    const v = window.__APP_VERSION || Date.now();
+
+    // ==================== 降级：传统动态加载函数 ====================
     // 自动版本号：基于时间戳，每次部署自动更新
     window.__APP_VERSION = Date.now();
     const v = window.__APP_VERSION || Date.now();
@@ -928,22 +965,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         }
     }
     
-    // ==================== 加载流程 ====================
-    console.log('[V222] 开始关键模块并行加载');
-    
-    // 1. 并行加载关键模块
-    loadScriptsParallel(criticalModules, function() {
-        console.log('[V222] 关键模块全部加载完成，开始初始化首页');
-        safeInitPortal();
-        
-        // 2. 关键模块完成后延迟200ms，后台并行加载非关键模块
+    // ==================== 安全初始化 ====================
+    function startLazyModules() {
+        // 延迟加载非关键模块
         setTimeout(function() {
-            console.log('[V222] 开始后台延迟加载非关键模块');
+            console.log("[V225] 开始后台延迟加载非关键模块");
             loadScriptsParallel(lazyModules, function() {
-                console.log('[V222] 所有模块加载完成');
+                console.log("[V225] 所有模块加载完成");
                 // 初始化视频播放器（延迟加载）
                 setTimeout(function() {
-                    if (typeof window.initEnhancedVideoPlayer === 'function' && window.videoCtx && !window.videoCtx.isInitialized) {
+                    if (typeof window.initEnhancedVideoPlayer === "function" && window.videoCtx && !window.videoCtx.isInitialized) {
                         window.initEnhancedVideoPlayer();
                     }
                 }, 50);
@@ -951,8 +982,43 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 // 单个延迟模块加载完成回调
             });
         }, 200);
-    }, function(src) {
-        console.log('[V222] 关键模块加载:', src);
+    }
+
+    function safeInitPortal(retries) {
+        retries = retries || 0;
+        if (typeof window.initPortal === "function") {
+            window.initPortal();
+            console.log("[V225] 首页关键模块加载完成，已初始化");
+            // Register Service Worker
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("./sw.js").catch(function(err) {});
+            }
+            // 开始加载非关键模块
+            startLazyModules();
+        } else if (retries < 50) {
+            // 最多重试5秒（50次 x 100ms）
+            setTimeout(function() { safeInitPortal(retries + 1); }, 100);
+        } else {
+            console.error("初始化失败：initPortal函数未找到，请检查JS文件加载");
+        }
+    }
+
+    // ==================== V225: ES6 Module优先加载流程 ====================
+    console.log("[V225] 尝试ES6 Module优先加载");
+    loadES6Modules().then(function() {
+        // ES6 Module加载成功，开始初始化
+        console.log("[V225] ES6 Module核心模块全部加载完成，开始初始化首页");
+        safeInitPortal();
+    }).catch(function() {
+        // ES6 Module加载失败，降级到传统加载方式
+        window.ES6_MODULE_FALLBACK = true;
+        console.log("[V225] 降级到传统关键模块并行加载");
+        loadScriptsParallel(criticalModules, function() {
+            console.log("[V225] 传统方式关键模块全部加载完成，开始初始化首页");
+            safeInitPortal();
+        }, function(src) {
+            console.log("[V225] 传统方式关键模块加载:", src);
+        });
     });
     
 })();

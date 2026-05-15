@@ -53,3 +53,20 @@ window.CURRENT_VISION_API = 'siliconflow';  // 默认使用硅基流动
 window.QUESTIONS_PER_PAGE = 5;
 window.currentMethodPage = {};
 window.currentThinkingPage = {};
+
+// ============================================================
+// ES6 Module Export - V225 ES6改造
+// ============================================================
+export {
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_API_URL,
+    DEEPSEEK_MODEL,
+    STORAGE_KEY,
+    API_CONFIG_KEY,
+    OLD_KEYS,
+    AVATAR_LIST,
+    VISION_SILICONFLOW_KEY,
+    VISION_SILICONFLOW_URL,
+    VISION_SILICONFLOW_MODEL,
+    VISION_DEEPSEEK_ENABLED
+};

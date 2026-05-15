@@ -2036,3 +2036,30 @@ window.saveApiConfig = saveApiConfig;
 window.showUserSwitchModal = showUserSwitchModal;
 window.closeUserSwitchModal = closeUserSwitchModal;
 window.openAvatarModal = openAvatarModal;
+
+// ============================================================
+// ES6 Module Export - V225 ES6改造
+// ============================================================
+export {
+    clearCurrentUserData,
+    clearAllData,
+    syncData,
+    openApiConfigModal,
+    saveApiConfig,
+    showUserSwitchModal,
+    closeUserSwitchModal,
+    openAvatarModal,
+    selectAvatar,
+    renderHomePage,
+    renderHeader,
+    renderPageTitle,
+    showPage,
+    goToPage,
+    renderLoading,
+    showModal,
+    closeModal,
+    closeAllModals,
+    renderCard,
+    renderProgressBar,
+    renderStatsCard
+};
