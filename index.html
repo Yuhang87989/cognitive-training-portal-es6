@@ -27,7 +27,7 @@ if('serviceWorker' in navigator){
 <meta name="theme-color" content="#3377FF"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>认知训练 V195</title>
+<title>认知训练 V222</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
@@ -791,26 +791,92 @@ if('serviceWorker' in navigator){
 
 <script>
 (function() {
-    // 加载顺序必须与ui.js中的loadOrder一致
+    // V222: 关键路径并行加载优化
     // 自动版本号：基于时间戳，每次部署自动更新
     window.__APP_VERSION = Date.now();
-    
-    const loadOrder = ['js/config.js', 'js/ctm.js', 'js/audio.js', 'js/db.js', 'js/storage.js', 'js/utils.js', 'js/user.js', 'js/data/week-plans.js', 'js/data/topics.js', 'js/data/podcasts.js', 'js/data/videos.js', 'js/data/games-config.js', 'js/modules/practice.js', 'js/modules/map.js', 'js/modules/plan.js', 'js/modules/topics.js', 'js/modules/method.js', 'js/modules/thinking.js', 'js/modules/podcast.js', 'js/modules/video.js', 'js/modules/player.js', 'js/modules/games.js', 'js/modules/ai.js', 'js/modules/usage-stats.js', 'js/modules/deepseek.js', 'js/modules/wrongbook.js', 'js/modules/pomodoro.js', 'js/modules/calculator.js', 'js/modules/notepad.js', 'js/modules/local-db.js', 'js/modules/my-page.js', 'js/modules/fix_all_deepseek_buttons.js', 'js/modules/self-drive.js', 'js/modules/stats.js', 'js/modules/ui.js'];
-    // 顺序加载JS文件，保证模块依赖正确
     const v = window.__APP_VERSION || Date.now();
-    let pending = loadOrder.length;
     
-    // 安全初始化：确保initPortal存在后才调用，最多重试5秒
+    // ==================== 模块划分 ====================
+    // 关键模块：首页必须，并行加载
+    const criticalModules = [
+        'js/config.js',
+        'js/ctm.js',
+        'js/db.js',
+        'js/storage.js',
+        'js/utils.js',
+        'js/user.js',
+        'js/modules/ui.js'
+    ];
+    
+    // 延迟加载模块：非首页必须，后台并行加载
+    const lazyModules = [
+        'js/audio.js',
+        'js/data/week-plans.js',
+        'js/data/topics.js',
+        'js/data/podcasts.js',
+        'js/data/videos.js',
+        'js/data/games-config.js',
+        'js/modules/practice.js',
+        'js/modules/map.js',
+        'js/modules/plan.js',
+        'js/modules/topics.js',
+        'js/modules/method.js',
+        'js/modules/thinking.js',
+        'js/modules/podcast.js',
+        'js/modules/video.js',
+        'js/modules/player.js',
+        'js/modules/games.js',
+        'js/modules/ai.js',
+        'js/modules/usage-stats.js',
+        'js/modules/deepseek.js',
+        'js/modules/wrongbook.js',
+        'js/modules/pomodoro.js',
+        'js/modules/calculator.js',
+        'js/modules/notepad.js',
+        'js/modules/local-db.js',
+        'js/modules/my-page.js',
+        'js/modules/fix_all_deepseek_buttons.js',
+        'js/modules/self-drive.js',
+        'js/modules/stats.js'
+    ];
+    
+    // ==================== 并行加载函数 ====================
+    function loadScriptsParallel(scripts, onAllLoaded, onSingleLoad) {
+        let loaded = 0;
+        const total = scripts.length;
+        
+        if (total === 0) {
+            if (onAllLoaded) onAllLoaded();
+            return;
+        }
+        
+        scripts.forEach(function(src) {
+            const script = document.createElement("script");
+            script.src = src + "?v=" + v;
+            script.onload = function() {
+                loaded++;
+                if (onSingleLoad) onSingleLoad(src);
+                if (loaded >= total && onAllLoaded) {
+                    onAllLoaded();
+                }
+            };
+            script.onerror = function() {
+                console.warn("[Parallel Load] Failed to load:", src);
+                loaded++;
+                if (loaded >= total && onAllLoaded) {
+                    onAllLoaded();
+                }
+            };
+            document.head.appendChild(script);
+        });
+    }
+    
+    // ==================== 安全初始化 ====================
     function safeInitPortal(retries) {
         retries = retries || 0;
         if (typeof window.initPortal === 'function') {
             window.initPortal();
-            // 初始化视频播放器
-            setTimeout(function() {
-                if (typeof window.initEnhancedVideoPlayer === 'function' && window.videoCtx && !window.videoCtx.isInitialized) {
-                    window.initEnhancedVideoPlayer();
-                }
-            }, 50);
+            console.log('[V222] 首页关键模块加载完成，已初始化');
             // Register Service Worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js').catch(function(err) {});
@@ -823,32 +889,33 @@ if('serviceWorker' in navigator){
         }
     }
     
-    function onScriptLoaded() {
-        pending--;
-        if (pending <= 0) {
-            safeInitPortal();
-        }
-    }
-    // 顺序加载：逐个加载，保证模块依赖关系正确
-    function loadNext(index) {
-        if (index >= loadOrder.length) {
-            onScriptLoaded();
-            return;
-        }
-        const script = document.createElement("script");
-        script.src = loadOrder[index] + "?v=" + v;
-        script.onload = function() { 
-            onScriptLoaded(); 
-            loadNext(index + 1); 
-        };
-        script.onerror = function() { 
-            console.warn("Failed to load:", loadOrder[index]); 
-            onScriptLoaded(); 
-            loadNext(index + 1); 
-        };
-        document.head.appendChild(script);
-    }
-    loadNext(0);
+    // ==================== 加载流程 ====================
+    console.log('[V222] 开始关键模块并行加载');
+    
+    // 1. 并行加载关键模块
+    loadScriptsParallel(criticalModules, function() {
+        console.log('[V222] 关键模块全部加载完成，开始初始化首页');
+        safeInitPortal();
+        
+        // 2. 关键模块完成后延迟200ms，后台并行加载非关键模块
+        setTimeout(function() {
+            console.log('[V222] 开始后台延迟加载非关键模块');
+            loadScriptsParallel(lazyModules, function() {
+                console.log('[V222] 所有模块加载完成');
+                // 初始化视频播放器（延迟加载）
+                setTimeout(function() {
+                    if (typeof window.initEnhancedVideoPlayer === 'function' && window.videoCtx && !window.videoCtx.isInitialized) {
+                        window.initEnhancedVideoPlayer();
+                    }
+                }, 50);
+            }, function(src) {
+                // 单个延迟模块加载完成回调
+            });
+        }, 200);
+    }, function(src) {
+        console.log('[V222] 关键模块加载:', src);
+    });
+    
 })();
 </script>
 <!-- 元认知预测弹窗 -->
