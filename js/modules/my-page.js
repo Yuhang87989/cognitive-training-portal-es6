@@ -290,20 +290,8 @@ window.openSystemSettings = function() {
 };
 
 // 打开自驱力训练
-window.openSelfDrivePage = function() {\n    openFullscreenPage('selfdrive');\n};
-    const modal = document.getElementById('fullscreen-page');
-    const content = document.getElementById('fullscreen-content');
-    const title = document.getElementById('fullscreen-title');
-    
-    if (modal && content) {
-        modal.classList.add('show');
-        title.textContent = '💪 自驱力训练';
-        if (typeof renderSelfDriveContent === 'function') {
-            renderSelfDriveContent(content);
-        } else {
-            content.innerHTML = '<div style="padding:20px;text-align:center;"><h3>💪 自驱力训练</h3><p>功能开发中...</p></div>';
-        }
-    }
+window.openSelfDrivePage = function() {
+    openFullscreenPage("selfdrive");
 };
 
 // 打开番茄钟
