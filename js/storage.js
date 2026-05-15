@@ -742,20 +742,11 @@ if (document.readyState === 'loading') {
 // ES6 Module Export - V225 ES6改造
 // ============================================================
 export {
-    DEFAULT_USER,
     loadData,
     saveData,
     saveUserData,
-    getUserData,
-    getCurrentUser,
-    setCurrentUser,
-    addUser,
-    switchUser,
-    deleteUser,
-    updateUserStats,
+    getCurrentUserData,
     migrateData,
-    exportData,
-    importData,
     saveImageFile,
     getImageFile,
     getImageFileAsDataUrl,

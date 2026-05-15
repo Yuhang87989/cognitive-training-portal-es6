@@ -1,9 +1,8 @@
 # Node modules
 node_modules/
 
-# Package files
-package.json
-package-lock.json
+# Build output
+dist/
 
 # Test files
 test_*.js

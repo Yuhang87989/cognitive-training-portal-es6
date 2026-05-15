@@ -411,15 +411,4 @@ window.weekPlans = {
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-export {
-    week1Plan,
-    week2Plan,
-    week3Plan,
-    week4Plan,
-    week5Plan,
-    week6Plan,
-    week7Plan,
-    week8Plan,
-    week9Plan,
-    weekPlans
-};
+// 数据已挂载到window对象，无需ES6导出

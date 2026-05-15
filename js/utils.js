@@ -191,47 +191,6 @@ function exitSystem() {
     }
 }
 
-function openAbout() {
-    const modal = document.getElementById('detail-modal');
-    const content = document.getElementById('detail-content');
-    modal.classList.add('show');
-    content.innerHTML = `
-        <div style="text-align:center;padding:20px 0;">
-            <div style="font-size:48px;margin-bottom:12px;">🧠</div>
-            <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V144</div>
-        </div>
-        <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                认知训练门户是一款专为12-16岁青少年设计的注意力和记忆力训练应用。通过科学系统的训练方法，帮助学生提升学习效率，培养良好的学习习惯。
-            </div>
-        </div>
-        <div style="background:#fff3e0;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">✨ 核心功能</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                • 12大训练模块（AI分身、母题、播客等）<br>
-                • 23个认知训练游戏<br>
-                • 378道经典母题库<br>
-                • DeepSeek AI 智能辅导<br>
-                • 个性化学习计划
-            </div>
-        </div>
-        <div style="background:#e8f5e9;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">👨‍💻 开发团队</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                Coze AI Agent 智能助手<br>
-                技术支持：DeepSeek API
-            </div>
-        </div>
-        <div style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;">
-            © 2026 认知训练门户 版权所有
-        </div>
-        <button class="modal-close" onclick="closeModal()" style="width:100%;">关闭</button>
-    `;
-}
-
-
 // ===== "关于"页面函数（重写版本）=====
 function openAbout() {
     const modal = document.getElementById('detail-modal');
@@ -468,20 +427,5 @@ export {
     showToast,
     cleanupModuleState,
     loadScript,
-    loadScripts,
-    debounce,
-    throttle,
-    formatTime,
-    formatDate,
-    formatNumber,
-    generateId,
-    deepClone,
-    getRandomInt,
-    shuffleArray,
-    storageAvailable,
-    safeJsonParse,
-    safeJsonStringify,
-    retry,
-    wait,
     loadModuleData
 };

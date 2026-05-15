@@ -851,19 +851,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 return;
             }
             
-            // 加载ES6 Module入口文件
-            const moduleScript = document.createElement("script");
-            moduleScript.type = "module";
-            moduleScript.src = "js/main.js?v=" + v;
-            moduleScript.onload = function() {
-                console.log("[V229] ES6 Module入口文件加载成功");
-                resolve();
-            };
-            moduleScript.onerror = function(e) {
-                console.warn("[V229] ES6 Module加载失败，切换到传统方式:", e);
-                reject(e);
-            };
-            document.head.appendChild(moduleScript);
+            // V230: 优先尝试加载构建版本，失败则回退到开发版本
+            function tryLoadModule(path, label) {
+                return new Promise(function(resolve, reject) {
+                    const moduleScript = document.createElement("script");
+                    moduleScript.type = "module";
+                    moduleScript.src = path + "?v=" + v;
+                    moduleScript.onload = function() {
+                        console.log("[V230] " + label + "加载成功");
+                        resolve();
+                    };
+                    moduleScript.onerror = function(e) {
+                        console.warn("[V230] " + label + "加载失败:", e);
+                        reject(e);
+                    };
+                    document.head.appendChild(moduleScript);
+                });
+            }
+            
+            // 优先尝试构建版本（ES Module），失败则回退到开发版本
+            tryLoadModule("dist/bundle.esm.js", "Rollup构建版本(ESM)")
+                .then(resolve)
+                .catch(function() {
+                    console.log("[V230] 回退到开发版本 js/main.js");
+                    return tryLoadModule("js/main.js", "开发版本");
+                })
+                .then(resolve)
+                .catch(reject);
         });
     }
 
