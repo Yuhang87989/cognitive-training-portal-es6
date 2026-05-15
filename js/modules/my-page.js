@@ -246,6 +246,53 @@ window.openDeepseekHelpModal = function() {
                 </div>
             </div>
             <div class="modal-footer" style="text-align: center;">
+                
+                <div id="prompt-tips" style="margin-bottom: 25px;">
+                    <h4 style="color: #667eea; margin-bottom: 10px;">💡 高级提问技巧</h4>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #333; margin-bottom: 8px;">🎯 原则1：描述越详细，答案越精准</h5>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            <strong>❌ 不好的提问：</strong>"什么是相对论？"<br>
+                            <strong>✅ 好的提问：</strong>"请用通俗易懂的语言解释爱因斯坦的相对论，假设我是初中生，尽量少用公式"
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #333; margin-bottom: 8px;">📝 原则2：明确输出格式</h5>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            告诉AI你想要什么格式的回答：分点列出、表格形式、思维导图大纲、对话体、故事化表述等
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #333; margin-bottom: 8px;">🎭 原则3：角色扮演法</h5>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            让AI扮演特定角色："作为一名高中数学老师，请用5分钟的试讲风格讲解三角函数的应用"
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #333; margin-bottom: 8px;">🔄 原则4：迭代优化</h5>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            第一次回答不满意时，可以继续追问："太复杂了，请再简化一下"、"能不能举个具体的例子？"、"补充XX方面的内容"
+                        </p>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <h5 style="color: #333; margin-bottom: 8px;">📐 原则5：结构化提问模板</h5>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 14px; color: #666;">
+                            <p style="margin: 0 0 8px 0;"><strong>【背景】</strong>我是XX年级学生，正在学习...</p>
+                            <p style="margin: 0 0 8px 0;"><strong>【问题】</strong>我不理解...</p>
+                            <p style="margin: 0 0 8px 0;"><strong>【要求】</strong>请用XX风格讲解，包含XX个例子，字数控制在...</p>
+                            <p style="margin: 0;"><strong>【输出格式】</strong>分3段回答，每段不超过...</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #667eea10, #764ba210); padding: 15px; border-radius: 8px; border-left: 4px solid #667eea;">
+                        <p style="margin: 0;"><strong>✨ 记住：</strong> AI 的回答质量取决于你的提问质量。花 10 秒钟把问题说清楚，可以节省几分钟的反复沟通！</p>
+                    </div>
+                </div>
                 <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove()">我知道了</button>
             </div>
         </div>
@@ -725,6 +772,10 @@ window.renderMyPage = function(container) {
                 <div class="quick-card-title">数据备份</div>
             </div>
         </div>
+            <div class="quick-card" onclick="openSettingsPanel()">
+                <div class="quick-card-icon">⚙️</div>
+                <div class="quick-card-title">设置</div>
+            </div>
         
         <!-- 折叠分区1: 📊 学习统计 -->
         <div class="accordion-section">
