@@ -21,13 +21,32 @@ if('serviceWorker' in navigator){
     });
   });
 }
+
+// V232: 占位函数 - 确保ES6 Module加载完成前点击有响应
+window._openFullscreenPagePlaceholder = function(module) {
+    console.log('[占位函数被调用，模块正在加载中...');
+    // 检查是否已经加载完成
+    if (window.openFullscreenPage && window.openFullscreenPage !== window._openFullscreenPagePlaceholder) {
+        return window.openFullscreenPage(module);
+    }
+    // 还在加载中，显示提示
+    alert('模块正在加载中，请稍候再试...');
+};
+
+// 初始化占位函数
+window.openFullscreenPage = window._openFullscreenPagePlaceholder;
+window.initPortal = function() {
+    console.log('[占位initPortal被调用，等待真实函数加载...');
+};
+
+console.log('[V232] 占位函数已初始化');
 </script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#3377FF"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>认知训练 V229</title>
+<title>认知训练 V232</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="icon" type="image/x-icon" href="favicon.ico"/>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
