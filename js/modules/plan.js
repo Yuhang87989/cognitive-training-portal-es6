@@ -1,10 +1,16 @@
-// 版本: V144
+// 版本: V226 - ES6 Module
+// 学习计划模块
 
-CTM.registerModule('plan', {
+export const planModule = {
     name: 'plan',
     icon: '🎯',
     render: renderPlan
-});
+};
+
+// 注册到CTM模块系统
+if (typeof CTM !== 'undefined' && CTM.registerModule) {
+    CTM.registerModule('plan', planModule);
+}
 
 function renderPlan(container) {
     const user = getCurrentUserData();
@@ -187,3 +193,17 @@ window.toggleWeekTask = toggleWeekTask;
 // ============================================================
 // TopicsModule - 主题模块
 // ============================================================
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+export {
+    renderPlan,
+    renderWeekPlan,
+    renderSlide,
+    changeWeek,
+    switchPlanDay,
+    toggleWeekTask
+};
+
+console.log('[ES6 Module] plan.js 模块加载完成');

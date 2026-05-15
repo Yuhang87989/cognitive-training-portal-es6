@@ -1,4 +1,6 @@
-// 版本: V152
+// 版本: V226 - ES6 Module
+// AI对话模块 - DeepSeek
+
 // V152修复: 图片识别功能改用视觉API，不再依赖Tesseract.js
 // V152修复: 支持DeepSeek视觉（如果可用）或硅基流动Qwen3-VL
 // V151-fix: callVisionAPI添加详细日志、图片格式处理、错误处理
@@ -997,3 +999,43 @@ function scrollToDeepSeekMessage(groupIndex) {
     }
 }
 window.scrollToDeepSeekMessage = scrollToDeepSeekMessage;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+// DeepSeek模块对象
+export const deepseekModule = {
+    name: 'deepseek',
+    icon: '🤖',
+    render: typeof renderDeepseek !== 'undefined' ? renderDeepseek : null
+};
+
+// 导出主要函数
+export {
+    callDeepSeekAPI,
+    callVisionAPI,
+    escapeHtml,
+    clearDeepSeekImage,
+    formatAIResponse,
+    recordDeepSeekCall,
+    recordDetailedUsage,
+    saveDeepSeekConversation,
+    autoSaveDeepSeekHistory,
+    sendDeepSeekMessage,
+    toggleDeepSeekVoice,
+    copyLastResponse,
+    toggleDeepSeekHistory,
+    saveCurrentDeepSeekChat,
+    loadSavedDeepSeekChat,
+    deleteSavedDeepSeekChat,
+    startNewDeepSeekChat,
+    scrollToDeepSeekMessage,
+    showAPIKeyModal,
+    showAPIBalance,
+    checkApiConfig,
+    openApiConfigModal,
+    showAPIRechargeModal
+};
+
+console.log('[ES6 Module] deepseek.js 模块加载完成');

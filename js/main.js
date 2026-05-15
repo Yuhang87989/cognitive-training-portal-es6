@@ -1,6 +1,6 @@
 // ============================================================
-// ES6 Module 入口文件 - V225
-// 认知训练门户ES6改造第一阶段：核心模块改造
+// ES6 Module 入口文件 - V226
+// 认知训练门户ES6改造第二阶段：业务模块迁移
 // ============================================================
 
 import './config.js';
@@ -11,7 +11,15 @@ import './utils.js';
 import './user.js';
 import './modules/ui.js';
 
-console.log('[ES6 Module] 核心模块加载完成！');
+// 业务模块 - 第二阶段迁移
+import './modules/practice.js';
+import './modules/plan.js';
+import './modules/games.js';
+import './modules/deepseek.js';
+import './modules/wrongbook.js';
+import './modules/player.js';
+
+console.log('[ES6 Module] 核心模块 + 业务模块加载完成！');
 
 // 标记ES6模块已加载
 window.ES6_MODULES_LOADED = true;

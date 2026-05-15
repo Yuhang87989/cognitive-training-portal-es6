@@ -1,4 +1,6 @@
-// 版本: V144 - 视频播放器优化版本
+// 版本: V226 - ES6 Module
+// 视频播放器模块
+
 
 // ========== 视频播放器全局状态 ==========
 window.videoCtx = {
@@ -1362,3 +1364,44 @@ window.compressVideo = compressVideo;
 window.cacheVideo = cacheVideo;
 window.getCachedVideo = getCachedVideo;
 window.deleteLocalVideo = deleteLocalVideo;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+// 视频播放器模块对象
+export const playerModule = {
+    name: 'player',
+    icon: '🎬',
+    render: null
+};
+
+// 导出主要函数
+export {
+    playVideo,
+    playPodcast,
+    closeVideoPlayer,
+    toggleVpPlay,
+    seekVideo,
+    toggleVolume,
+    togglePictureInPicture,
+    closeEnhancedVideoPlayer,
+    toggleEnhancedVideoPlay,
+    seekEnhancedVideo,
+    seekEnhancedVideoBackward,
+    seekEnhancedVideoForward,
+    toggleEnhancedMute,
+    toggleEnhancedFullscreen,
+    toggleEnhancedSpeedDropdown,
+    onEnhancedVideoError,
+    playLocalVideo,
+    handleVideoUpload,
+    compressVideo,
+    cacheVideo,
+    getCachedVideo,
+    deleteLocalVideo,
+    saveVideoWatchRecord,
+    updateVideoProgress
+};
+
+console.log('[ES6 Module] player.js 模块加载完成');

@@ -1,4 +1,6 @@
-// 版本: V151
+// 版本: V226 - ES6 Module
+// 错题本模块
+
 
 // ============================================================
 // 错题本主页
@@ -1608,3 +1610,40 @@ function submitFeedback() {
     closeDetail();
     showToast('感谢您的反馈！我们会认真处理');
 }
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+// 错题本模块对象
+export const wrongbookModule = {
+    name: 'wrongbook',
+    icon: '📒',
+    render: typeof renderWrongbook !== 'undefined' ? renderWrongbook : null
+};
+
+// 导出主要函数
+export {
+    renderWrongbook,
+    saveWrongNote,
+    viewWrongNote,
+    editWrongNote,
+    retryWrongNote,
+    selectRetryOption,
+    submitRetryChoiceAnswer,
+    submitRetryTextAnswer,
+    analyzeWrongNoteWithAI,
+    markWrongNoteReviewed,
+    removeWrongNote,
+    clearWrongNotes,
+    reviewAllWrongNotes,
+    openWrongPhotoCapture,
+    showWrongPhotoGallery,
+    analyzeWrongPhoto,
+    deleteWrongPhotoWithCleanup,
+    viewWrongNotes,
+    openFeedback,
+    submitFeedback
+};
+
+console.log('[ES6 Module] wrongbook.js 模块加载完成');
