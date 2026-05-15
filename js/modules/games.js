@@ -6257,3 +6257,4 @@ export {
 };
 
 console.log('[ES6 Module] games.js 模块加载完成');
+window.renderGames = renderGames;

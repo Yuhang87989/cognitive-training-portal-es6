@@ -358,32 +358,57 @@ function openFullscreenPage(module) {
     
     titleEl.textContent = moduleTitles[module] || '模块';
     
-    switch(module) {
-        case 'practice': renderPractice(contentEl); break;
-        case 'map': renderMap(contentEl); break;
-        case 'plan': renderPlan(contentEl); break;
-        case 'topics': renderTopics(contentEl); break;
-        case 'method': renderMethod(contentEl); break;
-        case 'thinking': renderThinking(contentEl); break;
-        case 'podcast': renderPodcast(contentEl); break;
-        case 'video': renderVideo(contentEl); break;
-        case 'games': renderGames(contentEl); break;
-        case 'deepseek': renderDeepseek(contentEl); break;
-        case 'wrongbook': renderWrongbook(contentEl); break;
-        case 'pomodoro': renderPomodoro(contentEl); break;
-        case 'calculator': renderCalculator(contentEl); break;
-        case 'notepad': renderNotepad(contentEl); break;
-        case 'usage-stats': renderUsageStats(contentEl); break;
-        case 'settings': openSettingsPanel(); closeFullscreenPage(); return; break;
-        case 'my': renderMyPage(contentEl); break;
-        case 'selfdrive': renderSelfDrive(contentEl); break;
-        case 'backup': renderBackupManager(contentEl); break;
-        case 'weekly': renderWeeklyReview(contentEl); break;
-        case 'progress': renderProgressChart(contentEl); break;
-        default: contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
+    // settings模块特殊处理
+    if (module === 'settings') {
+        openSettingsPanel();
+        closeFullscreenPage();
+        return;
     }
     
-    // 统一添加返回按钮
+    // V229: 使用动态懒加载加载模块
+    // 检查是否支持懒加载
+    if (window.MODULE_LAZY_LOAD_MAP && window.MODULE_LAZY_LOAD_MAP[module]) {
+        // 先显示加载状态
+        showModuleLoading(contentEl, moduleTitles[module] || module);
+        
+        // 异步加载模块
+        lazyLoadModule(module)
+            .then((renderFunc) => {
+                if (typeof renderFunc === 'function') {
+                    renderFunc(contentEl);
+                    // 重新添加返回按钮（因为模块可能重写了content）
+                    addBackButtonToModule(contentEl);
+                } else {
+                    contentEl.innerHTML = '<div class="card"><p style="color:red;">模块加载异常：渲染函数未找到</p></div>';
+                    addBackButtonToModule(contentEl);
+                }
+            })
+            .catch((error) => {
+                console.error('模块加载失败:', error);
+                contentEl.innerHTML = `
+                    <div class="card" style="text-align:center;padding:40px;">
+                        <p style="color:red;font-size:18px;margin-bottom:10px;">⚠️ 模块加载失败</p>
+                        <p style="color:#666;margin-bottom:20px;">${error.message || '请刷新页面重试'}</p>
+                        <button onclick="location.reload()" style="padding:10px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">刷新页面</button>
+                    </div>
+                `;
+                addBackButtonToModule(contentEl);
+            });
+    } else {
+        // 不支持懒加载的模块，降级处理或提示
+        contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
+        addBackButtonToModule(contentEl);
+    }
+    
+    container.classList.add('active');
+}
+
+/**
+ * 为模块页面添加返回按钮（V229: 抽离为独立函数）
+ */
+function addBackButtonToModule(contentEl) {
+    if (!contentEl) return;
+    
     const existingBack = contentEl.querySelector('.module-back-btn');
     if (!existingBack) {
         const backBtn = document.createElement('button');
@@ -394,8 +419,6 @@ function openFullscreenPage(module) {
         contentEl.style.position = 'relative';
         contentEl.appendChild(backBtn);
     }
-    
-    container.classList.add('active');
 }
 
 function closeFullscreenPage() { cleanupModuleState(); const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
