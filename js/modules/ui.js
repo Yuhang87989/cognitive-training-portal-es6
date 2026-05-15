@@ -9,6 +9,11 @@ function closeUserMenu() {
     if (el) el.classList.remove('show');
 }
 
+function toggleUserMenu() {
+    var el = document.getElementById("user-dropdown");
+    if (el) el.classList.toggle("show");
+}
+
 function closeAboutModal() {
     const modal = document.getElementById('about-modal');
     if (modal) modal.classList.remove('show');
@@ -1469,6 +1474,56 @@ window.openSettingsPanel = openSettingsPanel;
 window.closeSettingsPanel = closeSettingsPanel;
 window.savePasswordChanges = savePasswordChanges;
 window.setDifficulty = setDifficulty;
+
+window.openDeepseekHelpModal = function() {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+    modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+    modal.innerHTML = "\
+        u003cdiv class="modal-container" style="max-width: 600px; max-height: 80vh; overflow-y: auto;"u003e\
+            u003cdiv class="modal-header"u003e\
+                u003ch3u003e🔮 DeepSeek 使用帮助u003c/h3u003e\
+                u003cbutton class="modal-close" onclick="this.closest(\.modal-overlay).remove()"u003e×u003c/buttonu003e\
+            u003c/divu003e\
+            u003cdiv class="modal-body" style="padding: 20px;"u003e\
+                u003ch4 style="color: #667eea; margin-bottom: 10px;"u003e📋 目录u003c/h4u003e\
+                u003cdiv style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;"u003e\
+                    u003cul style="margin: 0; padding-left: 20px;"u003e\
+                        u003cliu003e快速模式 vs 专家模式u003c/liu003e\
+                        u003cliu003eToken 消耗说明u003c/liu003e\
+                        u003cliu003eAPI Key 配置方法u003c/liu003e\
+                    u003c/ulu003e\
+                u003c/divu003e\
+                u003cdiv style="margin-bottom: 20px;"u003e\
+                    u003ch4 style="color: #667eea; margin-bottom: 10px;"u003e⚡ 快速模式 vs 专家模式u003c/h4u003e\
+                    u003cp style="font-size: 14px; line-height: 1.6; color: #333;"u003e\
+                        u003cstrongu003e快速模式：u003c/strongu003e使用 DeepSeek Chat 模型，响应速度快（3-5秒），适合日常问题。u003cbru003e\
+                        u003cstrongu003e专家模式：u003c/strongu003e使用 DeepSeek Reasoner 模型，推理能力强，适合复杂问题，但响应较慢（10-20秒）。u003cbru003e\
+                    u003c/pu003e\
+                u003c/divu003e\
+                u003cdiv style="margin-bottom: 20px;"u003e\
+                    u003ch4 style="color: #667eea; margin-bottom: 10px;"u003e💰 Token 消耗说明u003c/h4u003e\
+                    u003cp style="font-size: 14px; line-height: 1.6; color: #333;"u003e\
+                        输入和输出都会消耗 Token，不同模型价格不同。你可以在"我的"页面查看 Token 使用统计。u003cbru003e\
+                        新用户通常有免费额度，用完后需要充值或配置自己的 API Key。u003cbru003e\
+                    u003c/pu003e\
+                u003c/divu003e\
+                u003cdiv style="margin-bottom: 20px;"u003e\
+                    u003ch4 style="color: #667eea; margin-bottom: 10px;"u003e🔧 API Key 配置方法u003c/h4u003e\
+                    u003col style="font-size: 14px; line-height: 1.8; color: #333; padding-left: 20px;"u003e\
+                        u003cliu003e访问 DeepSeek 官网：https://platform.deepseek.com/u003c/liu003e\
+                        u003cliu003e注册账号并登录u003c/liu003e\
+                        u003cliu003e进入 API Keys 页面，创建新的 API Keyu003c/liu003e\
+                        u003cliu003e点击 DeepSeek 页面右上角的"配置"按钮u003c/liu003e\
+                        u003cliu003e输入你的 API Key 并保存u003c/liu003e\
+                    u003c/olu003e\
+                u003c/divu003e\
+            u003c/divu003e\
+        u003c/divu003e";
+    document.body.appendChild(modal);
+};
+window.openDeepSeekHelpModal = window.openDeepseekHelpModal;
+console.log("✅ DeepSeek 帮助文档函数已加载");
 window.showCreateUserModal = showCreateUserModal;
 window.switchMainTab = switchMainTab;
 window.toggleSettingsGroup = toggleSettingsGroup;
