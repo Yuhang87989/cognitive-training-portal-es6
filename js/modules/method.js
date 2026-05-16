@@ -528,6 +528,51 @@ function renderMethod(container) {
             </div>
         </div>
         
+        <!-- 🚀 升级规划 -->
+        <div class="card" style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;margin-bottom:16px;">
+            <h3 style="margin-bottom:12px;font-size:16px;">🚀 V195 升级规划</h3>
+            <p style="font-size:13px;opacity:0.9;margin-bottom:16px;">9-10周，零成本升级，系统评分从72分→85分</p>
+            
+            <!-- 第一梯队功能 -->
+            <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:14px;margin-bottom:12px;">
+                <div style="font-weight:600;margin-bottom:10px;font-size:14px;">📊 第一梯队（P0必做，第1-4周）</div>
+                
+                <!-- 能力雷达图 -->
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:12px;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <span style="font-size:20px;">🎯</span>
+                        <span style="font-weight:600;">能力雷达图</span>
+                        <span style="background:#FFD93D;color:#333;padding:2px 8px;border-radius:4px;font-size:11px;">1周</span>
+                    </div>
+                    <p style="font-size:12px;opacity:0.9;margin:0;">5个能力维度：专注力、记忆力、思维力、反应力、坚持力</p>
+                </div>
+                
+                <!-- 成长曲线 -->
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:12px;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <span style="font-size:20px;">📈</span>
+                        <span style="font-weight:600;">成长曲线</span>
+                        <span style="background:#FFD93D;color:#333;padding:2px 8px;border-radius:4px;font-size:11px;">1周</span>
+                    </div>
+                    <p style="font-size:12px;opacity:0.9;margin:0;">日/周/月三个维度，里程碑自动解锁</p>
+                </div>
+                
+                <!-- AI辅导嵌入 -->
+                <div style="background:rgba(255,255,255,0.15);border-radius:6px;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                        <span style="font-size:20px;">🤖</span>
+                        <span style="font-weight:600;">训练中嵌入AI辅导</span>
+                        <span style="background:#FFD93D;color:#333;padding:2px 8px;border-radius:4px;font-size:11px;">1周</span>
+                    </div>
+                    <p style="font-size:12px;opacity:0.9;margin:0;">卡壳时一键求助，智能提示不直接给答案</p>
+                </div>
+            </div>
+            
+            <div style="text-align:center;font-size:12px;opacity:0.8;">
+                💡 更多功能规划中，敬请期待！
+            </div>
+        </div>
+        
         <!-- 学习统计 -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">
             <div style="background:white;border-radius:12px;padding:16px;text-align:center;">
