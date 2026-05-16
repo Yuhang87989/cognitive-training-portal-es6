@@ -126,7 +126,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderNotepad,
     saveNote,
     deleteNote,

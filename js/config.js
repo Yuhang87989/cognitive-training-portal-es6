@@ -57,7 +57,6 @@ window.currentThinkingPage = {};
 // ============================================================
 // ES6 Module Export - V225 ES6改造
 // ============================================================
-export {
     DEEPSEEK_API_KEY,
     DEEPSEEK_API_URL,
     DEEPSEEK_MODEL,

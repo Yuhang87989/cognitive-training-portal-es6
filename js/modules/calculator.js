@@ -125,7 +125,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderCalculator,
     calcInput
 };

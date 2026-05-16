@@ -2862,14 +2862,12 @@ function calculateDataStats() {
 }
 
 
-export const gamesModule = {
     name: 'games',
     icon: '🎮',
     render: typeof renderGames !== 'undefined' ? renderGames : null
 };
 
 // 导出主要函数
-export {
     startGame,
     exitGame,
     resetGame,

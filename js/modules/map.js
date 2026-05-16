@@ -179,7 +179,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderMap,
     renderCognitiveRadar,
     renderCognitiveDetails,

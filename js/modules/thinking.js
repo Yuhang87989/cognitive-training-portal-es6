@@ -862,7 +862,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderThinking,
     showThinkingType,
     startThinkingQuiz,

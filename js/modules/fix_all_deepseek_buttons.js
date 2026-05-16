@@ -233,7 +233,6 @@
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-export const DeepSeekButtonFix = {
     ensureDeepSeekHelpModal: window.ensureDeepSeekHelpModal,
     openDeepseekHelpModal: window.openDeepseekHelpModal,
     openDeepSeekHelpModal: window.openDeepSeekHelpModal,

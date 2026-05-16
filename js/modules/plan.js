@@ -1,7 +1,6 @@
 // 版本: V226 - ES6 Module
 // 学习计划模块
 
-export const planModule = {
     name: 'plan',
     icon: '🎯',
     render: renderPlan
@@ -197,7 +196,6 @@ window.toggleWeekTask = toggleWeekTask;
 // ES6 Module 导出
 // ============================================================
 
-export {
     renderPlan,
     renderWeekPlan,
     renderSlide,

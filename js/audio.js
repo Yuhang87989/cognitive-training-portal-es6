@@ -453,7 +453,6 @@ window.toggleVoiceInput = toggleVoiceInput;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-export {
     SoundEffects,
     speakText,
     stopTTSSpeech,

@@ -744,7 +744,6 @@ if (document.readyState === 'loading') {
 // ============================================================
 // ES6 Module Export - V225 ES6改造
 // ============================================================
-export {
     loadData,
     saveData,
     saveUserData,

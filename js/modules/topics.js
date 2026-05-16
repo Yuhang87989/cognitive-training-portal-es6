@@ -383,7 +383,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderTopics,
     selectTopicsGrade,
     selectTopicsSubject,

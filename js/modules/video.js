@@ -147,7 +147,6 @@ if (typeof module !== 'undefined' && module.exports) {
     };
 }
 
-export {
     renderVideo,
     renderLocalVideoList,
     filterVideoCourse,

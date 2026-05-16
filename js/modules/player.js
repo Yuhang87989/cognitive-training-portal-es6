@@ -1370,14 +1370,12 @@ window.deleteLocalVideo = deleteLocalVideo;
 // ============================================================
 
 // 视频播放器模块对象
-export const playerModule = {
     name: 'player',
     icon: '🎬',
     render: null
 };
 
 // 导出主要函数
-export {
     playVideo,
     playPodcast,
     closeVideoPlayer,

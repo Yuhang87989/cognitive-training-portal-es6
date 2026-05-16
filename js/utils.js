@@ -423,7 +423,6 @@ window.loadModuleData = loadModuleData;
 // ============================================================
 // ES6 Module Export - V225 ES6改造
 // ============================================================
-export {
     showToast,
     cleanupModuleState,
     loadScript,

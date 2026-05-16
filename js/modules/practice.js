@@ -1,7 +1,6 @@
 // 版本: V226 - ES6 Module
 // AI精准练模块
 
-export const practiceModule = {
     name: 'practice',
     icon: '🎯',
     render: renderPractice
@@ -327,7 +326,6 @@ window.handlePhotoToQuestion = handlePhotoToQuestion;
 // ES6 Module 导出
 // ============================================================
 
-export {
     renderPractice,
     handlePracticePhoto,
     showPracticePhotoModal,
