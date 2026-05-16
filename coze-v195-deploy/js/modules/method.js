@@ -1023,6 +1023,15 @@ async function photoToQuestion(imageData) {
     
     try {
         var ocrText = '';
+        // V224: 按需加载Tesseract.js
+        await new Promise(function(resolve) {
+            if (typeof loadTesseract === 'function') {
+                loadTesseract(resolve);
+            } else {
+                resolve();
+            }
+        });
+        
         if (typeof Tesseract !== 'undefined') {
             var result = await Tesseract.recognize(imageData, 'chi_sim+eng', {});
             ocrText = result.data.text.trim();
@@ -1075,3 +1084,24 @@ function showGameOver(score, total) {
     modal.classList.add('show');
 }
 window.showGameOver = showGameOver;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        startMethodQuiz,
+        rateMethodAnswer,
+        analyzeMethodWithAI,
+        conserveAnswer,
+        photoToQuestion,
+        showGameOver,
+        methodTrainingQuestions: window.methodTrainingQuestions
+    };
+}
+
+export {
+    startMethodQuiz,
+    rateMethodAnswer,
+    analyzeMethodWithAI
+};

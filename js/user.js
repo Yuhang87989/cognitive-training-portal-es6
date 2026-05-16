@@ -37,7 +37,7 @@ function closeUserMenuOutside(e) {
 
 function showUserSwitchModal() {
     closeUserMenu();
-    var data = loadData();
+    var data = window.loadData();
     
     if (data.users.length === 0) {
         showToast('暂无用户，请先创建账号');
@@ -78,11 +78,11 @@ function showUserSwitchModal() {
 function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
 
 function quickLogin(userId) {
-    const data = loadData();
+    const data = window.loadData();
     const user = data.users.find(u => u.id === userId);
     if (!user) return;
     data.currentUser = userId;
-    saveData(data);
+    window.saveData(data);
     
     // 更新登录页元素
     const displayEl = document.getElementById('selected-user-display');
@@ -103,7 +103,7 @@ function quickLogin(userId) {
 }
 
 function openEditProfileModal() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         document.getElementById('edit-name').value = user.name;
         document.getElementById('edit-grade').value = user.grade;
@@ -112,7 +112,7 @@ function openEditProfileModal() {
 }
 
 function openDifficultyModal() {
-    const userData = getCurrentUserData();
+    const userData = window.getCurrentUserData();
     const currentLevel = userData ? userData.difficulty : 1;
     // 高亮当前选中的按钮
     document.querySelectorAll('.diff-btn').forEach(btn => {
@@ -124,7 +124,7 @@ function openDifficultyModal() {
 }
 
 function openAvatarModal() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const modal = document.getElementById('avatar-modal');
     const content = document.getElementById('avatar-modal-content');
     
@@ -161,7 +161,7 @@ function openAvatarModal() {
 }
 
 function renderUserList() {
-    const data = loadData();
+    const data = window.loadData();
     const container = document.getElementById('user-list-container');
     if (!container) return;
     const colors = ['linear-gradient(135deg,#667eea,#764ba2)', 'linear-gradient(135deg,#FF9A63,#E87A4E)', 'linear-gradient(135deg,#43E97B,#38F9D7)'];
@@ -193,7 +193,7 @@ function createNewUser() {
         return;
     }
     
-    var data = loadData();
+    var data = window.loadData();
     
     // 检查名字是否重复
     if (data.users.some(function(u) { return u.name === name; })) {
@@ -228,7 +228,7 @@ function createNewUser() {
     
     data.users.push(newUser);
     data.currentUser = newUser.id;
-    saveData(data);
+    window.saveData(data);
     
     closeCreateUserModal();
     
@@ -265,7 +265,7 @@ function closeUserSwitchModal() { document.getElementById('user-switch-modal').c
 
 function showDeleteUserModal() {
     closeUserMenu();
-    var data = loadData();
+    var data = window.loadData();
     
     if (data.users.length === 0) {
         showToast('暂无用户');
@@ -311,7 +311,7 @@ function closeDeleteUserModal() {
 function confirmDeleteUser(userId) {
     if (!confirm('确定要删除此用户吗？此操作不可恢复！')) return;
     
-    var data = loadData();
+    var data = window.loadData();
     var userIndex = data.users.findIndex(function(u) { return u.id === userId; });
     
     if (userIndex === -1) {
@@ -331,7 +331,7 @@ function confirmDeleteUser(userId) {
         }
     }
     
-    saveData(data);
+    window.saveData(data);
     
     // 刷新UI
     updateUI();
@@ -350,7 +350,7 @@ function confirmDeleteUser(userId) {
 }
 
 function setDifficulty(level) {
-    const userData = getCurrentUserData();
+    const userData = window.getCurrentUserData();
     if (userData) {
         userData.difficulty = level;
         syncUserData(userData);
@@ -381,7 +381,7 @@ function closeDifficultyModal() {
 }
 
 function saveProfileChanges() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     
     const newName = document.getElementById('edit-name').value.trim();
@@ -484,7 +484,7 @@ function openApiConfigModal(type) {
 }
 
 function selectAvatar(emoji) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         user.avatar = emoji;
         syncUserData(user);
@@ -533,7 +533,7 @@ if (typeof selectGrade !== "undefined") window.selectGrade = selectGrade;
 
 // ====== 管理用户功能 ======
 function openManageUserModal() {
-    var data = loadData();
+    var data = window.loadData();
     var modal = document.getElementById('detail-modal');
     var content = document.getElementById('detail-content');
     if (!modal || !content) return;

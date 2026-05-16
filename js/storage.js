@@ -21,7 +21,7 @@ const DEFAULT_USER = {
     todayStats: { date: new Date().toISOString().split('T')[0], questions: 0, correct: 0, minutes: 0 }
 };
 
-function loadData() {
+function window.loadData() {
     try {
         // 尝试从IndexedDB迁移（异步，首次可能还没完成）
         if (window.DB) {
@@ -36,7 +36,7 @@ function loadData() {
                 users: [{ ...DEFAULT_USER }],
                 currentUser: DEFAULT_USER.id
             };
-            saveData(defaultData);
+            window.saveData(defaultData);
             console.log('已创建默认用户:', DEFAULT_USER.name);
             return defaultData;
         }
@@ -48,7 +48,7 @@ function loadData() {
                 users: [{ ...DEFAULT_USER }],
                 currentUser: DEFAULT_USER.id
             };
-            saveData(defaultData);
+            window.saveData(defaultData);
             return defaultData;
         }
         if (!Array.isArray(data.users)) data.users = [];
@@ -57,7 +57,7 @@ function loadData() {
         if (data.users.length === 0) {
             data.users = [{ ...DEFAULT_USER }];
             data.currentUser = DEFAULT_USER.id;
-            saveData(data);
+            window.saveData(data);
             console.log('用户列表为空，已创建默认用户:', DEFAULT_USER.name);
         }
         
@@ -73,12 +73,12 @@ function loadData() {
             users: [{ ...DEFAULT_USER }],
             currentUser: DEFAULT_USER.id
         };
-        saveData(defaultData);
+        window.saveData(defaultData);
         return defaultData;
     }
 }
 
-function saveData(data) {
+function window.saveData(data) {
     try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     } catch(e) {}
@@ -96,7 +96,7 @@ function saveData(data) {
 // 保存单个用户数据（更新到localStorage）
 function saveUserData(user) {
     try {
-        var data = loadData();
+        var data = window.loadData();
         var idx = -1;
         for (var i = 0; i < data.users.length; i++) {
             if (data.users[i].id === user.id) {
@@ -109,7 +109,7 @@ function saveUserData(user) {
         } else {
             data.users.push(user);
         }
-        saveData(data);
+        window.saveData(data);
     } catch(e) {
         console.warn('saveUserData失败:', e);
     }
@@ -118,7 +118,7 @@ function saveUserData(user) {
 function clearCurrentUserData() {
     if (!confirm('确定要清除当前用户的所有数据吗？')) return;
     
-    var data = loadData();
+    var data = window.loadData();
     var user = data.users.find(function(u) { return u.id === data.currentUser; });
     
     if (!user) {
@@ -139,7 +139,7 @@ function clearCurrentUserData() {
     user.completedTopics = [];
     user.weeklyProgress = {};
     
-    saveData(data);
+    window.saveData(data);
     updateUI();
     syncTodayStats();
     closeUserMenu();
@@ -175,8 +175,8 @@ function updateApiStatusDisplay() {
     }
 }
 
-function getCurrentUserData() {
-    const data = loadData();
+function window.getCurrentUserData() {
+    const data = window.loadData();
     if (!data.currentUser) return null;
     return data.users.find(u => u.id === data.currentUser) || null;
 }
@@ -234,9 +234,9 @@ function clearAllData() {
 }
 
 function syncUserData(user) {
-    const data = loadData();
+    const data = window.loadData();
     const idx = data.users.findIndex(u => u.id === user.id);
-    if (idx >= 0) { data.users[idx] = user; saveData(data); }
+    if (idx >= 0) { data.users[idx] = user; window.saveData(data); }
     // IndexedDB同步
     if (window.DB) {
         try { DB.saveUser(user); } catch(e) {
@@ -254,7 +254,7 @@ function syncData() {
         btn.disabled = true;
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         // 更新同步时间
         const now = new Date();
@@ -294,7 +294,7 @@ function syncData() {
 }
 
 function syncTodayStats() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     const today = new Date().toISOString().split('T')[0];
     let todayStats = user.todayStats || { date: today, questions: 0, correct: 0, minutes: 0 };
@@ -324,7 +324,7 @@ function syncTodayStats() {
 
 // 记录练习数据 - V145修复
 window.recordPractice = function(questionCount, correctCount, minutesSpent) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     const today = new Date().toISOString().split('T')[0];
     

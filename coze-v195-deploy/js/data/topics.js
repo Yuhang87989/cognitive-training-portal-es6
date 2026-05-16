@@ -553,3 +553,5 @@ function getGradeSubjectTopics(grade, subject) {
 // Window exports for cross-module access
 window.topics = topics;
 window.getGradeSubjectTopics = getGradeSubjectTopics;
+
+// 数据已挂载到window对象，无需ES6导出

@@ -7,7 +7,7 @@
 // 每周回顾功能
 // ============================================================
 function renderWeeklyReview(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1));
@@ -126,7 +126,7 @@ function getEncouragement(days, minutes) {
 // 进步曲线功能
 // ============================================================
 function renderProgressChart(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const today = new Date();
     
     // 获取最近30天的数据

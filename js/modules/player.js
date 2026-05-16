@@ -129,7 +129,7 @@ function playVideoCourse(courseId) {
 }
 
 function playLocalAudio(audioId) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const audio = user?.localAudios?.find(a => a.id === audioId);
     if (!audio) return;
 
@@ -140,7 +140,7 @@ function playLocalAudio(audioId) {
 }
 
 function playLocalVideo(videoId) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const video = user?.localVideos?.find(v => v.id === videoId);
     if (!video) {
         showToast('视频信息不存在');
@@ -874,7 +874,7 @@ function handleAudioUpload(input) {
         return;
     }
 
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.localAudios) user.localAudios = [];
 
     // 创建音频URL
@@ -1117,7 +1117,7 @@ function handleVideoUpload(input) {
         return;
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.localVideos) user.localVideos = [];
     
     // 生成视频ID（不存储 blob URL）
@@ -1175,7 +1175,7 @@ function handleVideoUpload(input) {
 function deleteLocalAudio(audioId) {
     if (!confirm('确定要删除这个音频吗？')) return;
 
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.localAudios) return;
 
     user.localAudios = user.localAudios.filter(a => a.id !== audioId);
@@ -1187,7 +1187,7 @@ function deleteLocalAudio(audioId) {
 function deleteLocalVideo(videoId) {
     if (!confirm('确定删除这个视频吗？')) return;
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     user.localVideos = user.localVideos.filter(v => v.id !== videoId);
     syncUserData(user);
     
@@ -1325,7 +1325,7 @@ window.startAudioSeq = startAudioSeq;
 // ========== 视频观看记录功能 ==========
 function getVideoWatchRecord(videoId) {
     try {
-        const user = getCurrentUserData();
+        const user = window.getCurrentUserData();
         if (!user || !user.videoWatchRecords) return null;
         return user.videoWatchRecords[videoId] || null;
     } catch (e) {
@@ -1335,7 +1335,7 @@ function getVideoWatchRecord(videoId) {
 
 function saveVideoWatchRecord(videoId, progress, duration) {
     try {
-        const user = getCurrentUserData();
+        const user = window.getCurrentUserData();
         if (!user) return;
         if (!user.videoWatchRecords) user.videoWatchRecords = {};
         user.videoWatchRecords[videoId] = {

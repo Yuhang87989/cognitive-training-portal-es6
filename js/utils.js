@@ -181,7 +181,7 @@ function exitSystem() {
     closeSettingsPanel();
     
     // 显示告别弹窗
-    var user = getCurrentUserData();
+    var user = window.getCurrentUserData();
     if (user) {
         showGoodbyeModal(user);
         // 延迟后执行退出

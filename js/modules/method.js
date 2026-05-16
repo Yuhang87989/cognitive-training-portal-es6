@@ -675,61 +675,9 @@ async function analyzeMethodPhotoWithAI() {
 // 导出函数
 window.analyzeMethodPhotoWithAI = analyzeMethodPhotoWithAI;
 
-function submitMethodAnswers(methodId, page) {
-    SoundEffects.playSubmit();
-    
-    const questions = window.methodTrainingQuestions[methodId];
-    if (!questions) return;
-    
-    const answers = [];
-    let hasEmpty = false;
-    
-    for (let i = 0; i < questions.length; i++) {
-        const input = document.getElementById('method-answer-' + i);
-        const answer = input?.value?.trim() || '';
-        if (!answer) hasEmpty = true;
-        answers.push(answer);
-    }
-    
-    if (hasEmpty && !confirm('有未填写的题目，确定提交吗？')) {
-        return;
-    }
-    
-    const methodNames = {
-        feyman: '费曼学习法', pomodoro: '番茄工作法', ebbinghaus: '艾宾浩斯遗忘曲线',
-        mindmap: '思维导图法', cornell: '康奈尔笔记法', sq3r: 'SQ3R阅读法',
-        timeManagement: '时间管理法', noteTaking: '笔记技巧', testStrategy: '考试技巧'
-    };
-    
-    const content = document.getElementById('detail-content');
-    content.innerHTML = `
-        <div class="modal-title">📝 ${methodNames[methodId] || methodId} - 答案对比</div>
-        <div style="max-height:400px;overflow-y:auto;margin-bottom:16px;">
-            ${questions.map((q, idx) => `
-                <div style="margin-bottom:16px;">
-                    <div style="font-size:13px;color:#1A6BFF;font-weight:600;margin-bottom:8px;">
-                        第${idx + 1}题：${q.q}
-                    </div>
-                    <div style="background:#e3f2fd;border-radius:8px;padding:10px;margin-bottom:8px;">
-                        <div style="font-size:12px;color:#1A6BFF;margin-bottom:4px;">你的答案</div>
-                        <div style="font-size:13px;color:#333;line-height:1.5;">${answers[idx] || '<span style="color:#999;">未作答</span>'}</div>
-                    </div>
-                    <div style="background:#e8f5e9;border-radius:8px;padding:10px;margin-bottom:8px;">
-                        <div style="font-size:12px;color:#4CAF50;margin-bottom:4px;">参考答案</div>
-                        <div style="font-size:13px;color:#333;line-height:1.5;">${q.a}</div>
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-        <button class="modal-close" onclick="closeModal()" style="width:100%;">关闭</button>
-    `;
-    
-    // 更新统计
-    updateMethodStats();
-}
 
 function updateMethodStats() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.methodStats || {};
     
     let totalCompleted = 0;
@@ -764,7 +712,7 @@ function handleMethodNoteUpload(input) {
     const reader = new FileReader();
     
     reader.onload = function(e) {
-        const user = getCurrentUserData();
+        const user = window.getCurrentUserData();
         user.methodNotes = user.methodNotes || [];
         user.methodNotes.push({
             id: Date.now(),
@@ -783,7 +731,7 @@ function renderMethodNotes() {
     const container = document.getElementById('method-notes-list');
     if (!container) return;
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const notes = user?.methodNotes || [];
     
     if (notes.length === 0) {
@@ -893,7 +841,7 @@ function rateMethodAnswer(methodId, isCorrect, questionIndex) {
         SoundEffects.playWrong();
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.methodStats) user.methodStats = {};
     if (!user.methodStats[methodId]) user.methodStats[methodId] = { completed: 0, correct: 0, answeredQuestions: [] };
     

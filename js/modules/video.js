@@ -59,7 +59,7 @@ function renderVideo(container) {
 }
 
 function renderLocalVideoList() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const localVideos = user?.localVideos || [];
     const listEl = document.getElementById('local-video-list');
     

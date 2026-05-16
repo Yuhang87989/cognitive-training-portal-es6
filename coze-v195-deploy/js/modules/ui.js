@@ -9,6 +9,11 @@ function closeUserMenu() {
     if (el) el.classList.remove('show');
 }
 
+function toggleUserMenu() {
+    var el = document.getElementById("user-dropdown");
+    if (el) el.classList.toggle("show");
+}
+
 function closeAboutModal() {
     const modal = document.getElementById('about-modal');
     if (modal) modal.classList.remove('show');
@@ -340,35 +345,70 @@ function openFullscreenPage(module) {
         'deepseek': '🤖 DeepSeek',
         'wrongbook': '📒 错题本',
         'pomodoro': '🍅 番茄闹钟',
+        'calculator': '🧮 计算器',
+        'notepad': '📝 记事本',
+        'usage-stats': '📊 AI使用统计',
         'settings': '⚙️ 设置',
         'my': '👤 我的',
         'selfdrive': '💪 自驱力训练',
-        'backup': '💾 数据备份'
+        'backup': '💾 数据备份',
+        'weekly': '📅 每周回顾',
+        'progress': '📉 进步曲线'
     };
     
     titleEl.textContent = moduleTitles[module] || '模块';
     
-    switch(module) {
-        case 'practice': renderPractice(contentEl); break;
-        case 'map': renderMap(contentEl); break;
-        case 'plan': renderPlan(contentEl); break;
-        case 'topics': renderTopics(contentEl); break;
-        case 'method': renderMethod(contentEl); break;
-        case 'thinking': renderThinking(contentEl); break;
-        case 'podcast': renderPodcast(contentEl); break;
-        case 'video': renderVideo(contentEl); break;
-        case 'games': renderGames(contentEl); break;
-        case 'deepseek': renderDeepseek(contentEl); break;
-        case 'wrongbook': renderWrongbook(contentEl); break;
-        case 'pomodoro': renderPomodoro(contentEl); break;
-        case 'settings': openSettingsPanel(); closeFullscreenPage(); return; break;
-        case 'my': renderMyPage(contentEl); break;
-        case 'selfdrive': renderSelfDrive(contentEl); break;
-        case 'backup': renderBackupManager(contentEl); break;
-        default: contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
+    // settings模块特殊处理
+    if (module === 'settings') {
+        openSettingsPanel();
+        closeFullscreenPage();
+        return;
     }
     
-    // 统一添加返回按钮
+    // V229: 使用动态懒加载加载模块
+    // 检查是否支持懒加载
+    if (window.MODULE_LAZY_LOAD_MAP && window.MODULE_LAZY_LOAD_MAP[module]) {
+        // 先显示加载状态
+        showModuleLoading(contentEl, moduleTitles[module] || module);
+        
+        // 异步加载模块
+        lazyLoadModule(module)
+            .then((renderFunc) => {
+                if (typeof renderFunc === 'function') {
+                    renderFunc(contentEl);
+                    // 重新添加返回按钮（因为模块可能重写了content）
+                    addBackButtonToModule(contentEl);
+                } else {
+                    contentEl.innerHTML = '<div class="card"><p style="color:red;">模块加载异常：渲染函数未找到</p></div>';
+                    addBackButtonToModule(contentEl);
+                }
+            })
+            .catch((error) => {
+                console.error('模块加载失败:', error);
+                contentEl.innerHTML = `
+                    <div class="card" style="text-align:center;padding:40px;">
+                        <p style="color:red;font-size:18px;margin-bottom:10px;">⚠️ 模块加载失败</p>
+                        <p style="color:#666;margin-bottom:20px;">${error.message || '请刷新页面重试'}</p>
+                        <button onclick="location.reload()" style="padding:10px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">刷新页面</button>
+                    </div>
+                `;
+                addBackButtonToModule(contentEl);
+            });
+    } else {
+        // 不支持懒加载的模块，降级处理或提示
+        contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
+        addBackButtonToModule(contentEl);
+    }
+    
+    container.classList.add('active');
+}
+
+/**
+ * 为模块页面添加返回按钮（V229: 抽离为独立函数）
+ */
+function addBackButtonToModule(contentEl) {
+    if (!contentEl) return;
+    
     const existingBack = contentEl.querySelector('.module-back-btn');
     if (!existingBack) {
         const backBtn = document.createElement('button');
@@ -379,8 +419,6 @@ function openFullscreenPage(module) {
         contentEl.style.position = 'relative';
         contentEl.appendChild(backBtn);
     }
-    
-    container.classList.add('active');
 }
 
 function closeFullscreenPage() { cleanupModuleState(); const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
@@ -1433,6 +1471,13 @@ function getWeekNumber() {
 
 function switchPlanDay(day) {
     window._planDay = day;
+    const el = document.getElementById('module-content');
+    if (el) renderPlan(el);
+}
+
+// ============================================================
+// 暴露全局函数到 window 对象
+// ============================================================
 window.closeChangePasswordModal = closeChangePasswordModal;
 window.closeCreateUserModal = closeCreateUserModal;
 window.closeDifficultyModal = closeDifficultyModal;
@@ -1452,10 +1497,6 @@ window.openSettingsPanel = openSettingsPanel;
 window.closeSettingsPanel = closeSettingsPanel;
 window.savePasswordChanges = savePasswordChanges;
 window.setDifficulty = setDifficulty;
-window.showCreateUserModal = showCreateUserModal;
-window.switchMainTab = switchMainTab;
-window.toggleSettingsGroup = toggleSettingsGroup;
-window.toggleSoundEffects = toggleSoundEffects;
 window.toggleUserMenu = toggleUserMenu;
 window.openRegisterModal = openRegisterModal;
 window.handleLogin = handleLogin;
@@ -1472,12 +1513,12 @@ window.closeWelcomeModal = closeWelcomeModal;
 window.deleteUser = deleteUser;
 window.registerNewUser = registerNewUser;
 window.showToast = showToast;
-window.escapeHtml = escapeHtml; // V147-fix: 添加escapeHtml导出供全局使用
+window.escapeHtml = escapeHtml;
 window.switchToUser = switchToUser;
 window.updateUI = updateUI;
-    const el = document.getElementById('module-content');
-    if (el) renderPlan(el);
-}
+window.switchPlanDay = switchPlanDay;
+window.showWelcomeMessage = showWelcomeMessage;
+window.toggleTask = toggleTask;
 
 function showWelcomeMessage(user) {
     const hour = new Date().getHours();
@@ -1822,3 +1863,207 @@ window.handleImportFile = handleImportFile;
 window.calculateCognitiveData = calculateCognitiveData;
 window.getDefaultCognitiveData = getDefaultCognitiveData;
 window.drawRadarChart = drawRadarChart;
+
+// ============================================================
+// 新增/修复的功能函数
+// ============================================================
+
+// 清除当前用户数据
+function clearCurrentUserData() {
+    const user = getCurrentUserData();
+    if (!user) {
+        showToast('请先登录');
+        return;
+    }
+    
+    if (!confirm('确定要清除 ' + user.name + ' 的所有数据吗？')) return;
+    
+    user.stats = { totalQuestions: 0, correctAnswers: 0, totalMinutes: 0, streakDays: 0 };
+    user.wrongNotes = [];
+    user.completedTopics = [];
+    user.weeklyProgress = {};
+    user.studyDays = {};
+    user.todayStats = { questions: 0, correct: 0, minutes: 0 };
+    user.methodStats = {};
+    user.thinkingStats = {};
+    user.gameScores = {};
+    user.gameCounts = {};
+    user.points = 0;
+    
+    syncUserData(user);
+    updateUI();
+    showToast('数据已清除');
+    closeUserMenu();
+}
+
+// 清除所有数据
+function clearAllData() {
+    if (!confirm('⚠️ 确定要清除所有本地数据吗？此操作不可恢复！')) return;
+    
+    localStorage.removeItem('cognitive_training_data');
+    localStorage.removeItem('self_drive_goals');
+    localStorage.removeItem('self_drive_habits');
+    localStorage.removeItem('self_drive_achievements');
+    localStorage.removeItem('self_drive_diary');
+    localStorage.removeItem('self_drive_checkins');
+    
+    closeSettingsPanel();
+    showToast('所有数据已清除，页面即将刷新');
+    setTimeout(() => location.reload(), 1500);
+}
+
+// 同步数据（简化版 - 仅保存到本地）
+function syncData() {
+    const data = loadData();
+    if (!data) {
+        showToast('无数据可同步');
+        return;
+    }
+    
+    saveData(data);
+    const syncBtn = document.getElementById('sync-btn');
+    const syncTimeEl = document.getElementById('last-sync-time');
+    if (syncBtn) {
+        syncBtn.textContent = '同步中...';
+        syncBtn.disabled = true;
+    }
+    
+    setTimeout(() => {
+        if (syncBtn) {
+            syncBtn.textContent = '同步';
+            syncBtn.disabled = false;
+        }
+        if (syncTimeEl) {
+            syncTimeEl.textContent = '上次同步：' + new Date().toLocaleString();
+        }
+        showToast('数据同步完成');
+    }, 1000);
+}
+
+// 打开API配置弹窗
+function openApiConfigModal(type) {
+    const modal = document.getElementById('api-config-modal');
+    if (!modal) {
+        showToast('功能加载中，请稍后再试');
+        return;
+    }
+    
+    const titleEl = document.getElementById('api-config-title');
+    const keyEl = document.getElementById('api-key-input');
+    const keyDisplay = document.getElementById('api-' + type + '-status');
+    
+    if (titleEl) {
+        const titles = { 'deepseek': 'DeepSeek API Key 配置', 'peerjs': 'PeerJS 服务器配置' };
+        titleEl.textContent = titles[type] || 'API 配置';
+    }
+    
+    if (keyEl) {
+        const savedKey = localStorage.getItem('api_' + type + '_key') || '';
+        keyEl.value = savedKey;
+        keyEl.dataset.type = type;
+    }
+    
+    modal.classList.add('show');
+}
+
+// 保存API配置
+function saveApiConfig() {
+    const keyEl = document.getElementById('api-key-input');
+    if (!keyEl) return;
+    
+    const type = keyEl.dataset.type || 'deepseek';
+    const key = keyEl.value.trim();
+    
+    localStorage.setItem('api_' + type + '_key', key);
+    
+    // 更新状态显示
+    const statusEl = document.getElementById('api-' + type + '-status');
+    if (statusEl) {
+        statusEl.textContent = key ? '已配置' : '状态：未配置';
+    }
+    
+    closeApiConfigModal();
+    showToast('配置已保存');
+}
+
+// 显示用户切换模态框
+function showUserSwitchModal() {
+    closeUserMenu();
+    const data = loadData();
+    
+    if (data.users.length === 0) {
+        showToast('暂无用户，请先创建');
+        return;
+    }
+    
+    const container = document.getElementById('user-switch-list');
+    if (!container) {
+        showToast('页面加载异常');
+        return;
+    }
+    
+    const colors = ['#667eea', '#FF9A63', '#43E97B'];
+    let htmlContent = '';
+    
+    data.users.forEach(function(u, i) {
+        const isCurrent = u.id === data.currentUser;
+        htmlContent += '<div onclick="switchToUser(\'' + u.id + '\')" style="display:flex;align-items:center;gap:10px;padding:12px;background:' + (isCurrent ? '#fff3f3' : '#f8f9fa') + ';border-radius:8px;margin-bottom:8px;cursor:pointer;' + (isCurrent ? 'border:2px solid #667eea;' : '') + '">';
+        htmlContent += '<div style="background:' + colors[i % 3] + ';color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;">' + u.name.charAt(0) + '</div>';
+        htmlContent += '<div style="flex:1;">';
+        htmlContent += '<div style="font-weight:600;font-size:15px;">' + u.name + '</div>';
+        htmlContent += '<div style="font-size:12px;color:#999;">' + (gradeNames[u.grade] || '') + ' · Lv.' + u.difficulty + '</div>';
+        htmlContent += '</div>';
+        if (isCurrent) {
+            htmlContent += '<span style="font-size:12px;color:#667eea;font-weight:600;">当前登录</span>';
+        }
+        htmlContent += '</div>';
+    });
+    
+    container.innerHTML = htmlContent;
+    document.getElementById('user-switch-modal').classList.add('show');
+}
+
+function closeUserSwitchModal() {
+    document.getElementById('user-switch-modal').classList.remove('show');
+}
+
+// 打开头像选择弹窗
+function openAvatarModal() {
+    closeUserMenu();
+    
+    const emojis = ['👤', '😊', '😎', '🤓', '🥳', '🌟', '🚀', '💪', '🎯', '📚', '🧠', '💡', '🔥', '⭐', '🌈', '🎨', '🏆', '💎', '🎮', '🎵', '📖', '✏️', '🎓', '💫'];
+    
+    const modal = document.getElementById('avatar-modal');
+    const grid = document.getElementById('avatar-grid');
+    
+    if (!modal || !grid) {
+        showToast('头像功能加载中');
+        return;
+    }
+    
+    grid.innerHTML = emojis.map(emoji => 
+        '<div onclick="selectAvatar(\'' + emoji + '\')" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;border-radius:12px;background:#f8f9fa;transition:all 0.2s;" onmouseover="this.style.background=\'#e8f4ff\'" onmouseout="this.style.background=\'#f8f9fa\'">' + emoji + '</div>'
+    ).join('');
+    
+    modal.classList.add('show');
+}
+
+// ============================================================
+// 额外的全局函数导出
+// ============================================================
+window.clearCurrentUserData = clearCurrentUserData;
+window.clearAllData = clearAllData;
+window.syncData = syncData;
+window.openApiConfigModal = openApiConfigModal;
+window.saveApiConfig = saveApiConfig;
+window.showUserSwitchModal = showUserSwitchModal;
+window.closeUserSwitchModal = closeUserSwitchModal;
+window.openAvatarModal = openAvatarModal;
+
+// ============================================================
+// ES6 Module Export - V225 ES6改造
+// ============================================================
+export {
+    showPage,
+    closeModal
+};

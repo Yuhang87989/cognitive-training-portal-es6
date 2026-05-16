@@ -1,10 +1,16 @@
-// 版本: V144
+// 版本: V226 - ES6 Module
+// 学习计划模块
 
-CTM.registerModule('plan', {
+export const planModule = {
     name: 'plan',
     icon: '🎯',
     render: renderPlan
-});
+};
+
+// 注册到CTM模块系统
+if (typeof CTM !== 'undefined' && CTM.registerModule) {
+    CTM.registerModule('plan', planModule);
+}
 
 function renderPlan(container) {
     const user = getCurrentUserData();
@@ -13,6 +19,17 @@ function renderPlan(container) {
     
     if (!window._planWeek) window._planWeek = currentWeek;
     if (!window._planDay) window._planDay = today;
+    
+    // V224: 按需加载周计划数据
+    if (typeof weekPlans === 'undefined') {
+        container.innerHTML = '<div style="text-align:center;padding:40px;color:#666;"><div style="font-size:32px;margin-bottom:12px;">⏳</div><div>正在加载周计划数据...</div></div>';
+        if (typeof loadModuleData === 'function') {
+            loadModuleData('week-plans', function() {
+                renderPlan(container);
+            });
+        }
+        return;
+    }
     
     const plan = getWeekPlan('week' + window._planWeek);
     const userTasks = (user.weekTasks || {});
@@ -176,3 +193,17 @@ window.toggleWeekTask = toggleWeekTask;
 // ============================================================
 // TopicsModule - 主题模块
 // ============================================================
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+export {
+    renderPlan,
+    renderWeekPlan,
+    renderSlide,
+    changeWeek,
+    switchPlanDay,
+    toggleWeekTask
+};
+
+console.log('[ES6 Module] plan.js 模块加载完成');

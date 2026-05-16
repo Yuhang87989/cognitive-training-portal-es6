@@ -792,6 +792,15 @@ async function photoToQuestion(imageData) {
     
     try {
         var ocrText = '';
+        // V224: 按需加载Tesseract.js
+        await new Promise(function(resolve) {
+            if (typeof loadTesseract === 'function') {
+                loadTesseract(resolve);
+            } else {
+                resolve();
+            }
+        });
+        
         if (typeof Tesseract !== 'undefined') {
             var result = await Tesseract.recognize(imageData, 'chi_sim+eng', {});
             ocrText = result.data.text.trim();
@@ -830,3 +839,32 @@ async function photoToQuestion(imageData) {
     }
 }
 window.photoToQuestion = photoToQuestion;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        renderThinking,
+        showThinkingType,
+        startThinkingQuiz,
+        selectThinkingOpt,
+        submitThinkingAnswers,
+        renderThinkingNotes,
+        handleThinkingNoteUpload,
+        deleteThinkingNote,
+        updateThinkingStats,
+        rateThinkingAnswer,
+        viewThinkingNote,
+        analyzeThinkingWithAI,
+        photoToQuestion,
+        thinkingQuestions: window.thinkingQuestions
+    };
+}
+
+export {
+    renderThinking,
+    showThinkingType,
+    startThinkingQuiz,
+    submitThinkingAnswers
+};

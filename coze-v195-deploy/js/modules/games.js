@@ -1,4 +1,6 @@
-// 版本: V144
+// 版本: V226 - ES6 Module
+// 训练游戏模块
+
 
 // 安全声明 - 防止游戏加载时序问题
 var playSound = playSound || function() {};
@@ -6209,3 +6211,50 @@ function showGameOver(score, total) {
     modal.classList.add('show');
 }
 window.showGameOver = showGameOver;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+// 游戏模块对象
+export const gamesModule = {
+    name: 'games',
+    icon: '🎮',
+    render: typeof renderGames !== 'undefined' ? renderGames : null
+};
+
+// 导出主要函数
+export {
+    startGame,
+    exitGame,
+    resetGame,
+    checkSchulte,
+    clickAttention,
+    startAttentionSeq,
+    checkDigit,
+    checkPattern,
+    checkMathAnswer,
+    checkVisual,
+    textMemoryStartTest,
+    textMemoryCheck,
+    textMemoryNext,
+    checkWordAssoc,
+    classifyItem,
+    unclassifyItem,
+    checkClassification,
+    checkDiff,
+    checkReason,
+    checkShapeReason,
+    checkSpaceRotate,
+    playSound,
+    shuffleSlide,
+    tapTarget,
+    reset2048,
+    whackMole,
+    startSchulte,
+    startWhack,
+    startSnake
+};
+
+console.log('[ES6 Module] games.js 模块加载完成');
+window.renderGames = renderGames;

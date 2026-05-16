@@ -31,7 +31,7 @@ window.toggleAccordion = function(id) {
 
 // 切换难度级别
 window.changeDifficulty = function(direction) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         let newDiff = user.difficulty + direction;
         newDiff = Math.max(1, Math.min(10, newDiff)); // 限制1-10级
@@ -44,7 +44,7 @@ window.changeDifficulty = function(direction) {
 
 // 更新每日训练次数
 window.updateDailyGoal = function(value) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         user.dailyGoal = parseInt(value);
         saveUserData(user);
@@ -62,7 +62,7 @@ window.toggleSound = function() {
 // 清空错题本
 window.clearWrongBook = function() {
     if (confirm('确定要清空所有错题吗？此操作不可恢复！')) {
-        const user = getCurrentUserData();
+        const user = window.getCurrentUserData();
         if (user) {
             user.wrongNotes = [];
             saveUserData(user);
@@ -527,7 +527,7 @@ window.renderMyPage = function(container) {
         };
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const streakDays = calculateStreakDays();
     const wrongCount = (user && user.wrongNotes) ? user.wrongNotes.length : 0;
     const dailyGoal = user && user.dailyGoal ? user.dailyGoal : 8;
@@ -1014,29 +1014,6 @@ console.log('✅ V199 my-page.js 已加载 - 2x2快捷功能卡片 + 5个折叠�
 // ES6 Module 导出
 // ============================================================
 export {
-    accordionState,
-    toggleAccordion,
-    changeDifficulty,
-    updateDailyGoal,
-    toggleSound,
-    clearWrongBook,
-    toggleDeepSeekMode,
-    clearAIContext,
-    openUsageStats,
     renderUsageStats,
-    openDeepseekHelpModal,
-    doBackup,
-    doRestore,
-    saveApiKey,
-    clearAppCache,
-    showAbout,
-    openSelfDrivePage,
-    openPomodoro,
-    openCalculator,
-    openNotepad,
-    openWeeklyReview,
-    openProgressChart,
-    renderMyPage,
     openBackupPage,
-    renderBackupManager
 };

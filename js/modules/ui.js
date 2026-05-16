@@ -424,7 +424,7 @@ function addBackButtonToModule(contentEl) {
 function closeFullscreenPage() { cleanupModuleState(); const el = document.getElementById('fullscreen-container'); if (el) el.classList.remove('active'); }
 
 function handleLogin() {
-    const data = loadData();
+    const data = window.loadData();
     const btn = document.querySelector('.user-select-btn');
     if (!btn || !btn.dataset.userId) {
         showToast('请先选择学习者');
@@ -438,7 +438,7 @@ function handleLogin() {
         user.difficulty = difficulty; 
         user.lastLogin = Date.now(); 
         data.currentUser = userId; 
-        saveData(data); 
+        window.saveData(data); 
         // 先切换页面，再更新UI
         showPage('home');
         setTimeout(() => {
@@ -453,7 +453,7 @@ function handleLogin() {
 }
 
 function logoutAndReturn() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     
     // 停止TTS
     stopTTSSpeech();
@@ -476,9 +476,9 @@ function doExitSystem() {
     console.log("执行完整退出系统...");
     
     // 1. 保留currentUser（用户名保留），只重置运行时状态
-    var data = loadData();
+    var data = window.loadData();
     // 不清除currentUser，保留用户名
-    saveData(data);
+    window.saveData(data);
     
     // 2. 停止TTS语音
     if (typeof stopTTSSpeech === "function") {
@@ -597,7 +597,7 @@ window.setInterval = function(func, delay) {
 };
 // V148-fix: 切换用户后关闭全屏页面，回到首页刷新
 function switchToUser(userId) {
-    var data = loadData();
+    var data = window.loadData();
     var user = data.users.find(function(u) { return u.id === userId; });
     
     if (!user) {
@@ -606,7 +606,7 @@ function switchToUser(userId) {
     }
     
     data.currentUser = userId;
-    saveData(data);
+    window.saveData(data);
     closeUserSwitchModal();
     
     // 切换用户后关闭全屏页面，回到首页刷新
@@ -620,7 +620,7 @@ function switchToUser(userId) {
 function deleteUser(userId) {
     if (!confirm('确定要删除此用户吗？此操作不可恢复！')) return;
     
-    var data = loadData();
+    var data = window.loadData();
     var userIndex = data.users.findIndex(function(u) { return u.id === userId; });
     
     if (userIndex === -1) {
@@ -640,7 +640,7 @@ function deleteUser(userId) {
         }
     }
     
-    saveData(data);
+    window.saveData(data);
     showUserSwitchModal(); // 刷新用户列表
     updateUI();
     showToast('已删除用户: ' + userName);
@@ -676,7 +676,7 @@ function registerNewUser() {
     }
     
     // 检查手机号是否已注册
-    const data = loadData();
+    const data = window.loadData();
     if (data.users.find(u => u.phone === phone)) {
         showToast('该手机号已注册，请直接登录或切换用户');
         return;
@@ -734,7 +734,7 @@ function registerNewUser() {
     // 保存用户
     data.users.push(newUser);
     data.currentUser = newUser.id;
-    saveData(data);
+    window.saveData(data);
     
     // 关闭注册模态框
     document.getElementById('register-modal').classList.remove('show');
@@ -759,7 +759,7 @@ function closeCreateUserModal() { document.getElementById('create-user-modal').c
 function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
 
 function openDifficultyModal() {
-    const userData = getCurrentUserData();
+    const userData = window.window.getCurrentUserData();
     const currentLevel = userData ? userData.difficulty : 1;
     // 高亮当前选中的按钮
     document.querySelectorAll('.diff-btn').forEach(btn => {
@@ -775,7 +775,7 @@ function closeDifficultyModal() {
 }
 
 function setDifficulty(level) {
-    const userData = getCurrentUserData();
+    const userData = window.window.getCurrentUserData();
     if (userData) {
         userData.difficulty = level;
         syncUserData(userData);
@@ -887,7 +887,7 @@ function showToast(message, duration = 2000) {
 function updateUI() {
     updateAllAvatarDisplays();
 
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) return;
     const greetingEl = document.getElementById('greeting-name');
     const diffEl = document.getElementById('difficulty-text');
@@ -917,7 +917,7 @@ function toggleSettingsGroup(groupId) {
 }
 
 function openSettingsPanel() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (user) {
         // 更新用户信息卡片
         const avatarEl = document.getElementById('settings-avatar');
@@ -1098,7 +1098,7 @@ function drawRadarChart(data) {
 }
 
 function calculateCognitiveData() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) {
         return getDefaultCognitiveData();
     }
@@ -1361,7 +1361,7 @@ function renderStatItems(data) {
 }
 
 function updateAllAvatarDisplays() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) return;
     
     const avatar = user.avatar || AVATAR_LIST[0].emoji;
@@ -1415,7 +1415,7 @@ function openAbout() {
 }
 
 function selectAvatar(emoji) {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (user) {
         user.avatar = emoji;
         syncUserData(user);
@@ -1426,7 +1426,7 @@ function selectAvatar(emoji) {
 }
 
 function updateMethodStats() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     const stats = user?.methodStats || {};
     
     let totalCompleted = 0;
@@ -1447,7 +1447,7 @@ function updateMethodStats() {
 }
 
 function updateThinkingStats() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     const stats = user?.thinkingStats || {};
     
     let totalCompleted = 0;
@@ -1604,7 +1604,7 @@ if('serviceWorker' in navigator){
 // 更新首页用户信息显示
 function updateHomeUserInfo(user) {
     if (!user) {
-        user = getCurrentUserData();
+        user = window.window.getCurrentUserData();
     }
     if (!user) return;
     
@@ -1638,7 +1638,7 @@ function updateHomeUserInfo(user) {
 
 // 更新今日统计
 function updateTodayStats() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) return;
     
     const today = new Date().toISOString().split('T')[0];
@@ -1680,7 +1680,7 @@ function updateTodayStats() {
 // 应用初始化入口函数
 function initPortal() {
     // 检查是否有用户数据
-    const userData = getCurrentUserData();
+    const userData = window.window.getCurrentUserData();
     
     if (userData && userData.name) {
         // 已登录，更新首页用户信息
@@ -1705,7 +1705,7 @@ function initPortal() {
 // ====== 删除用户功能 ======
 function showDeleteUserModal() {
     closeUserMenu();
-    var data = loadData();
+    var data = window.loadData();
     
     if (data.users.length === 0) {
         showToast('暂无用户');
@@ -1756,7 +1756,7 @@ window.updateRecommendCard = updateRecommendCard;
 
 // 显示数据统计弹窗
 function showDataStatsModal() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) {
         showToast('请先登录');
         return;
@@ -1782,7 +1782,7 @@ function showDataStatsModal() {
 
 // 导出数据
 function exportData() {
-    const data = loadData();
+    const data = window.loadData();
     if (!data) {
         showToast('导出失败，无数据');
         return;
@@ -1833,7 +1833,7 @@ function handleImportFile(event) {
                 return;
             }
             if (!confirm('确定要导入数据吗？这将覆盖当前所有用户数据！')) return;
-            const currentData = loadData();
+            const currentData = window.loadData();
             importedData.users.forEach(function(u) {
                 const existingIdx = currentData.users.findIndex(function(cu) { return cu.id === u.id; });
                 if (existingIdx >= 0) currentData.users[existingIdx] = u;
@@ -1842,7 +1842,7 @@ function handleImportFile(event) {
             if (importedData.currentUser && currentData.users.find(u => u.id === importedData.currentUser)) {
                 currentData.currentUser = importedData.currentUser;
             }
-            saveData(currentData);
+            window.saveData(currentData);
             updateUI();
             showToast('数据导入成功！');
         } catch(err) {
@@ -1870,7 +1870,7 @@ window.drawRadarChart = drawRadarChart;
 
 // 清除当前用户数据
 function clearCurrentUserData() {
-    const user = getCurrentUserData();
+    const user = window.window.getCurrentUserData();
     if (!user) {
         showToast('请先登录');
         return;
@@ -1914,13 +1914,13 @@ function clearAllData() {
 
 // 同步数据（简化版 - 仅保存到本地）
 function syncData() {
-    const data = loadData();
+    const data = window.loadData();
     if (!data) {
         showToast('无数据可同步');
         return;
     }
     
-    saveData(data);
+    window.saveData(data);
     const syncBtn = document.getElementById('sync-btn');
     const syncTimeEl = document.getElementById('last-sync-time');
     if (syncBtn) {
@@ -1989,7 +1989,7 @@ function saveApiConfig() {
 // 显示用户切换模态框
 function showUserSwitchModal() {
     closeUserMenu();
-    const data = loadData();
+    const data = window.loadData();
     
     if (data.users.length === 0) {
         showToast('暂无用户，请先创建');

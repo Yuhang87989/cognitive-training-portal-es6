@@ -14,7 +14,7 @@ function getTopicsPerPage() {
 }
 
 function renderTopics(container) {
-    const currentUser = getCurrentUserData();
+    const currentUser = window.getCurrentUserData();
     const userGrade = (currentUser && currentUser.grade) ? currentUser.grade : 7;
     
     container.innerHTML = `
@@ -205,7 +205,7 @@ function checkTopicAnswer(topicId) {
            <div style="margin-top:8px;font-size:13px;color:#666;">解析：${topic.e}</div>
            <button class="game-btn btn-blue" style="margin-top:12px;" onclick="analyzeTopicWithAI(${topicId})">🤖 AI详细解说</button>`;
     
-    const userData = getCurrentUserData();
+    const userData = window.getCurrentUserData();
     if (userData) {
         if (!userData.topicStats) userData.topicStats = {};
         userData.topicStats[topicId] = { 

@@ -1,10 +1,16 @@
-// 版本: V144
+// 版本: V226 - ES6 Module
+// AI精准练模块
 
-CTM.registerModule('practice', {
+export const practiceModule = {
     name: 'practice',
     icon: '🎯',
     render: renderPractice
-});
+};
+
+// 注册到CTM模块系统
+if (typeof CTM !== 'undefined' && CTM.registerModule) {
+    CTM.registerModule('practice', practiceModule);
+}
 
 function renderPractice(container) {
     const user = getCurrentUserData();
@@ -316,3 +322,20 @@ async function handlePhotoToQuestion(imageData) {
     else { showToast('拍照出题功能加载中，请稍后再试'); }
 }
 window.handlePhotoToQuestion = handlePhotoToQuestion;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+export {
+    renderPractice,
+    handlePracticePhoto,
+    showPracticePhotoModal,
+    analyzePracticePhoto,
+    handleQuestionPhoto,
+    submitPracticeQuestion,
+    askPracticeAI,
+    handlePhotoToQuestion
+};
+
+console.log('[ES6 Module] practice.js 模块加载完成');

@@ -13,7 +13,7 @@ if (typeof CTM !== 'undefined' && CTM.registerModule) {
 }
 
 function renderPlan(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const currentWeek = user.currentWeek || 1;
     const today = new Date().getDay() || 7;
     
@@ -174,7 +174,7 @@ function changeWeek(dir) {
 }
 
 function toggleWeekTask(taskId) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     user.weekTasks = user.weekTasks || {};
     user.weekTasks[taskId] = !user.weekTasks[taskId];
     saveUserData(user);
@@ -202,7 +202,6 @@ export {
     renderWeekPlan,
     renderSlide,
     changeWeek,
-    switchPlanDay,
     toggleWeekTask
 };
 

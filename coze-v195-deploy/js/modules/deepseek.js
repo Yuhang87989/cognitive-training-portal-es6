@@ -1,4 +1,6 @@
-// 版本: V152
+// 版本: V226 - ES6 Module
+// AI对话模块 - DeepSeek
+
 // V152修复: 图片识别功能改用视觉API，不再依赖Tesseract.js
 // V152修复: 支持DeepSeek视觉（如果可用）或硅基流动Qwen3-VL
 // V151-fix: callVisionAPI添加详细日志、图片格式处理、错误处理
@@ -40,6 +42,16 @@ function recordDeepSeekCall(tokens) {
     } catch(e) {}
 }
 window.recordDeepSeekCall = recordDeepSeekCall;
+
+// 记录详细的DeepSeek使用统计
+function recordDetailedUsage(inputTokens, outputTokens, questionSummary, model) {
+    if (window.UsageStatsModule) {
+        window.UsageStatsModule.recordUsage(inputTokens, outputTokens, questionSummary, model);
+    }
+    // 同时保持原有统计
+    recordDeepSeekCall((inputTokens || 0) + (outputTokens || 0));
+}
+window.recordDetailedUsage = recordDetailedUsage;
 
 function escapeHtml(text) {
     if (!text) return '';
@@ -192,7 +204,27 @@ async function callVisionAPIEndpoint(messages, temperature, apiType) {
         }
         var data = await response.json();
         var content = data.choices[0].message.content;
-        if (data.usage) recordDeepSeekCall(data.usage.total_tokens);
+        if (data.usage) {
+            // 提取问题摘要
+            var questionSummary = '';
+            if (messages && messages.length > 0) {
+                var lastUserMsg = messages.filter(function(m) { return m.role === 'user'; }).pop();
+                if (lastUserMsg) {
+                    if (typeof lastUserMsg.content === 'string') {
+                        questionSummary = lastUserMsg.content;
+                    } else if (Array.isArray(lastUserMsg.content)) {
+                        var textPart = lastUserMsg.content.find(function(p) { return p.type === 'text'; });
+                        if (textPart) questionSummary = textPart.text;
+                    }
+                }
+            }
+            recordDetailedUsage(
+                data.usage.prompt_tokens || data.usage.input_tokens || 0,
+                data.usage.completion_tokens || data.usage.output_tokens || 0,
+                questionSummary,
+                DEEPSEEK_MODEL
+            );
+        }
         return {success: true, content: content};
     } catch (error) {
         if (error.message === 'unsupported') {
@@ -260,7 +292,27 @@ async function callDeepSeekAPI(messages, temperature) {
         }
         var data = await response.json();
         var content = data.choices[0].message.content;
-        if (data.usage) recordDeepSeekCall(data.usage.total_tokens);
+        if (data.usage) {
+            // 提取问题摘要
+            var questionSummary = '';
+            if (messages && messages.length > 0) {
+                var lastUserMsg = messages.filter(function(m) { return m.role === 'user'; }).pop();
+                if (lastUserMsg) {
+                    if (typeof lastUserMsg.content === 'string') {
+                        questionSummary = lastUserMsg.content;
+                    } else if (Array.isArray(lastUserMsg.content)) {
+                        var textPart = lastUserMsg.content.find(function(p) { return p.type === 'text'; });
+                        if (textPart) questionSummary = textPart.text;
+                    }
+                }
+            }
+            recordDetailedUsage(
+                data.usage.prompt_tokens || data.usage.input_tokens || 0,
+                data.usage.completion_tokens || data.usage.output_tokens || 0,
+                questionSummary,
+                DEEPSEEK_MODEL
+            );
+        }
         return {success: true, content: content};
     } catch (error) {
         return {error: true, type: 'network', message: error.message};
@@ -390,6 +442,15 @@ async function ocrImageAndSend(base64) {
     
     try {
         var ocrText = '';
+        // V224: 按需加载Tesseract.js
+        await new Promise(function(resolve) {
+            if (typeof loadTesseract === 'function') {
+                loadTesseract(resolve);
+            } else {
+                resolve();
+            }
+        });
+        
         // 尝试用Tesseract.js识别
         if (typeof Tesseract !== 'undefined') {
             var result = await Tesseract.recognize(base64, 'chi_sim+eng', {
@@ -686,6 +747,15 @@ function renderDeepseek(contentEl) {
         '</div>' +
         // 聊天区
         '<div id="deepseek-messages" style="flex:1;overflow-y:auto;padding:10px;font-size:13px;"></div>' +
+        // 模式切换按钮
+        '<div style="padding:6px 10px;background:#f9f9f9;border-top:1px solid #eee;display:flex;gap:8px;flex-shrink:0;">' +
+        '  <button class="ds-mode-btn" data-mode="fast" onclick="toggleDeepseekMode(\'fast\')" style="flex:1;padding:6px 12px;border:none;border-radius:16px;font-size:11px;cursor:pointer;background:#667eea;color:white;transition:all 0.2s;">' +
+        '    🚀 快速模式' +
+        '  </button>' +
+        '  <button class="ds-mode-btn" data-mode="expert" onclick="toggleDeepseekMode(\'expert\')" style="flex:1;padding:6px 12px;border:none;border-radius:16px;font-size:11px;cursor:pointer;background:#f5f5f5;color:#666;transition:all 0.2s;">' +
+        '    💎 专家模式' +
+        '  </button>' +
+        '</div>' +
         // 输入区
         '<div style="padding:6px 8px;border-top:1px solid #eee;display:flex;gap:4px;align-items:center;background:white;flex-shrink:0;">' +
             '<button onclick="triggerDeepSeekImage()" style="width:28px;height:28px;border:none;background:#667eea;color:white;border-radius:6px;font-size:12px;cursor:pointer;flex-shrink:0;">📷</button>' +
@@ -711,6 +781,16 @@ function renderDeepseek(contentEl) {
     
     // 查询余额
     updateDeepSeekBalance();
+    
+    // 初始化模式按钮状态
+    setTimeout(function() {
+        if (typeof window.deepseekMode !== 'undefined') {
+            document.querySelectorAll('.ds-mode-btn').forEach(btn => {
+                btn.style.background = btn.dataset.mode === window.deepseekMode ? '#667eea' : '#f5f5f5';
+                btn.style.color = btn.dataset.mode === window.deepseekMode ? 'white' : '#666';
+            });
+        }
+    }, 50);
 }
 window.renderDeepseek = renderDeepseek;
 
@@ -919,3 +999,43 @@ function scrollToDeepSeekMessage(groupIndex) {
     }
 }
 window.scrollToDeepSeekMessage = scrollToDeepSeekMessage;
+
+// ============================================================
+// ES6 Module 导出
+// ============================================================
+
+// DeepSeek模块对象
+export const deepseekModule = {
+    name: 'deepseek',
+    icon: '🤖',
+    render: typeof renderDeepseek !== 'undefined' ? renderDeepseek : null
+};
+
+// 导出主要函数
+export {
+    callDeepSeekAPI,
+    callVisionAPI,
+    escapeHtml,
+    clearDeepSeekImage,
+    formatAIResponse,
+    recordDeepSeekCall,
+    recordDetailedUsage,
+    saveDeepSeekConversation,
+    autoSaveDeepSeekHistory,
+    sendDeepSeekMessage,
+    toggleDeepSeekVoice,
+    copyLastResponse,
+    toggleDeepSeekHistory,
+    saveCurrentDeepSeekChat,
+    loadSavedDeepSeekChat,
+    deleteSavedDeepSeekChat,
+    startNewDeepSeekChat,
+    scrollToDeepSeekMessage,
+    showAPIKeyModal,
+    showAPIBalance,
+    checkApiConfig,
+    openApiConfigModal,
+    showAPIRechargeModal
+};
+
+console.log('[ES6 Module] deepseek.js 模块加载完成');

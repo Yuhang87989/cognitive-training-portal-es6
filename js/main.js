@@ -215,7 +215,7 @@ console.log('[ES6 Module V229] 动态懒加载系统初始化完成！');
 // 创建默认用户
 // ============================================================
 function createDefaultUser() {
-    const data = window.loadData ? window.loadData() : { users: [], currentUser: null };
+    const data = window.loadData ? window.window.loadData() : { users: [], currentUser: null };
     
     // 如果已经有用户了，不需要创建
     if (data.users && data.users.length > 0) {
@@ -253,7 +253,7 @@ function createDefaultUser() {
     data.currentUser = defaultUser.id;
     
     if (window.saveData) {
-        window.saveData(data);
+        window.window.saveData(data);
     }
     
     console.log('[V233] 默认用户创建成功:', defaultUser.name);
@@ -271,7 +271,7 @@ window.initPortal = function() {
         createDefaultUser();
         
         // 获取当前用户数据
-        const userData = window.getCurrentUserData ? window.getCurrentUserData() : null;
+        const userData = window.getCurrentUserData ? window.window.getCurrentUserData() : null;
         
         // 更新首页用户信息
         if (window.updateHomeUserInfo) {

@@ -524,8 +524,6 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 export {
-    SelfDrive,
-    renderSelfDrive,
     calculateStreakDays,
     hasCheckedInToday,
     checkInToday

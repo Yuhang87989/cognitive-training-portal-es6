@@ -7,7 +7,7 @@
 // ============================================================
 
 function renderWrongbook(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const photoCount = user?.uploadedImages?.length || 0;
     
@@ -153,7 +153,7 @@ function openWrongPhotoCapture() {
     const content = document.getElementById('detail-content');
     modal.classList.add('show');
     
-    const photoCount = getCurrentUserData()?.uploadedImages?.length || 0;
+    const photoCount = window.getCurrentUserData()?.uploadedImages?.length || 0;
     
     content.innerHTML = `
         <div class="modal-header">
@@ -254,7 +254,7 @@ async function submitManualWrongNote() {
     
     if (questionData.error) {
         // AI解析失败，直接保存原始文字
-        var user = getCurrentUserData() || {};
+        var user = window.getCurrentUserData() || {};
         user.wrongNotes = user.wrongNotes || [];
         var wrongNote = {
             wrongKey: 'manual-' + Date.now(),
@@ -278,7 +278,7 @@ async function submitManualWrongNote() {
     }
     
     // AI解析成功，保存结构化题目
-    var user = getCurrentUserData() || {};
+    var user = window.getCurrentUserData() || {};
     user.wrongNotes = user.wrongNotes || [];
     var wrongKey = 'manual-' + Date.now();
     if (!user.wrongNotes.find(function(n) { return n.wrongKey === wrongKey; })) {
@@ -365,7 +365,7 @@ async function uploadWrongPhotoWithAI(input) {
             await saveImageFile(photoId, file);
             
             // 记录到用户数据（只存元信息，不存base64）
-            const user = getCurrentUserData() || {};
+            const user = window.getCurrentUserData() || {};
             user.uploadedImages = user.uploadedImages || [];
             user.uploadedImages.push({
                 id: photoId,
@@ -593,7 +593,7 @@ function showOcrFailedUI(photoId, imageData, message) {
 
 // 从照片做题目
 async function doWrongQuestionFromPhoto(photoId) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const note = user?.wrongNotes?.find(n => n.photoId === photoId);
     
     if (!note) {
@@ -613,7 +613,7 @@ async function doWrongQuestionFromPhoto(photoId) {
 // ============================================================
 
 function showWrongPhotoGallery() {
-    const user = getCurrentUserData() || {};
+    const user = window.getCurrentUserData() || {};
     const photos = user.uploadedImages || [];
     const modal = document.getElementById('detail-modal');
     const content = document.getElementById('detail-content');
@@ -735,7 +735,7 @@ async function deleteWrongPhotoWithCleanup(photoId) {
     }
     
     // 从用户数据删除
-    const user = getCurrentUserData() || {};
+    const user = window.getCurrentUserData() || {};
     user.uploadedImages = user.uploadedImages || [];
     user.uploadedImages = user.uploadedImages.filter(function(p) { 
         return (p.imageId || p.id) !== photoId; 
@@ -789,7 +789,7 @@ async function analyzePhotoWithAI(photoId) {
         
         // 尝试从用户数据获取旧格式
         if (!imageUrl) {
-            const user = getCurrentUserData() || {};
+            const user = window.getCurrentUserData() || {};
             const photo = user.uploadedImages?.find(p => (p.imageId || p.id) === photoId);
             if (photo && photo.image) {
                 imageUrl = photo.image;
@@ -858,7 +858,7 @@ async function analyzePhotoWithAI(photoId) {
         
         // 4. 添加到错题本
         const wrongKey = 'photo-' + photoId;
-        const user = getCurrentUserData();
+        const user = window.getCurrentUserData();
         
         // 检查是否已存在
         if (!user.wrongNotes) user.wrongNotes = [];
@@ -988,7 +988,7 @@ function backToWrongbook() {
 // ============================================================
 
 function retryWrongNote(index) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const note = wrongNotes[index];
     if (!note) { showToast('错题不存在'); return; }
@@ -1112,7 +1112,7 @@ function submitRetryChoiceAnswer(noteIndex) {
         return;
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const note = wrongNotes[noteIndex];
     if (!note) return;
@@ -1170,7 +1170,7 @@ async function submitRetryTextAnswer(noteIndex) {
         return;
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const note = wrongNotes[noteIndex];
     if (!note) return;
@@ -1332,7 +1332,7 @@ function fuzzyMatch(userAns, correctAns) {
 // ============================================================
 
 async function analyzeWrongNoteWithAI(index) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const note = wrongNotes[index];
     if (!note) { showToast('错题不存在'); return; }
@@ -1473,7 +1473,7 @@ ${note.explanation || '无'}
 // ============================================================
 
 function markWrongNoteReviewed(index) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user || !user.wrongNotes || !user.wrongNotes[index]) return;
     user.wrongNotes[index].reviewed = true;
     syncUserData(user);
@@ -1490,7 +1490,7 @@ function markWrongNoteReviewed(index) {
 function removeWrongNote(index) {
     if (!confirm('确定要删除这道错题吗？')) return;
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user && user.wrongNotes) {
         user.wrongNotes.splice(index, 1);
         syncUserData(user);
@@ -1506,7 +1506,7 @@ function removeWrongNote(index) {
 }
 
 function reviewAllWrongNotes() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const wrongNotes = user?.wrongNotes || [];
     const unreviewed = wrongNotes.filter(n => !n.reviewed);
     
@@ -1525,7 +1525,7 @@ function reviewAllWrongNotes() {
 function clearWrongNotes() {
     if (!confirm('确定要清空所有错题记录吗？')) return;
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         user.wrongNotes = [];
         syncUserData(user);
@@ -1627,7 +1627,6 @@ export {
     renderWrongbook,
     saveWrongNote,
     viewWrongNote,
-    editWrongNote,
     retryWrongNote,
     selectRetryOption,
     submitRetryChoiceAnswer,
@@ -1639,7 +1638,6 @@ export {
     reviewAllWrongNotes,
     openWrongPhotoCapture,
     showWrongPhotoGallery,
-    analyzeWrongPhoto,
     deleteWrongPhotoWithCleanup,
     viewWrongNotes,
     openFeedback,

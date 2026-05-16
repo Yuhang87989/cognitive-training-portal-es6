@@ -161,56 +161,7 @@ function closeModal(modalId) {
     }
 }
 
-function openSettingsPanel() {
-    const user = getCurrentUserData();
-    if (user) {
-        // 更新用户信息卡片
-        const avatarEl = document.getElementById('settings-avatar');
-        const nameEl = document.getElementById('settings-name');
-        const gradeEl = document.getElementById('settings-grade');
-        const diffEl = document.getElementById('settings-difficulty-display');
-        const wrongCountEl = document.getElementById('settings-wrong-count');
-        const trainCountEl = document.getElementById('settings-train-count');
-        
-        if (avatarEl) avatarEl.textContent = user.name.charAt(0);
-        if (nameEl) nameEl.textContent = user.name;
-        if (gradeEl) gradeEl.textContent = gradeNames[user.grade] + ' · Lv.' + user.difficulty;
-        if (diffEl) diffEl.textContent = 'Lv.' + user.difficulty;
-        
-        // 更新错题数量
-        const wrongNotes = user.wrongNotes || [];
-        if (wrongCountEl) wrongCountEl.textContent = '共 ' + wrongNotes.length + ' 道错题';
-        
-        // 更新训练次数
-        const trainCount = user.trainCount || 8;
-        if (trainCountEl) trainCountEl.value = trainCount;
-        
-        // 更新数据统计显示
-        if (typeof updateDataStatsDisplay === 'function') {
-            updateDataStatsDisplay();
-        }
-    }
-    
-    // 更新API配置状态显示
-    if (typeof updateApiStatusDisplay === 'function') {
-        updateApiStatusDisplay();
-    }
-    
-    document.getElementById('settings-panel').style.display = 'block';
-}
-
-function closeSettingsPanel(e) {
-    if (!e || e.target === document.getElementById('settings-panel')) {
-        document.getElementById('settings-panel').style.display = 'none';
-    }
-}
-
-function toggleSettingsGroup(groupId) {
-    const group = document.getElementById('group-' + groupId);
-    if (group) {
-        group.classList.toggle('open');
-    }
-}
+// 注意：openSettingsPanel、closeSettingsPanel、toggleSettingsGroup 函数已移至 js/modules/ui.js 中统一管理，避免命名冲突
 
 function exitSystem() {
     // 停止所有媒体
@@ -239,47 +190,6 @@ function exitSystem() {
         doExitSystem();
     }
 }
-
-function openAbout() {
-    const modal = document.getElementById('detail-modal');
-    const content = document.getElementById('detail-content');
-    modal.classList.add('show');
-    content.innerHTML = `
-        <div style="text-align:center;padding:20px 0;">
-            <div style="font-size:48px;margin-bottom:12px;">🧠</div>
-            <div style="font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;">认知训练门户</div>
-            <div style="font-size:13px;color:#999;margin-bottom:20px;">版本 V144</div>
-        </div>
-        <div style="background:#f5f7ff;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">📱 产品介绍</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                认知训练门户是一款专为12-16岁青少年设计的注意力和记忆力训练应用。通过科学系统的训练方法，帮助学生提升学习效率，培养良好的学习习惯。
-            </div>
-        </div>
-        <div style="background:#fff3e0;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">✨ 核心功能</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                • 12大训练模块（AI分身、母题、播客等）<br>
-                • 23个认知训练游戏<br>
-                • 378道经典母题库<br>
-                • DeepSeek AI 智能辅导<br>
-                • 个性化学习计划
-            </div>
-        </div>
-        <div style="background:#e8f5e9;border-radius:12px;padding:16px;margin-bottom:16px;">
-            <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:12px;">👨‍💻 开发团队</div>
-            <div style="font-size:13px;color:#666;line-height:1.8;">
-                Coze AI Agent 智能助手<br>
-                技术支持：DeepSeek API
-            </div>
-        </div>
-        <div style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;">
-            © 2026 认知训练门户 版权所有
-        </div>
-        <button class="modal-close" onclick="closeModal()" style="width:100%;">关闭</button>
-    `;
-}
-
 
 // ===== "关于"页面函数（重写版本）=====
 function openAbout() {
@@ -340,5 +250,182 @@ window.toggleSettingsGroup = toggleSettingsGroup;
 
 
 // ============================================================
+// V224: 第三方库按需加载
+// ============================================================
+
+// 动态加载脚本通用函数
+function loadScript(url, callback, onerror) {
+    const existing = document.querySelector(`script[src="${url}"]`);
+    if (existing) {
+        if (callback) callback();
+        return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = url;
+    script.onload = function() {
+        console.log('[按需加载] 已加载:', url);
+        if (callback) callback();
+    };
+    script.onerror = function() {
+        console.error('[按需加载] 加载失败:', url);
+        if (onerror) onerror();
+    };
+    document.head.appendChild(script);
+}
+
+// PeerJS 动态加载
+let peerJsLoading = false;
+let peerJsLoaded = false;
+const peerJsCallbacks = [];
+
+function loadPeerJS(callback) {
+    if (typeof Peer !== 'undefined') {
+        if (callback) callback();
+        return;
+    }
+    
+    if (peerJsLoaded) {
+        if (callback) callback();
+        return;
+    }
+    
+    if (callback) peerJsCallbacks.push(callback);
+    
+    if (peerJsLoading) {
+        return;
+    }
+    
+    peerJsLoading = true;
+    showToast('正在加载音视频库...', 1000);
+    
+    loadScript('https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js', function() {
+        peerJsLoading = false;
+        peerJsLoaded = true;
+        peerJsCallbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+        peerJsCallbacks.length = 0;
+    }, function() {
+        peerJsLoading = false;
+        showToast('音视频库加载失败', 2000);
+    });
+}
+window.loadPeerJS = loadPeerJS;
+
+// Tesseract.js 动态加载
+let tesseractLoading = false;
+let tesseractLoaded = false;
+const tesseractCallbacks = [];
+
+function loadTesseract(callback) {
+    if (typeof Tesseract !== 'undefined') {
+        if (callback) callback();
+        return;
+    }
+    
+    if (tesseractLoaded) {
+        if (callback) callback();
+        return;
+    }
+    
+    if (callback) tesseractCallbacks.push(callback);
+    
+    if (tesseractLoading) {
+        return;
+    }
+    
+    tesseractLoading = true;
+    showToast('正在加载OCR识别库...', 1000);
+    
+    loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js', function() {
+        tesseractLoading = false;
+        tesseractLoaded = true;
+        tesseractCallbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+        tesseractCallbacks.length = 0;
+    }, function() {
+        tesseractLoading = false;
+        showToast('OCR识别库加载失败', 2000);
+    });
+}
+window.loadTesseract = loadTesseract;
+
+
+// ============================================================
+// V224: 数据文件按需加载
+// ============================================================
+
+// 已加载的数据模块缓存
+const loadedDataModules = {};
+
+// 数据模块URL映射
+const dataModuleUrls = {
+    'week-plans': 'js/data/week-plans.js',
+    'topics': 'js/data/topics.js',
+    'podcasts': 'js/data/podcasts.js',
+    'videos': 'js/data/videos.js',
+    'games-config': 'js/data/games-config.js'
+};
+
+// 加载中的回调队列
+const dataLoadingCallbacks = {};
+
+function loadModuleData(moduleName, callback) {
+    // 如果已加载，直接回调
+    if (loadedDataModules[moduleName]) {
+        if (callback) callback();
+        return;
+    }
+    
+    const url = dataModuleUrls[moduleName];
+    if (!url) {
+        console.error('[数据加载] 未知模块:', moduleName);
+        if (callback) callback();
+        return;
+    }
+    
+    // 如果正在加载，加入回调队列
+    if (dataLoadingCallbacks[moduleName]) {
+        if (callback) dataLoadingCallbacks[moduleName].push(callback);
+        return;
+    }
+    
+    // 初始化回调队列
+    dataLoadingCallbacks[moduleName] = [];
+    if (callback) dataLoadingCallbacks[moduleName].push(callback);
+    
+    showToast('正在加载数据...', 800);
+    
+    loadScript(url, function() {
+        loadedDataModules[moduleName] = true;
+        const callbacks = dataLoadingCallbacks[moduleName] || [];
+        delete dataLoadingCallbacks[moduleName];
+        callbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+    }, function() {
+        const callbacks = dataLoadingCallbacks[moduleName] || [];
+        delete dataLoadingCallbacks[moduleName];
+        showToast('数据加载失败', 2000);
+        callbacks.forEach(cb => {
+            try { cb(); } catch(e) {}
+        });
+    });
+}
+window.loadModuleData = loadModuleData;
+
+
+// ============================================================
 // User - 用户管理
 // ============================================================
+// ============================================================
+// ES6 Module Export - V225 ES6改造
+// ============================================================
+export {
+    showToast,
+    cleanupModuleState,
+    loadScript,
+    loadModuleData
+};

@@ -13,7 +13,7 @@ if (typeof CTM !== 'undefined' && CTM.registerModule) {
 }
 
 function renderPractice(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.practiceStats || {total: 0, correct: 0, weakPoints: 0};
     const wrongNotes = user?.wrongNotes || [];
     

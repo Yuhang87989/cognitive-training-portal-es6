@@ -248,7 +248,7 @@ window.LocalDB = {
 // 数据双向同步：IndexedDB <-> localStorage
 window.syncDBToLocalStorage = function() {
     // 从localStorage同步到IndexedDB
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) LocalDB.save('userInfo', user, 'currentUser');
     
     // 错题本同步

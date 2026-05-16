@@ -53,11 +53,6 @@ function recordDetailedUsage(inputTokens, outputTokens, questionSummary, model) 
 }
 window.recordDetailedUsage = recordDetailedUsage;
 
-function escapeHtml(text) {
-    if (!text) return '';
-    var d = document.createElement('div'); d.textContent = text; return d.innerHTML;
-}
-window.escapeHtml = escapeHtml;
 
 var deepseekConversationHistory = (function() {
     try {
@@ -619,7 +614,7 @@ async function sendToDeepSeek() {
             deepseekConversationHistory.push({role: 'assistant', content: responseContent});
             saveDeepSeekConversation();
             recordDeepSeekCall(Math.ceil(responseContent.length / 4));
-            const dsUser = getCurrentUserData();
+            const dsUser = window.getCurrentUserData();
             if (dsUser) { dsUser.aiChatCount = (dsUser.aiChatCount || 0) + 1; saveUserData(dsUser); }
             speakText(responseContent);
         }
@@ -798,7 +793,7 @@ function updateDeepSeekBalance() {
     var apiKey = (typeof DEEPSEEK_API_KEY !== 'undefined' && DEEPSEEK_API_KEY) ? DEEPSEEK_API_KEY : 
                  localStorage.getItem('deepseek_api_key') || '';
     if (!apiKey) {
-        var user = getCurrentUserData();
+        var user = window.getCurrentUserData();
         apiKey = user && user.deepseekApiKey ? user.deepseekApiKey : '';
     }
     if (!apiKey) {
@@ -1033,7 +1028,6 @@ export {
     scrollToDeepSeekMessage,
     showAPIKeyModal,
     showAPIBalance,
-    checkApiConfig,
     openApiConfigModal,
     showAPIRechargeModal
 };

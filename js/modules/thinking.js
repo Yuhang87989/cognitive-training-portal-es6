@@ -1,7 +1,7 @@
 // 版本: V151
 
 function renderThinking(container) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.thinkingStats || {};
     
     let totalCompleted = 0;
@@ -556,7 +556,7 @@ function rateThinkingAnswer(type, isCorrect, questionIdx) {
         SoundEffects.playWrong();
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.thinkingStats) user.thinkingStats = {};
     if (!user.thinkingStats[type]) user.thinkingStats[type] = { completed: 0, correct: 0, answeredQuestions: [] };
     
@@ -604,7 +604,7 @@ function rateThinkingAnswer(type, isCorrect, questionIdx) {
 
 // 更新统计
 function updateThinkingStats() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.thinkingStats || {};
     
     let totalCompleted = 0;
@@ -629,7 +629,7 @@ function handleThinkingNoteUpload(input) {
         return;
     }
     
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user.thinkingNotes) user.thinkingNotes = [];
     
     const imageUrl = URL.createObjectURL(file);
@@ -646,7 +646,7 @@ function handleThinkingNoteUpload(input) {
 
 // 渲染笔记
 function renderThinkingNotes() {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const notes = user?.thinkingNotes || [];
     const listEl = document.getElementById('thinking-notes-list');
     if (!listEl) return;
@@ -671,7 +671,7 @@ function renderThinkingNotes() {
 
 // 查看/删除笔记
 function viewThinkingNote(noteId) {
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     const note = user?.thinkingNotes?.find(n => n.id === noteId);
     if (!note) return;
     
@@ -688,7 +688,7 @@ function viewThinkingNote(noteId) {
 
 function deleteThinkingNote(noteId) {
     if (!confirm('确定删除这个笔记吗？')) return;
-    const user = getCurrentUserData();
+    const user = window.getCurrentUserData();
     user.thinkingNotes = user.thinkingNotes.filter(n => n.id !== noteId);
     syncUserData(user);
     renderThinkingNotes();
