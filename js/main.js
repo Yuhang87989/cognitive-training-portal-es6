@@ -212,13 +212,65 @@ if (window.dispatchEvent) {
 console.log('[ES6 Module V229] 动态懒加载系统初始化完成！');
 
 // ============================================================
-// 首页初始化函数 - V232修复
+// 创建默认用户
+// ============================================================
+function createDefaultUser() {
+    const data = window.loadData ? window.loadData() : { users: [], currentUser: null };
+    
+    // 如果已经有用户了，不需要创建
+    if (data.users && data.users.length > 0) {
+        console.log('[V233] 已有用户，无需创建默认用户');
+        return data.users[0];
+    }
+    
+    // 创建默认用户
+    const defaultUser = {
+        id: 'user_' + Date.now(),
+        name: '学习者',
+        grade: 7,
+        difficulty: 1,
+        points: 1000,
+        createdAt: new Date().toISOString(),
+        stats: {
+            totalQuestions: 0,
+            correctAnswers: 0,
+            totalMinutes: 0,
+            streakDays: 0,
+            lastActiveDate: null
+        },
+        topicStats: {},
+        weeklyProgress: {},
+        wrongNotes: [],
+        completedTopics: [],
+        methodStats: {},
+        thinkingStats: {},
+        gameScores: {},
+        gameCounts: {},
+        gameTimes: {}
+    };
+    
+    data.users = [defaultUser];
+    data.currentUser = defaultUser.id;
+    
+    if (window.saveData) {
+        window.saveData(data);
+    }
+    
+    console.log('[V233] 默认用户创建成功:', defaultUser.name);
+    return defaultUser;
+}
+
+// ============================================================
+// 首页初始化函数 - V233修复
 // ============================================================
 window.initPortal = function() {
-    console.log('[V232] 开始初始化门户...');
+    console.log('[V233] 开始初始化门户...');
     
     try {
-        // 获取当前用户数据（从window获取）
+        // 先确保有默认用户
+        createDefaultUser();
+        
+        // 获取当前用户数据
         const userData = window.getCurrentUserData ? window.getCurrentUserData() : null;
         
         // 更新首页用户信息
@@ -226,9 +278,9 @@ window.initPortal = function() {
             window.updateHomeUserInfo(userData);
         }
         
-        console.log('[V232] 门户初始化完成！');
+        console.log('[V233] 门户初始化完成！');
     } catch (error) {
-        console.error('[V232] 初始化出错:', error);
+        console.error('[V233] 初始化出错:', error);
     }
 };
 

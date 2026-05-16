@@ -443,6 +443,8 @@ window.resetApiConfig = resetApiConfig;
 window.syncData = syncData;
 window.saveUserData = saveUserData;
 window.getCurrentUserData = getCurrentUserData;
+window.loadData = loadData;
+window.saveData = saveData;
 
 
 // ============================================================
