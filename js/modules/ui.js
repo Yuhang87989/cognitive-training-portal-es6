@@ -453,7 +453,7 @@ function handleLogin() {
 }
 
 function logoutAndReturn() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     
     // 停止TTS
     stopTTSSpeech();
@@ -759,7 +759,7 @@ function closeCreateUserModal() { document.getElementById('create-user-modal').c
 function showCreateUserModal() { document.getElementById('create-user-modal').classList.add('show'); }
 
 function openDifficultyModal() {
-    const userData = window.window.getCurrentUserData();
+    const userData = window.getCurrentUserData();
     const currentLevel = userData ? userData.difficulty : 1;
     // 高亮当前选中的按钮
     document.querySelectorAll('.diff-btn').forEach(btn => {
@@ -775,7 +775,7 @@ function closeDifficultyModal() {
 }
 
 function setDifficulty(level) {
-    const userData = window.window.getCurrentUserData();
+    const userData = window.getCurrentUserData();
     if (userData) {
         userData.difficulty = level;
         syncUserData(userData);
@@ -887,7 +887,7 @@ function showToast(message, duration = 2000) {
 function updateUI() {
     updateAllAvatarDisplays();
 
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     const greetingEl = document.getElementById('greeting-name');
     const diffEl = document.getElementById('difficulty-text');
@@ -917,7 +917,7 @@ function toggleSettingsGroup(groupId) {
 }
 
 function openSettingsPanel() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         // 更新用户信息卡片
         const avatarEl = document.getElementById('settings-avatar');
@@ -1098,7 +1098,7 @@ function drawRadarChart(data) {
 }
 
 function calculateCognitiveData() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) {
         return getDefaultCognitiveData();
     }
@@ -1361,7 +1361,7 @@ function renderStatItems(data) {
 }
 
 function updateAllAvatarDisplays() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     
     const avatar = user.avatar || AVATAR_LIST[0].emoji;
@@ -1415,7 +1415,7 @@ function openAbout() {
 }
 
 function selectAvatar(emoji) {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (user) {
         user.avatar = emoji;
         syncUserData(user);
@@ -1426,7 +1426,7 @@ function selectAvatar(emoji) {
 }
 
 function updateMethodStats() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.methodStats || {};
     
     let totalCompleted = 0;
@@ -1447,7 +1447,7 @@ function updateMethodStats() {
 }
 
 function updateThinkingStats() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     const stats = user?.thinkingStats || {};
     
     let totalCompleted = 0;
@@ -1500,7 +1500,6 @@ window.setDifficulty = setDifficulty;
 window.toggleUserMenu = toggleUserMenu;
 window.openRegisterModal = openRegisterModal;
 window.handleLogin = handleLogin;
-window.initPortal = initPortal;
 window.selectAvatar = selectAvatar;
 window.selectGrade = selectGrade;
 window.selectSubject = selectSubject;
@@ -1604,7 +1603,7 @@ if('serviceWorker' in navigator){
 // 更新首页用户信息显示
 function updateHomeUserInfo(user) {
     if (!user) {
-        user = window.window.getCurrentUserData();
+        user = window.getCurrentUserData();
     }
     if (!user) return;
     
@@ -1638,7 +1637,7 @@ function updateHomeUserInfo(user) {
 
 // 更新今日统计
 function updateTodayStats() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) return;
     
     const today = new Date().toISOString().split('T')[0];
@@ -1677,28 +1676,7 @@ function updateTodayStats() {
     if (streakEl) streakEl.textContent = streak;
 }
 
-// 应用初始化入口函数
-function initPortal() {
-    // 检查是否有用户数据
-    const userData = window.window.getCurrentUserData();
-    
-    if (userData && userData.name) {
-        // 已登录，更新首页用户信息
-        updateHomeUserInfo(userData);
-    } else {
-        // 未登录，显示默认状态（同学）
-        updateHomeUserInfo(null);
-    }
-    
-    // 显示首页（默认就是显示的，这里确保状态正确）
-    const homePage = document.getElementById('page-home');
-    if (homePage) {
-        homePage.style.display = 'block';
-        homePage.classList.add('active');
-    }
-    
-    console.log('Portal initialized');
-}
+// 注意：initPortal函数现在在main.js中定义，这里不再重复定义
 
 // ============================================================
 
@@ -1756,7 +1734,7 @@ window.updateRecommendCard = updateRecommendCard;
 
 // 显示数据统计弹窗
 function showDataStatsModal() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) {
         showToast('请先登录');
         return;
@@ -1870,7 +1848,7 @@ window.drawRadarChart = drawRadarChart;
 
 // 清除当前用户数据
 function clearCurrentUserData() {
-    const user = window.window.getCurrentUserData();
+    const user = window.getCurrentUserData();
     if (!user) {
         showToast('请先登录');
         return;
