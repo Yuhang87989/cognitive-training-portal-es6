@@ -353,7 +353,8 @@ function openFullscreenPage(module) {
         'selfdrive': '💪 自驱力训练',
         'backup': '💾 数据备份',
         'weekly': '📅 每周回顾',
-        'progress': '📉 进步曲线'
+        'progress': '📉 进步曲线',
+        'mindmap': '🌳 思维导图'
     };
     
     titleEl.textContent = moduleTitles[module] || '模块';
@@ -365,40 +366,49 @@ function openFullscreenPage(module) {
         return;
     }
     
-    // V229: 使用动态懒加载加载模块
-    // 检查是否支持懒加载
-    if (window.MODULE_LAZY_LOAD_MAP && window.MODULE_LAZY_LOAD_MAP[module]) {
+    // V242: 等待ES6 Module加载完成后再使用动态懒加载
+    function tryOpenModule() {
         // 先显示加载状态
         showModuleLoading(contentEl, moduleTitles[module] || module);
         
-        // 异步加载模块
-        lazyLoadModule(module)
-            .then((renderFunc) => {
-                if (typeof renderFunc === 'function') {
-                    renderFunc(contentEl);
-                    // 重新添加返回按钮（因为模块可能重写了content）
+        // 检查ES6 Module是否已加载完成
+        if (window.MODULE_LAZY_LOAD_MAP && window.MODULE_LAZY_LOAD_MAP[module]) {
+            // 异步加载模块
+            lazyLoadModule(module)
+                .then((renderFunc) => {
+                    if (typeof renderFunc === 'function') {
+                        renderFunc(contentEl);
+                        // 重新添加返回按钮（因为模块可能重写了content）
+                        addBackButtonToModule(contentEl);
+                    } else {
+                        contentEl.innerHTML = '<div class="card"><p style="color:red;">模块加载异常：渲染函数未找到</p></div>';
+                        addBackButtonToModule(contentEl);
+                    }
+                })
+                .catch((error) => {
+                    console.error('模块加载失败:', error);
+                    contentEl.innerHTML = `
+                        <div class="card" style="text-align:center;padding:40px;">
+                            <p style="color:red;font-size:18px;margin-bottom:10px;">⚠️ 模块加载失败</p>
+                            <p style="color:#666;margin-bottom:20px;">${error.message || '请刷新页面重试'}</p>
+                            <button onclick="location.reload()" style="padding:10px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">刷新页面</button>
+                        </div>
+                    `;
                     addBackButtonToModule(contentEl);
-                } else {
-                    contentEl.innerHTML = '<div class="card"><p style="color:red;">模块加载异常：渲染函数未找到</p></div>';
-                    addBackButtonToModule(contentEl);
-                }
-            })
-            .catch((error) => {
-                console.error('模块加载失败:', error);
-                contentEl.innerHTML = `
-                    <div class="card" style="text-align:center;padding:40px;">
-                        <p style="color:red;font-size:18px;margin-bottom:10px;">⚠️ 模块加载失败</p>
-                        <p style="color:#666;margin-bottom:20px;">${error.message || '请刷新页面重试'}</p>
-                        <button onclick="location.reload()" style="padding:10px 24px;background:#667eea;color:white;border:none;border-radius:8px;cursor:pointer;">刷新页面</button>
-                    </div>
-                `;
-                addBackButtonToModule(contentEl);
-            });
-    } else {
-        // 不支持懒加载的模块，降级处理或提示
-        contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
-        addBackButtonToModule(contentEl);
+                });
+        } else if (!window.ES6_MODULES_LOADED) {
+            // 还在加载中，等待一下再试
+            console.log('[V242] ES6 Module仍在加载中，等待 500ms 后重试...');
+            setTimeout(tryOpenModule, 500);
+        } else {
+            // 不支持懒加载的模块，降级处理或提示
+            contentEl.innerHTML = '<div class="card"><p>模块开发中...</p></div>';
+            addBackButtonToModule(contentEl);
+        }
     }
+    
+    // 开始执行
+    tryOpenModule();
     
     container.classList.add('active');
 }
@@ -2065,6 +2075,7 @@ window.openAbout = openAbout;
 // ============================================================
 // ES6 Module Export - V225 ES6改造
 // ============================================================
+export {
     showPage,
     closeModal
 };

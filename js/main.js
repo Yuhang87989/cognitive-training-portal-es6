@@ -38,7 +38,6 @@ import './data/week-plans.js';
 import './data/podcasts.js';
 import './data/videos.js';
 import './data/games-config.js';
-import './data/learning-methods.js';
 
 console.log('[ES6 Module] 核心模块 + 数据模块加载完成！');
 
@@ -67,6 +66,7 @@ window.MODULE_LAZY_LOAD_MAP = {
     'my':         { path: resolveModulePath('./modules/my-page.js'),    render: 'renderMyPage' },
     'usage-stats':{ path: resolveModulePath('./modules/my-page.js'),    render: 'renderUsageStats' },
     'backup':     { path: resolveModulePath('./modules/local-db.js'),   render: 'renderBackupManager' },
+    'mindmap':    { path: resolveModulePath('./modules/mindmap.js'),    render: 'renderMindMap' },
     
     // player.js 由其他模块依赖，不单独懒加载
 };
