@@ -472,3 +472,4 @@ const LEARNING_METHODS = {
         `
     }
 };
+window.LEARNING_METHODS = LEARNING_METHODS;
