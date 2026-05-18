@@ -72,22 +72,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .header-top{display:flex;justify-content:space-between;align-items:center}
 .app-logo{width:44px;height:44px;background:linear-gradient(135deg,#3377FF,#FF9A63);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
 .app-logo-img{width:44px;height:44px;border-radius:12px;object-fit:cover;}
-.app-title{font-size:18px;font-weight:bold;color:#333;margin-left:8px}
+.app-title{font-size:26px;font-weight:bold;color:#333;margin-left:8px}
 .header-right{display:flex;align-items:center;gap:8px}
 .difficulty-tag{background:rgba(255,149,0,0.1);padding:6px 12px;border-radius:18px;font-size:12px;color:var(--orange);cursor:pointer;transition:all 0.2s}
-.user-avatar-circle{width:42px;height:42px;background:linear-gradient(135deg,#FFD4B8,#FFB6C1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:#fff;cursor:pointer;transition:transform 0.2s}
+.user-avatar-circle{width:42px;height:42px;background:linear-gradient(135deg,#FFD4B8,#FFB6C1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;color:#fff;cursor:pointer;transition:transform 0.2s}
 .module-section{padding:16px 16px 80px}
 .module-title{font-size:16px;font-weight:bold;color:#333;margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .module-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
 .module-grid-unified{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 @media (max-width: 380px) { .module-grid-unified { grid-template-columns: repeat(3, 1fr); } } @media (max-width: 480px) and (min-width: 381px) { .module-grid-unified { grid-template-columns: repeat(4, 1fr); } }
-.module-btn{display:flex;flex-direction:column;align-items:center;padding:8px 4px 6px;border-radius:20px;border:none;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative;min-height:60px;overflow:hidden}
+.module-btn{display:flex;flex-direction:column;align-items:center;padding:14px 8px 12px;border-radius:20px;border:none;cursor:pointer;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);box-shadow:0 4px 15px rgba(0,0,0,0.1);position:relative;min-height:85px;overflow:hidden}
 .module-btn:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 8px 25px rgba(0,0,0,0.15)}
 .module-btn:active{transform:translateY(-2px) scale(0.98)}
 .module-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,0.15),transparent);pointer-events:none}
-.module-icon{font-size:18px;margin-bottom:8px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
-.module-name{font-size:10px;font-weight:600;color:white;margin-bottom:3px;text-align:center;letter-spacing:0.3px}
-.module-desc{font-size:7px;color:rgba(255,255,255,0.85);text-align:center;font-weight:400}
+.module-icon{font-size:26px;margin-bottom:8px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.15))}
+.module-name{font-size:13px;font-weight:600;color:white;margin-bottom:3px;text-align:center;letter-spacing:0.3px}
+.module-desc{font-size:10px;color:rgba(255,255,255,0.85);text-align:center;font-weight:400}
 .module-tag{position:absolute;top:6px;right:6px;background:rgba(255,255,255,0.25);color:white;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;backdrop-filter:blur(4px)}
 
 /* 统一配色 - 更柔和协调的渐变 */
@@ -102,7 +102,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 .gradient-teal{background:linear-gradient(135deg,#2193b0,#6dd5ed)}
 .today-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
 .stat-item{background:white;border-radius:12px;padding:10px 6px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
-.stat-value{font-size:18px;font-weight:bold;color:var(--blue)}
+.stat-value{font-size:26px;font-weight:bold;color:var(--blue)}
 .stat-label{font-size:8px;color:var(--text-light);margin-top:2px}
 .bottom-nav{position:fixed;bottom:0;left:0;width:100%;max-width:480px;left:50%;transform:translateX(-50%);background:white;border-top:1px solid #f0f0f0;display:flex;padding:8px 0;z-index:50;box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
 .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:6px;cursor:pointer;color:var(--text-light);transition:all 0.2s}
@@ -132,7 +132,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
                 <div class="user-menu-wrapper">
                     <div class="user-avatar-circle" id="header-avatar" onclick="toggleUserMenu()">👤</div>
                     <div class="user-dropdown" id="user-dropdown">
-                        <div style="position:absolute;top:8px;right:12px;cursor:pointer;font-size:18px;color:rgba(255,255,255,0.7);z-index:10;" onclick="closeUserMenu()">✕</div>
+                        <div style="position:absolute;top:8px;right:12px;cursor:pointer;font-size:26px;color:rgba(255,255,255,0.7);z-index:10;" onclick="closeUserMenu()">✕</div>
                         <div class="user-dropdown-header" onclick="event.stopPropagation();openEditProfileModal()">
                             <div class="user-dropdown-avatar" id="dropdown-avatar">👤</div>
                             <div class="user-dropdown-name" id="dropdown-name">同学</div>
@@ -201,95 +201,71 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 
 
     <div class="module-section">
-        <div class="module-grid-unified">
-            <button class="module-btn gradient-orange" onclick="openFullscreenPage('practice')">
+        <div class="module-grid-unified" style="grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <button class="module-btn gradient-orange" onclick="openFullscreenPage('ai')">
                 <span class="module-tag">AI</span>
                 <div class="module-icon">🎯</div>
                 <div class="module-name">AI精准练</div>
                 <div class="module-desc">薄弱点诊断</div>
             </button>
-            <button class="module-btn gradient-green" onclick="openFullscreenPage('map')">
-                <div class="module-icon">🧠</div>
-                <div class="module-name">认知地图</div>
-                <div class="module-desc">能力可视化</div>
+            <button class="module-btn gradient-green" onclick="openFullscreenPage('notepad')">
+                <div class="module-icon">📝</div>
+                <div class="module-name">学习日记</div>
+                <div class="module-desc">记录成长</div>
             </button>
-            <button class="module-btn gradient-yellow" onclick="openFullscreenPage('mindmap')">
+            <button class="module-btn gradient-purple" onclick="openFullscreenPage('plan')">
                 <span class="module-tag">NEW</span>
-                <div class="module-icon">🌐</div>
-                <div class="module-name">思维导图</div>
-                <div class="module-desc">看书·听书·导图</div>
-            </button>
-            <button class="module-btn gradient-cyan" onclick="openFullscreenPage('method')">
-                <div class="module-icon">💡</div>
-                <div class="module-name">学霸方法</div>
-                <div class="module-desc">高效学习技巧</div>
-            </button>
-            <button class="module-btn gradient-blue" onclick="openFullscreenPage('podcast')">
-                <div class="module-icon">🎧</div>
-                <div class="module-name">播客课堂</div>
-                <div class="module-desc">21个音频课程</div>
-            </button>
-            <button class="module-btn gradient-teal" onclick="openFullscreenPage('video')">
-                <div class="module-icon">📺</div>
-                <div class="module-name">视频课堂</div>
-                <div class="module-desc">视频学习</div>
-            </button>
-            <button class="module-btn gradient-pink" onclick="openFullscreenPage('topics')">
-                <div class="module-icon">📚</div>
-                <div class="module-name">母题训练</div>
-                <div class="module-desc">126道经典题</div>
-            </button>
-            <button class="module-btn gradient-purple" onclick="openFullscreenPage('deepseek')">
-                <div class="module-icon">🤖</div>
-                <div class="module-name">DeepSeek</div>
-                <div class="module-desc">AI智能助手</div>
-            </button>
-            <button class="module-btn gradient-green" onclick="openFullscreenPage('plan')">
-                <span class="module-tag">NEW</span>
-                <div class="module-icon">📅</div>
+                <div class="module-icon">📋</div>
                 <div class="module-name">学习计划</div>
-                <div class="module-desc">Week1-7训练</div>
-            </button>
-            <button class="module-btn gradient-indigo" onclick="openFullscreenPage('thinking')">
-                <div class="module-icon">🧩</div>
-                <div class="module-name">思维训练</div>
-                <div class="module-desc">四维能力提升</div>
-            </button>
-            <button class="module-btn gradient-green" onclick="openFullscreenPage('games')">
-                <div class="module-icon">🎮</div>
-                <div class="module-name">训练游戏</div>
-                <div class="module-desc">23大认知游戏</div>
-            </button>
-            <button class="module-btn gradient-cyan" onclick="openFullscreenPage('selfdrive')">
-                <div class="module-icon">💪</div>
-                <div class="module-name">自驱力训练</div>
-                <div class="module-desc">学习动力提升</div>
+                <div class="module-desc">目标管理</div>
             </button>
             <button class="module-btn gradient-blue" onclick="openFullscreenPage('weekly')">
                 <div class="module-icon">📅</div>
                 <div class="module-name">每周回顾</div>
-                <div class="module-desc">学习数据分析</div>
+                <div class="module-desc">复盘总结</div>
+            </button>
+            <button class="module-btn gradient-pink" onclick="openFullscreenPage('practice')">
+                <div class="module-icon">📚</div>
+                <div class="module-name">母题训练</div>
+                <div class="module-desc">126道经典</div>
+            </button>
+            <button class="module-btn gradient-cyan" onclick="openFullscreenPage('method')">
+                <div class="module-icon">💡</div>
+                <div class="module-name">学霸方法</div>
+                <div class="module-desc">高效技巧</div>
+            </button>
+            <button class="module-btn gradient-yellow" onclick="openFullscreenPage('thinking')">
+                <div class="module-icon">🧩</div>
+                <div class="module-name">思维训练</div>
+                <div class="module-desc">逻辑提升</div>
+            </button>
+            <button class="module-btn gradient-blue" onclick="openFullscreenPage('podcast')">
+                <div class="module-icon">🎧</div>
+                <div class="module-name">播客课堂</div>
+                <div class="module-desc">21个音频</div>
+            </button>
+            <button class="module-btn gradient-orange" onclick="openFullscreenPage('video')">
+                <div class="module-icon">📺</div>
+                <div class="module-name">视频课堂</div>
+                <div class="module-desc">学习视频</div>
+            </button>
+            <button class="module-btn gradient-green" onclick="openFullscreenPage('map')">
+                <div class="module-icon">📚</div>
+                <div class="module-name">学习图书馆</div>
+                <div class="module-desc">看书听书</div>
+            </button>
+            <button class="module-btn gradient-teal" onclick="openFullscreenPage('selfdrive')">
+                <div class="module-icon">🚀</div>
+                <div class="module-name">自驱力训练</div>
+                <div class="module-desc">自主学习</div>
             </button>
             <button class="module-btn gradient-pink" onclick="openFullscreenPage('wrongbook')">
                 <div class="module-icon">📒</div>
                 <div class="module-name">错题本</div>
-                <div class="module-desc">错题复习巩固</div>
-            </button>
-            <button class="module-btn gradient-purple" onclick="openFullscreenPage('notepad')">
-                <div class="module-icon">📓</div>
-                <div class="module-name">学习日记</div>
-                <div class="module-desc">记录成长点滴</div>
+                <div class="module-desc">错题复习</div>
             </button>
         </div>
-
-        <button class="module-btn gradient-red" onclick="openSettingsPanel()" style="display:none;">
-            <div class="module-icon">⚙️</div>
-            <div class="module-name">设置</div>
-            <div class="module-desc">账户与充值</div>
-        </button>
     </div>
-
-</div>
 
 <!-- 主页面底部导航栏 -->
 <div class="bottom-nav">
@@ -319,14 +295,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <div id="settings-panel" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2100;overflow-y:auto;" onclick="closeSettingsPanel(event)">
     <div style="background:white;width:100%;max-width:400px;border-radius:0 0 20px 20px;padding:20px;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <div style="font-size:18px;font-weight:bold;">⚙️ 设置</div>
-            <div onclick="closeSettingsPanel()" style="cursor:pointer;font-size:18px;padding:8px;">✕</div>
+            <div style="font-size:26px;font-weight:bold;">⚙️ 设置</div>
+            <div onclick="closeSettingsPanel()" style="cursor:pointer;font-size:26px;padding:8px;">✕</div>
         </div>
         
         <!-- 用户信息卡片 -->
         <div id="settings-user-card" style="background:linear-gradient(135deg,#1A6BFF,#4A90E2);color:white;border-radius:16px;padding:16px;margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-                <div id="settings-avatar" style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;">邱</div>
+                <div id="settings-avatar" style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;">邱</div>
                 <div>
                     <div id="settings-name" style="font-size:16px;font-weight:600;">邱宇菲</div>
                     <div id="settings-grade" style="font-size:12px;opacity:0.9;">初一 · Lv.1</div>
@@ -682,8 +658,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <div id="metacognitive-modal" class="modal-overlay">
     <div class="modal-content" style="max-width:340px;padding:24px;">
         <div style="text-align:center;margin-bottom:20px;">
-            <div style="font-size:18px;margin-bottom:8px;">🎯</div>
-            <div style="font-size:18px;font-weight:bold;color:#333;">预测你的得分</div>
+            <div style="font-size:26px;margin-bottom:8px;">🎯</div>
+            <div style="font-size:26px;font-weight:bold;color:#333;">预测你的得分</div>
             <div style="font-size:14px;color:#666;margin-top:4px;" id="meta-game-name">游戏名称</div>
         </div>
         
@@ -692,15 +668,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;">
                 <div>
                     <div style="font-size:11px;color:#999;">历史最高</div>
-                    <div style="font-size:18px;font-weight:bold;color:#FF6B6B;" id="meta-best-score">0</div>
+                    <div style="font-size:26px;font-weight:bold;color:#FF6B6B;" id="meta-best-score">0</div>
                 </div>
                 <div>
                     <div style="font-size:11px;color:#999;">历史平均</div>
-                    <div style="font-size:18px;font-weight:bold;color:#667eea;" id="meta-avg-score">-</div>
+                    <div style="font-size:26px;font-weight:bold;color:#667eea;" id="meta-avg-score">-</div>
                 </div>
                 <div>
                     <div style="font-size:11px;color:#999;">游戏次数</div>
-                    <div style="font-size:18px;font-weight:bold;color:#43E97B;" id="meta-game-count">0</div>
+                    <div style="font-size:26px;font-weight:bold;color:#43E97B;" id="meta-game-count">0</div>
                 </div>
             </div>
         </div>
@@ -813,7 +789,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <!-- 增强版视频播放器 -->
 <div id="enhanced-video-player" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:2000;display:none;flex-direction:column;">
     <div style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;padding:12px 16px;background:linear-gradient(rgba(0,0,0,0.6),transparent);">
-        <div onclick="closeEnhancedVideoPlayer()" style="color:white;font-size:18px;cursor:pointer;padding:8px 12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border-radius:8px;">← 退出</div>
+        <div onclick="closeEnhancedVideoPlayer()" style="color:white;font-size:26px;cursor:pointer;padding:8px 12px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.15);border-radius:8px;">← 退出</div>
         <div id="evp-title" style="color:white;font-size:14px;font-weight:bold;margin-left:8px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
     </div>
     <video id="evp-video" preload="metadata" playsinline webkit-playsinline x5-video-player-type="h5" x5-video-player-fullscreen="true" style="width:100%;height:100%;object-fit:contain;"></video>
@@ -828,16 +804,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;">
             <div style="display:flex;align-items:center;gap:12px;">
-                <button onclick="toggleEnhancedVideoPlay()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;" id="evp-play-btn">▶</button>
-                <button onclick="seekEnhancedVideoBackward()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⏪</button>
-                <button onclick="seekEnhancedVideoForward()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⏩</button>
+                <button onclick="toggleEnhancedVideoPlay()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;" id="evp-play-btn">▶</button>
+                <button onclick="seekEnhancedVideoBackward()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">⏪</button>
+                <button onclick="seekEnhancedVideoForward()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">⏩</button>
             </div>
             <div style="display:flex;align-items:center;gap:12px;">
                 <button id="evp-speed-btn" onclick="toggleEnhancedSpeedDropdown()" style="background:none;border:none;color:white;font-size:12px;cursor:pointer;">1x</button>
-                <button id="evp-volume-btn" onclick="toggleEnhancedMute()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">🔊</button>
-                <button onclick="togglePictureInPicture()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">📺</button>
-                <button onclick="toggleEnhancedFullscreen()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">⛶</button>
-                <button onclick="closeEnhancedVideoPlayer()" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;">✕</button>
+                <button id="evp-volume-btn" onclick="toggleEnhancedMute()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">🔊</button>
+                <button onclick="togglePictureInPicture()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">📺</button>
+                <button onclick="toggleEnhancedFullscreen()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">⛶</button>
+                <button onclick="closeEnhancedVideoPlayer()" style="background:none;border:none;color:white;font-size:26px;cursor:pointer;">✕</button>
             </div>
         </div>
     </div>
@@ -848,7 +824,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 </div>
 <style>
 @keyframes spin {
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}.modal-overlay.show{display:flex !important;animation:fadeIn 0.2s;z-index:9999}.modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto}.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;text-align:center}.modal-close{background:#f5f5f5;color:#666;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:14px;width:100%}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #eee}.modal-body{padding:0}.modal-footer{margin-top:20px;padding-top:15px;border-top:1px solid #eee;text-align:center}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:2000;padding:20px}.modal-overlay.show{display:flex !important;animation:fadeIn 0.2s;z-index:9999}.modal-content{background:white;border-radius:20px;padding:24px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto}.modal-title{font-size:26px;font-weight:700;margin-bottom:16px;text-align:center}.modal-close{background:#f5f5f5;color:#666;border:none;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:14px;width:100%}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:15px;border-bottom:1px solid #eee}.modal-body{padding:0}.modal-footer{margin-top:20px;padding-top:15px;border-top:1px solid #eee;text-align:center}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
     from { transform: translate(-50%,-50%) rotate(0deg); }
     to { transform: translate(-50%,-50%) rotate(360deg); }
 }
@@ -1078,21 +1054,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
 <div id="metacognitive-modal" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:6000;display:none;align-items:center;justify-content:center;">
   <div style="background:white;border-radius:20px;padding:28px 24px;width:90%;max-width:360px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;">
     <div style="font-size:40px;margin-bottom:12px;">🧠</div>
-    <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:4px;">元认知预测</div>
+    <div style="font-size:26px;font-weight:700;color:#333;margin-bottom:4px;">元认知预测</div>
     <div id="meta-game-name" style="font-size:14px;color:#667eea;margin-bottom:20px;">游戏名称</div>
     <div id="meta-first-time-tip" style="background:#fff8e1;border-radius:10px;padding:10px;margin-bottom:16px;font-size:11px;color:#f57c00;display:none;">🎯 首次挑战，大胆预测！</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;">
       <div style="background:#f0f4ff;border-radius:10px;padding:10px 8px;">
         <div style="font-size:11px;color:#999;">最高分</div>
-        <div id="meta-best-score" style="font-size:18px;font-weight:700;color:#667eea;">0</div>
+        <div id="meta-best-score" style="font-size:26px;font-weight:700;color:#667eea;">0</div>
       </div>
       <div style="background:#f0fff4;border-radius:10px;padding:10px 8px;">
         <div style="font-size:11px;color:#999;">平均分</div>
-        <div id="meta-avg-score" style="font-size:18px;font-weight:700;color:#43e97b;">-</div>
+        <div id="meta-avg-score" style="font-size:26px;font-weight:700;color:#43e97b;">-</div>
       </div>
       <div style="background:#fff0f6;border-radius:10px;padding:10px 8px;">
         <div style="font-size:11px;color:#999;">已玩</div>
-        <div id="meta-game-count" style="font-size:18px;font-weight:700;color:#fa709a;">0次</div>
+        <div id="meta-game-count" style="font-size:26px;font-weight:700;color:#fa709a;">0次</div>
       </div>
     </div>
     <div style="margin-bottom:24px;">
@@ -1100,7 +1076,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
       <input type="range" id="meta-prediction-input" min="0" max="500" value="50" oninput="updatePredictionDisplay(this.value)" style="width:100%;height:6px;-webkit-appearance:none;background:linear-gradient(90deg,#667eea,#fa709a);border-radius:3px;outline:none;">
       <div style="display:flex;justify-content:space-between;margin-top:6px;">
         <span style="font-size:11px;color:#999;">0</span>
-        <span id="meta-prediction-value" style="font-size:18px;font-weight:700;color:#667eea;">50</span>
+        <span id="meta-prediction-value" style="font-size:26px;font-weight:700;color:#667eea;">50</span>
         <span style="font-size:11px;color:#999;">500</span>
       </div>
     </div>
@@ -1118,9 +1094,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         <div id="game-level-badge" style="background:rgba(255,255,255,0.2);padding:4px 10px;border-radius:12px;font-size:12px;color:white;margin-right:8px;">关卡 1</div>
     </div>
     <div style="padding:12px;background:rgba(0,0,0,0.2);display:flex;justify-content:space-around;">
-        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">得分</div><div id="game-score" style="color:white;font-size:18px;font-weight:bold;">0</div></div>
-        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">最高分</div><div id="game-best-score" style="color:#FFD700;font-size:18px;font-weight:bold;">0</div></div>
-        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">用时</div><div id="game-timer" style="color:white;font-size:18px;font-weight:bold;">0s</div></div>
+        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">得分</div><div id="game-score" style="color:white;font-size:26px;font-weight:bold;">0</div></div>
+        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">最高分</div><div id="game-best-score" style="color:#FFD700;font-size:26px;font-weight:bold;">0</div></div>
+        <div style="text-align:center;"><div style="color:rgba(255,255,255,0.7);font-size:8px;">用时</div><div id="game-timer" style="color:white;font-size:26px;font-weight:bold;">0s</div></div>
     </div>
     <div id="game-fullscreen" style="flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;"></div>
     <div id="game-board" style="flex:1;display:flex;align-items:center;justify-content:center;padding:12px;overflow:hidden;min-height:0;max-height:calc(100vh - 200px);"></div>
