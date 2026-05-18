@@ -238,4 +238,3 @@ console.log('V201 - 学习统计模块已加载');
     renderProgressChart,
     getEncouragement,
     getProgressAnalysis
-};

@@ -611,4 +611,3 @@ window.openManageUserModal = openManageUserModal;
     showCreateUserModal,
     quickLogin,
     openManageUserModal
-};

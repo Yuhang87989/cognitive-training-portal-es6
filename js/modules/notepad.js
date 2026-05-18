@@ -130,4 +130,3 @@ if (typeof module !== 'undefined' && module.exports) {
     saveNote,
     deleteNote,
     loadNotes
-};

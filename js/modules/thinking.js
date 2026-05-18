@@ -866,4 +866,3 @@ if (typeof module !== 'undefined' && module.exports) {
     showThinkingType,
     startThinkingQuiz,
     submitThinkingAnswers
-};

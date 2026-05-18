@@ -151,4 +151,3 @@ if (typeof module !== 'undefined' && module.exports) {
     renderLocalVideoList,
     filterVideoCourse,
     playVideoFromList
-};

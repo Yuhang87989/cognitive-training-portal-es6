@@ -427,4 +427,3 @@ window.loadModuleData = loadModuleData;
     cleanupModuleState,
     loadScript,
     loadModuleData
-};

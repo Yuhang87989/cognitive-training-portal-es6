@@ -389,4 +389,3 @@ if (typeof module !== 'undefined' && module.exports) {
     loadTopicsList,
     openTopicQuestion,
     checkTopicAnswer
-};

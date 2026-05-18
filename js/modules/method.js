@@ -1127,4 +1127,3 @@ if (typeof module !== 'undefined' && module.exports) {
     startMethodQuiz,
     rateMethodAnswer,
     analyzeMethodWithAI
-};

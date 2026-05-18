@@ -765,4 +765,3 @@ if (typeof module !== 'undefined' && module.exports) {
     podcastNext,
     podcastCycleSpeed,
     stopPodcastAudio
-};

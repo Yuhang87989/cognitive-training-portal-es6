@@ -183,4 +183,3 @@ if (typeof module !== 'undefined' && module.exports) {
     renderCognitiveRadar,
     renderCognitiveDetails,
     renderStatItems
-};

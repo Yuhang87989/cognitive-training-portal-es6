@@ -238,4 +238,3 @@
     openDeepSeekHelpModal: window.openDeepSeekHelpModal,
     renderUsageStats: window.renderUsageStats,
     openUsageStats: window.openUsageStats
-};

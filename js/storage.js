@@ -754,4 +754,3 @@ if (document.readyState === 'loading') {
     getImageFileAsDataUrl,
     deleteImageFile,
     clearAllImageFiles
-};
