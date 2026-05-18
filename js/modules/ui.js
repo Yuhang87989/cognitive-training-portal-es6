@@ -333,7 +333,8 @@ function openFullscreenPage(module) {
     if (!container || !titleEl || !contentEl) return;
     
     const moduleTitles = {
-        'practice': '🎯 AI精准练',
+        'ai': '🎯 AI精准练',
+        'practice': '📚 母题训练',
         'map': '🧠 认知地图',
         'plan': '📅 学习计划',
         'topics': '📚 母题训练',

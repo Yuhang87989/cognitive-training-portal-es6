@@ -46,6 +46,7 @@ console.log('[ES6 Module] 核心模块 + 数据模块加载完成！');
 // ============================================================
 window.MODULE_LAZY_LOAD_MAP = {
     // 业务模块 - 点击时动态加载
+    'ai':         { path: resolveModulePath('./modules/deepseek.js'),  render: 'renderDeepseek' },
     'practice':   { path: resolveModulePath('./modules/practice.js'),   render: 'renderPractice' },
     'plan':       { path: resolveModulePath('./modules/plan.js'),       render: 'renderPlan' },
     'games':      { path: resolveModulePath('./modules/games.js'),      render: 'renderGames' },
