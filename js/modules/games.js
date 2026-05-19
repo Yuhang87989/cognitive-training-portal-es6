@@ -3044,3 +3044,5 @@ window.renderLibraryModule = function(container) {
 };
 
 console.log('[Library] renderLibraryModule 已挂载到window');
+// ES6 Module兼容
+export {};

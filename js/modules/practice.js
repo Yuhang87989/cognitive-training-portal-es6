@@ -1,5 +1,7 @@
 // 版本: V226 - ES6 Module
 // AI精准练模块
+const practiceModule = {
+
 
     name: 'practice',
     icon: '🎯',

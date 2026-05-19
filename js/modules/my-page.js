@@ -1015,3 +1015,5 @@ console.log('✅ V199 my-page.js 已加载 - 2x2快捷功能卡片 + 5个折叠�
 // ============================================================
     renderUsageStats,
     openBackupPage,
+// ES6 Module兼容
+export {};

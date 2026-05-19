@@ -1031,6 +1031,3 @@ window.scrollToDeepSeekMessage = scrollToDeepSeekMessage;
 };
 
 console.log('[ES6 Module] deepseek.js 模块加载完成');
-
-// ES6 Module导出
-export { renderDeepseek };
