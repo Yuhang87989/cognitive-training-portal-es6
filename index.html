@@ -1101,5 +1101,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         <button onclick="resetGame()" style="flex:1;padding:14px;background:#667eea;border:none;border-radius:12px;color:white;font-size:14px;cursor:pointer;">重新开始</button>
     </div>
 </div>
+<script>
+// API密钥自动初始化 - 页面加载时自动配置
+(function() {
+    var apiKeys = {
+        deepseek: 'sk-upymyvbtqdunkmmksrmtqugootqqysvgevwkllyomqcvskrw'
+    };
+    
+    // 保存到多种格式，确保兼容性
+    for (var type in apiKeys) {
+        var key = apiKeys[type];
+        if (key) {
+            localStorage.setItem('api_' + type + '_key', key);
+            localStorage.setItem(type + '_api_key', key);
+            
+            try {
+                var config = JSON.parse(localStorage.getItem('api_config') || '{}');
+                config[type] = key;
+                localStorage.setItem('api_config', JSON.stringify(config));
+            } catch(e) {}
+        }
+    }
+    
+    console.log('[Init] API密钥已自动配置完成');
+})();
+</script>
 </body>
 </html> 

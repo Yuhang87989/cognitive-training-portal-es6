@@ -1982,7 +1982,16 @@ function saveApiConfig() {
     const type = keyEl.dataset.type || 'deepseek';
     const key = keyEl.value.trim();
     
+    // 同时保存到多个位置，确保兼容性
     localStorage.setItem('api_' + type + '_key', key);
+    localStorage.setItem(type + '_api_key', key);
+    
+    // 保存到统一配置对象
+    try {
+        var config = JSON.parse(localStorage.getItem('api_config') || '{}');
+        config[type] = key;
+        localStorage.setItem('api_config', JSON.stringify(config));
+    } catch(e) {}
     
     // 更新状态显示
     const statusEl = document.getElementById('api-' + type + '-status');

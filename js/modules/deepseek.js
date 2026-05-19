@@ -7,6 +7,47 @@
 // V148-fix: toggleDeepSeekVoice添加微信浏览器检测
 // V147修复: 添加escapeHtml到window导出，确保全局可用
 
+// ============================================================
+// API Key 配置 - 从localStorage读取，不硬编码
+// ============================================================
+function getAPIKeyFromStorage(keyName, fallbackKey) {
+    try {
+        // 尝试多种key格式，确保兼容性
+        var keyFormats = [
+            'api_' + keyName + '_key',      // ui.js格式
+            keyName + '_api_key',           // 新格式
+            fallbackKey                      // 旧格式
+        ];
+        
+        for (var i = 0; i < keyFormats.length; i++) {
+            var key = keyFormats[i];
+            if (key && localStorage.getItem(key)) {
+                return localStorage.getItem(key);
+            }
+        }
+        
+        // 尝试配置对象
+        var config = JSON.parse(localStorage.getItem('api_config') || '{}');
+        if (config[keyName]) return config[keyName];
+        
+        // 尝试用户数据
+        var user = window.getCurrentUserData ? window.getCurrentUserData() : {};
+        if (user.deepseekApiKey && keyName === 'deepseek') {
+            return user.deepseekApiKey;
+        }
+    } catch(e) {}
+    return '';
+}
+
+const DEEPSEEK_API_KEY = getAPIKeyFromStorage('deepseek', 'deepseek_api_key');
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+const DEEPSEEK_MODEL = 'deepseek-chat';
+
+const VISION_DEEPSEEK_ENABLED = true;
+const VISION_SILICONFLOW_KEY = getAPIKeyFromStorage('siliconflow', 'siliconflow_api_key');
+const VISION_SILICONFLOW_URL = 'https://api.siliconflow.cn/v1/chat/completions';
+const VISION_SILICONFLOW_MODEL = 'Qwen/Qwen3-VL-30B-A3B-Instruct';
+
 function escapeHtml(text) {
     if (typeof text !== 'string') return text;
     const div = document.createElement('div');
@@ -66,6 +107,8 @@ function saveDeepSeekConversation() {
         var toSave = deepseekConversationHistory;
         if (toSave.length > 40) { toSave = toSave.slice(toSave.length - 40); deepseekConversationHistory = toSave; }
         localStorage.setItem('cognitive_training_ds_conversation', JSON.stringify(toSave));
+
+        if (window.syncChatHistoryToDB) window.syncChatHistoryToDB(toSave);
         // 自动保存到历史列表
         autoSaveDeepSeekHistory();
     } catch(e) { console.error('Save conversation error:', e); }
@@ -995,17 +1038,25 @@ function scrollToDeepSeekMessage(groupIndex) {
 }
 window.scrollToDeepSeekMessage = scrollToDeepSeekMessage;
 
+// 导出API函数供其他模块使用
+window.callDeepSeekAPI = callDeepSeekAPI;
+window.callVisionAPI = callVisionAPI;
+
+
 // ============================================================
 // ES6 Module 导出
 // ============================================================
 
 // DeepSeek模块对象
+const DeepSeekModule = {
     name: 'deepseek',
     icon: '🤖',
     render: typeof renderDeepseek !== 'undefined' ? renderDeepseek : null
 };
 
 // 导出主要函数
+export {
+    DeepSeekModule,
     callDeepSeekAPI,
     callVisionAPI,
     escapeHtml,
@@ -1015,19 +1066,16 @@ window.scrollToDeepSeekMessage = scrollToDeepSeekMessage;
     recordDetailedUsage,
     saveDeepSeekConversation,
     autoSaveDeepSeekHistory,
-    sendDeepSeekMessage,
-    toggleDeepSeekVoice,
-    copyLastResponse,
     toggleDeepSeekHistory,
     saveCurrentDeepSeekChat,
     loadSavedDeepSeekChat,
     deleteSavedDeepSeekChat,
     startNewDeepSeekChat,
     scrollToDeepSeekMessage,
-    showAPIKeyModal,
-    showAPIBalance,
-    openApiConfigModal,
-    showAPIRechargeModal
+    showAPIRechargeModal,
+    openApiConfigModalBridge,
+    updateDeepSeekBalance,
+    renderDeepseek
 };
 
 console.log('[ES6 Module] deepseek.js 模块加载完成');

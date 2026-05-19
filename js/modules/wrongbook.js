@@ -271,6 +271,8 @@ async function submitManualWrongNote() {
             time: Date.now()
         };
         user.wrongNotes.push(wrongNote);
+
+        if (window.syncWrongNoteToDB) window.syncWrongNoteToDB(wrongNote);
         syncUserData(user);
         showToast('✅ 已保存到错题本');
         backToWrongbook();
@@ -299,6 +301,8 @@ async function submitManualWrongNote() {
             time: Date.now()
         };
         user.wrongNotes.push(wrongNote);
+
+        if (window.syncWrongNoteToDB) window.syncWrongNoteToDB(wrongNote);
         syncUserData(user);
     }
     showToast('✅ AI分析完成，已保存到错题本');
@@ -441,6 +445,8 @@ async function uploadWrongPhotoWithAI(input) {
                     time: Date.now()
                 };
                 user.wrongNotes.push(wrongNote);
+
+        if (window.syncWrongNoteToDB) window.syncWrongNoteToDB(wrongNote);
                 syncUserData(user);
             }
             
@@ -887,6 +893,8 @@ async function analyzePhotoWithAI(photoId) {
             user.wrongNotes[existingIndex] = wrongNote;
         } else {
             user.wrongNotes.push(wrongNote);
+
+        if (window.syncWrongNoteToDB) window.syncWrongNoteToDB(wrongNote);
         }
         syncUserData(user);
         

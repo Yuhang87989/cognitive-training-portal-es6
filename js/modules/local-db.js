@@ -252,8 +252,8 @@ window.syncDBToLocalStorage = function() {
     if (user) LocalDB.save('userInfo', user, 'currentUser');
     
     // 错题本同步
-    if (window.wrongBook && window.wrongBook.questions) {
-        LocalDB.save('wrongBook', window.wrongBook.questions, 'all');
+    if (window.wrongBook && user.wrongNotes || []) {
+        LocalDB.save('wrongBook', user.wrongNotes || [], 'all');
     }
     
     console.log('数据已同步到本地数据库');
@@ -375,3 +375,63 @@ if (typeof CTM !== 'undefined') {
         render: renderBackupManager
     });
 }
+
+// ==========================================
+// 页面加载时自动恢复数据
+// ==========================================
+window.restoreFromDB = function() {
+    // 恢复用户信息
+    LocalDB.get('userInfo', 'currentUser').then(function(user) {
+        if (user) {
+            const currentLocal = window.getCurrentUserData();
+            if (currentLocal && JSON.stringify(currentLocal) !== JSON.stringify(user)) {
+                window.updateUserData(user);
+                console.log('✅ 已从本地数据库恢复用户数据');
+            }
+        }
+    });
+    
+    // 恢复错题本
+    LocalDB.get('wrongBook', 'all').then(function(wrongNotes) {
+        if (wrongNotes && wrongNotes.length > 0) {
+            const user = window.getCurrentUserData();
+            if (user && (!user.wrongNotes || user.wrongNotes.length === 0) {
+                user.wrongNotes = wrongNotes;
+                window.saveUserData(user);
+                console.log('✅ 已从本地数据库恢复错题本数据:', wrongNotes.length + '道');
+            }
+        }
+    });
+    
+    // 恢复对话历史
+    LocalDB.get('chatHistory', 'deepseek').then(function(history) {
+        if (history && history.length > 0) {
+            localStorage.setItem('cognitive_training_ds_conversation', JSON.stringify(history));
+            console.log('✅ 已从本地数据库恢复对话历史');
+        }
+    });
+};
+
+// 页面加载3秒后执行恢复
+setTimeout(function() {
+    restoreFromDB();
+}, 3000);
+
+// ==========================================
+// 各模块实时同步函数
+// ==========================================
+window.syncWrongNoteToDB = function(wrongNote) {
+    LocalDB.get('wrongBook', 'all').then(function(existing) {
+        const all = existing || [];
+        all.push(wrongNote);
+        LocalDB.save('wrongBook', all, 'all');
+    });
+};
+
+window.syncChatHistoryToDB = function(history) {
+    LocalDB.save('chatHistory', history, 'deepseek');
+};
+
+window.syncTrainingRecordToDB = function(record) {
+    LocalDB.save('trainingRecords', record, record.id || Date.now().toString());
+};

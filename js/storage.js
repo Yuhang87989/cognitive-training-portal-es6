@@ -95,6 +95,16 @@ function saveData(data) {
 
 // 保存单个用户数据（更新到localStorage）
 function saveUserData(user) {
+
+    // 自动同步训练记录到IndexedDB
+    if (window.syncTrainingRecordToDB) {
+        const record = {
+            type: user.practiceStats ? "practice" : "study",
+            timestamp: new Date().toISOString(),
+            stats: user.practiceStats || user.todayStats
+        };
+        window.syncTrainingRecordToDB(record);
+    }
     try {
         var data = window.loadData();
         var idx = -1;
