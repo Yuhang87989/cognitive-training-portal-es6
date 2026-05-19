@@ -246,7 +246,7 @@ window.LocalDB = {
 };
 
 // 数据双向同步：IndexedDB <-> localStorage
-window.syncDBToLocalStorage = function() {
+window.syncToLocalDB = function() {
     // 从localStorage同步到IndexedDB
     const user = window.getCurrentUserData();
     if (user) LocalDB.save('userInfo', user, 'currentUser');
@@ -337,7 +337,7 @@ window.syncDBToLocalStorage = function() {
 };
 
 // 页面关闭时自动保存
-window.addEventListener('beforeunload', syncDBToLocalStorage);
+window.addEventListener('beforeunload', syncToLocalDB);
 
 // 初始化
 LocalDB.init();
@@ -505,3 +505,10 @@ window.syncChatHistoryToDB = function(history) {
 window.syncTrainingRecordToDB = function(record) {
     LocalDB.save('trainingRecords', record, record.id || Date.now().toString());
 };
+
+// ============================================================
+// ES6 Module Export - V256
+// ============================================================
+// 所有函数已挂载到window，ES6模块import后可通过window使用
+// 例如：import './local-db.js'; 然后 window.syncToLocalDB();
+export default 'local-db-module-loaded';
