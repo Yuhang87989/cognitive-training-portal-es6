@@ -1,5 +1,5 @@
 // 版本: V231 - ES6 Module
-// 模拟考试模块 - 独立功能模块
+// 模拟考试模块 - 独立功能模块（增强版）
 
 const examModule = {
     name: 'exam',
@@ -21,7 +21,9 @@ let currentExam = {
     answers: {},
     startTime: null,
     timeLimit: 30 * 60, // 30分钟
-    timer: null
+    timer: null,
+    mode: 'auto', // auto=系统出题, manual=上传试卷
+    uploadedPaper: null // 上传的试卷图片
 };
 
 let examHistory = [];
@@ -43,56 +45,275 @@ const examConfig = {
     }
 };
 
+// 仿真笔迹样式
+const handwritingStyles = `
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&display=swap');
+        
+        .handwriting-mode {
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+        
+        .handwriting-mode .card {
+            background: linear-gradient(to bottom, #fffdf5 0%, #fff9e6 100%);
+            border: 1px solid #e8dcc8;
+            box-shadow: 2px 2px 8px rgba(139, 119, 101, 0.15);
+        }
+        
+        .handwriting-mode .question-card {
+            background: white;
+            border: 1px solid #d4c4a8;
+            position: relative;
+        }
+        
+        .handwriting-mode .question-card::before {
+            content: '';
+            position: absolute;
+            left: 60px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #ffcccc;
+        }
+        
+        .handwriting-mode .option-btn {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 18px;
+            border: 2px dashed #c4b59d;
+            transition: all 0.3s;
+        }
+        
+        .handwriting-mode .option-btn:hover {
+            border-style: solid;
+            transform: scale(1.02);
+        }
+        
+        .handwriting-mode .option-btn.selected {
+            background: #fff3e0;
+            border-color: #ff9800;
+            border-style: solid;
+        }
+        
+        .handwriting-mode .question-number {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 28px;
+            color: #8b7355;
+        }
+        
+        .handwriting-mode .question-text {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 17px;
+            line-height: 1.8;
+            color: #2d1f1a;
+        }
+        
+        .paper-upload-area {
+            border: 3px dashed #ccc;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+        
+        .paper-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .paper-preview {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .answer-sheet-area {
+            background: #fffdf5;
+            border: 2px solid #e8dcc8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+        
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .answer-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #d4c4a8;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .answer-cell:hover {
+            background: #fff3e0;
+            border-color: #ff9800;
+        }
+        
+        .answer-cell.filled {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .mode-toggle {
+            display: flex;
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .mode-toggle-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+`;
+
 // 渲染主界面
 function renderExam(container) {
-    container.innerHTML = `
+    container.innerHTML = handwritingStyles + `
         <div class="card">
             <h3 style="margin-bottom:16px;">📝 模拟考试</h3>
             <p style="color:#666;font-size:13px;margin-bottom:20px;">全真模拟，实战演练，检验学习成果</p>
             
-            <div style="margin-bottom:20px;">
-                <label style="display:block;margin-bottom:8px;font-weight:600;">选择科目</label>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-                    ${Object.entries(examConfig.subjects).map(([key, val]) => `
-                        <button 
-                            onclick="selectExamSubject('${key}', this)"
-                            class="subject-btn ${key === currentExam.subject ? 'active' : ''}"
-                            style="padding:12px;border:2px solid ${key === currentExam.subject ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${key === currentExam.subject ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
-                        >
-                            ${val.icon} ${val.name}
-                        </button>
-                    `).join('')}
+            <!-- 考试模式切换 -->
+            <div class="mode-toggle">
+                <button class="mode-toggle-btn ${currentExam.mode === 'auto' ? 'active' : ''}" onclick="setExamMode('auto')">
+                    🤖 系统出题
+                </button>
+                <button class="mode-toggle-btn ${currentExam.mode === 'manual' ? 'active' : ''}" onclick="setExamMode('manual')">
+                    📄 上传试卷
+                </button>
+            </div>
+            
+            <div id="auto-mode-config" style="${currentExam.mode === 'manual' ? 'display:none' : ''}">
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">选择科目</label>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        ${Object.entries(examConfig.subjects).map(([key, val]) => `
+                            <button 
+                                onclick="selectExamSubject('${key}', this)"
+                                class="subject-btn ${key === currentExam.subject ? 'active' : ''}"
+                                style="padding:12px;border:2px solid ${key === currentExam.subject ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${key === currentExam.subject ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
+                            >
+                                ${val.icon} ${val.name}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">选择年级</label>
+                    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+                        ${examConfig.grades.map(grade => `
+                            <button 
+                                onclick="selectExamGrade(${grade}, this)"
+                                class="grade-btn ${grade === currentExam.grade ? 'active' : ''}"
+                                style="padding:10px;border:2px solid ${grade === currentExam.grade ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${grade === currentExam.grade ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
+                            >
+                                ${grade}年级
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">选择难度</label>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                        ${Object.entries(examConfig.difficulties).map(([key, val]) => `
+                            <button 
+                                onclick="selectExamDifficulty('${key}', this)"
+                                class="diff-btn ${key === currentExam.difficulty ? 'active' : ''}"
+                                style="padding:12px;border:2px solid ${key === currentExam.difficulty ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${key === currentExam.difficulty ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
+                            >
+                                ${val.name}<br>
+                                <span style="font-size:11px;color:#666;">${val.questionCount}题 / ${val.time}分钟</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <!-- 仿真笔迹开关 -->
+                <div style="margin-bottom:20px;padding:12px;background:#f5f7ff;border-radius:10px;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-weight:600;">✍️ 仿真笔迹模式</div>
+                        <div style="font-size:12px;color:#666;">使用手写字体，模拟真实考试答题体验</div>
+                    </div>
+                    <label style="position:relative;display:inline-block;width:50px;height:26px;">
+                        <input type="checkbox" id="handwriting-toggle" style="opacity:0;width:0;height:0;" onchange="toggleHandwriting()">
+                        <span style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:26px;transition:.4s;">
+                            <span style="position:absolute;content:'';height:20px;width:20px;left:3px;bottom:3px;background-color:white;border-radius:50%;transition:.4s;"></span>
+                        </span>
+                    </label>
                 </div>
             </div>
             
-            <div style="margin-bottom:20px;">
-                <label style="display:block;margin-bottom:8px;font-weight:600;">选择年级</label>
-                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
-                    ${examConfig.grades.map(grade => `
-                        <button 
-                            onclick="selectExamGrade(${grade}, this)"
-                            class="grade-btn ${grade === currentExam.grade ? 'active' : ''}"
-                            style="padding:10px;border:2px solid ${grade === currentExam.grade ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${grade === currentExam.grade ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
-                        >
-                            ${grade}年级
-                        </button>
-                    `).join('')}
+            <div id="manual-mode-config" style="${currentExam.mode === 'auto' ? 'display:none' : ''}">
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">📄 上传试卷</label>
+                    <div class="paper-upload-area" onclick="document.getElementById('paper-upload').click()" id="paper-upload-area">
+                        <div style="font-size:48px;margin-bottom:12px;">📷</div>
+                        <div style="font-weight:600;margin-bottom:8px;">点击上传试卷照片</div>
+                        <div style="font-size:13px;color:#666;">支持拍照或从相册选择</div>
+                    </div>
+                    <input type="file" id="paper-upload" accept="image/*" style="display:none;" onchange="handlePaperUpload(this)">
+                    
+                    <div id="paper-preview-container" style="display:none;margin-top:16px;">
+                        <img id="paper-preview" class="paper-preview" />
+                        <div style="display:flex;gap:10px;margin-top:12px;">
+                            <button onclick="clearUploadedPaper()" style="flex:1;padding:10px;background:#f5f5f5;color:#666;border:none;border-radius:8px;cursor:pointer;">重新上传</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div style="margin-bottom:20px;">
-                <label style="display:block;margin-bottom:8px;font-weight:600;">选择难度</label>
-                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-                    ${Object.entries(examConfig.difficulties).map(([key, val]) => `
-                        <button 
-                            onclick="selectExamDifficulty('${key}', this)"
-                            class="diff-btn ${key === currentExam.difficulty ? 'active' : ''}"
-                            style="padding:12px;border:2px solid ${key === currentExam.difficulty ? '#3377FF' : '#e0e0e0'};border-radius:10px;background:${key === currentExam.difficulty ? '#e8f0ff' : 'white'};cursor:pointer;font-weight:600;"
-                        >
-                            ${val.name}<br>
-                            <span style="font-size:11px;color:#666;">${val.questionCount}题 / ${val.time}分钟</span>
-                        </button>
-                    `).join('')}
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">⏱️ 考试时长</label>
+                    <select id="manual-time-select" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                        <option value="30">30分钟</option>
+                        <option value="45">45分钟</option>
+                        <option value="60">60分钟</option>
+                        <option value="90">90分钟</option>
+                        <option value="120">120分钟</option>
+                    </select>
+                </div>
+                
+                <div style="margin-bottom:20px;">
+                    <label style="display:block;margin-bottom:8px;font-weight:600;">📝 题目数量</label>
+                    <select id="manual-question-count" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                        <option value="10">10题</option>
+                        <option value="15">15题</option>
+                        <option value="20">20题</option>
+                        <option value="25">25题</option>
+                        <option value="30">30题</option>
+                        <option value="50">50题</option>
+                    </select>
                 </div>
             </div>
             
@@ -114,6 +335,57 @@ function renderExam(container) {
     
     // 从本地存储加载历史记录
     loadExamHistory();
+}
+
+// 切换考试模式
+function setExamMode(mode) {
+    currentExam.mode = mode;
+    
+    document.querySelectorAll('.mode-toggle-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', (idx === 0 && mode === 'auto') || (idx === 1 && mode === 'manual'));
+    });
+    
+    document.getElementById('auto-mode-config').style.display = mode === 'auto' ? 'block' : 'none';
+    document.getElementById('manual-mode-config').style.display = mode === 'manual' ? 'block' : 'none';
+}
+
+// 处理试卷上传
+function handlePaperUpload(input) {
+    if (!input.files || !input.files[0]) return;
+    
+    const file = input.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        currentExam.uploadedPaper = e.target.result;
+        
+        const preview = document.getElementById('paper-preview');
+        const container = document.getElementById('paper-preview-container');
+        const uploadArea = document.getElementById('paper-upload-area');
+        
+        preview.src = e.target.result;
+        container.style.display = 'block';
+        uploadArea.style.display = 'none';
+        
+        showToast('试卷上传成功！');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// 清除上传的试卷
+function clearUploadedPaper() {
+    currentExam.uploadedPaper = null;
+    document.getElementById('paper-preview-container').style.display = 'none';
+    document.getElementById('paper-upload-area').style.display = 'block';
+    document.getElementById('paper-upload').value = '';
+}
+
+// 仿真笔迹开关
+let handwritingEnabled = false;
+function toggleHandwriting() {
+    handwritingEnabled = document.getElementById('handwriting-toggle').checked;
+    showToast(handwritingEnabled ? '已开启仿真笔迹模式 ✍️' : '已关闭仿真笔迹模式');
 }
 
 // 选择科目
@@ -151,20 +423,153 @@ function selectExamDifficulty(difficulty, btn) {
 
 // 开始新考试
 function startNewExam() {
-    const config = examConfig.difficulties[currentExam.difficulty];
-    const subjectInfo = examConfig.subjects[currentExam.subject];
-    
-    // 生成题目
-    currentExam.questions = generateExamQuestions(currentExam.subject, currentExam.grade, config.questionCount);
-    currentExam.answers = {};
-    currentExam.timeLimit = config.time * 60;
-    currentExam.startTime = Date.now();
-    
-    // 渲染考试界面
-    renderExamInterface(subjectInfo, config);
+    if (currentExam.mode === 'manual') {
+        // 上传试卷模式
+        const timeSelect = document.getElementById('manual-time-select');
+        const countSelect = document.getElementById('manual-question-count');
+        const time = parseInt(timeSelect.value);
+        const count = parseInt(countSelect.value);
+        
+        if (!currentExam.uploadedPaper) {
+            showToast('请先上传试卷照片！');
+            return;
+        }
+        
+        // 生成答题卡题目（只有编号，没有题目内容）
+        currentExam.questions = [];
+        for (let i = 1; i <= count; i++) {
+            currentExam.questions.push({
+                id: i,
+                question: `第 ${i} 题`,
+                answer: 'A',
+                explanation: '请自行对照答案',
+                type: 'manual',
+                options: ['A', 'B', 'C', 'D']
+            });
+        }
+        currentExam.answers = {};
+        currentExam.timeLimit = time * 60;
+        currentExam.startTime = Date.now();
+        
+        // 渲染手动答题界面
+        renderManualExamInterface(time, count);
+        
+    } else {
+        // 系统出题模式
+        const config = examConfig.difficulties[currentExam.difficulty];
+        const subjectInfo = examConfig.subjects[currentExam.subject];
+        
+        // 生成题目
+        currentExam.questions = generateExamQuestions(currentExam.subject, currentExam.grade, config.questionCount);
+        currentExam.answers = {};
+        currentExam.timeLimit = config.time * 60;
+        currentExam.startTime = Date.now();
+        
+        // 渲染考试界面
+        renderExamInterface(subjectInfo, config);
+    }
     
     // 开始计时
     startExamTimer();
+}
+
+// 渲染手动答题界面（上传试卷）
+function renderManualExamInterface(time, count) {
+    const container = document.getElementById('fullscreen-content');
+    if (!container) return;
+    
+    container.innerHTML = handwritingStyles + `
+        <div class="${handwritingEnabled ? 'handwriting-mode' : ''}" style="padding:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div>
+                    <span style="font-size:20px;font-weight:600;">📄 自定义试卷</span>
+                    <span style="margin-left:10px;font-size:13px;color:#666;">${count}题 / ${time}分钟</span>
+                </div>
+                <div id="exam-timer" style="font-size:24px;font-weight:bold;color:#FF6B6B;">
+                    ${Math.floor(time/60).toString().padStart(2,'0')}:${(time%60).toString().padStart(2,'0')}
+                </div>
+            </div>
+            
+            <!-- 试卷图片 -->
+            <div style="margin-bottom:16px;background:#f5f5f5;border-radius:12px;overflow:hidden;">
+                <img src="${currentExam.uploadedPaper}" style="width:100%;display:block;" />
+            </div>
+            
+            <!-- 答题卡 -->
+            <div class="answer-sheet-area">
+                <div style="text-align:center;margin-bottom:16px;font-weight:600;font-size:18px;">
+                    ✍️ 答题卡
+                </div>
+                <div class="answer-grid" id="answer-grid">
+                    ${currentExam.questions.map((q, idx) => `
+                        <div 
+                            class="answer-cell"
+                            id="answer-cell-${idx}"
+                            onclick="selectManualAnswer(${idx})"
+                        >
+                            ${idx + 1}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            <!-- 选项选择器 -->
+            <div id="option-selector" style="display:none;position:fixed;bottom:0;left:0;right:0;background:white;padding:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.15);border-radius:20px 20px 0 0;z-index:1000;">
+                <div style="text-align:center;margin-bottom:12px;font-weight:600;">选择答案</div>
+                <div style="display:flex;gap:12px;justify-content:center;">
+                    ${['A', 'B', 'C', 'D'].map(opt => `
+                        <button 
+                            onclick="setManualAnswer('${opt}')"
+                            style="width:60px;height:60px;border:2px solid #ddd;border-radius:12px;font-size:24px;font-weight:bold;background:white;cursor:pointer;"
+                        >
+                            ${opt}
+                        </button>
+                    `).join('')}
+                </div>
+                <button onclick="closeOptionSelector()" style="margin-top:12px;width:100%;padding:12px;background:#f5f5f5;color:#666;border:none;border-radius:8px;cursor:pointer;">取消</button>
+            </div>
+            
+            <div style="position:sticky;bottom:0;left:0;right:0;background:white;padding:16px 0;border-top:1px solid #eee;margin-top:16px;">
+                <div style="display:flex;gap:12px;">
+                    <button 
+                        onclick="submitExam()"
+                        style="flex:1;padding:14px;background:linear-gradient(135deg,#FF6B6B,#FF9A63);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;"
+                    >
+                        ✅ 交卷
+                    </button>
+                </div>
+                <div style="text-align:center;margin-top:8px;font-size:12px;color:#999;">
+                    已答：<span id="answered-count">0</span> / ${currentExam.questions.length}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+let currentSelectingQuestion = -1;
+
+function selectManualAnswer(idx) {
+    currentSelectingQuestion = idx;
+    document.getElementById('option-selector').style.display = 'block';
+}
+
+function setManualAnswer(option) {
+    if (currentSelectingQuestion < 0) return;
+    
+    currentExam.answers[currentSelectingQuestion] = option;
+    const cell = document.getElementById(`answer-cell-${currentSelectingQuestion}`);
+    if (cell) {
+        cell.textContent = option;
+        cell.classList.add('filled');
+    }
+    
+    closeOptionSelector();
+    updateAnsweredCount();
+}
+
+function closeOptionSelector() {
+    currentSelectingQuestion = -1;
+    document.getElementById('option-selector').style.display = 'none';
 }
 
 // 生成考试题目
@@ -242,19 +647,6 @@ function generateBackupQuestions(subject, grade, count) {
 
 // 生成选项
 function generateOptions(correctAnswer, subject) {
-    const options = [correctAnswer];
-    const distractors = generateDistractors(correctAnswer, subject);
-    
-    while (options.length < 4 && distractors.length > 0) {
-        const idx = Math.floor(Math.random() * distractors.length);
-        options.push(distractors.splice(idx, 1)[0]);
-    }
-    
-    return shuffleArray(options);
-}
-
-// 生成干扰项
-function generateDistractors(correctAnswer, subject) {
     const distractors = [];
     const num = parseFloat(correctAnswer);
     
@@ -263,15 +655,15 @@ function generateDistractors(correctAnswer, subject) {
         distractors.push(String(num + 1));
         distractors.push(String(num - 1));
         distractors.push(String(num * 2));
-        distractors.push(String(Math.floor(num / 2)));
     } else {
         // 文字干扰项
-        distractors.push(correctAnswer + '（错误）');
-        distractors.push('其他' + correctAnswer);
+        distractors.push('其他选项');
         distractors.push('不正确答案');
+        distractors.push('以上都不对');
     }
     
-    return distractors.filter(d => d !== correctAnswer);
+    const options = [correctAnswer, ...distractors.slice(0, 3)];
+    return shuffleArray(options);
 }
 
 // 打乱数组
@@ -289,8 +681,8 @@ function renderExamInterface(subjectInfo, config) {
     const container = document.getElementById('fullscreen-content');
     if (!container) return;
     
-    container.innerHTML = `
-        <div style="padding:16px;">
+    container.innerHTML = handwritingStyles + `
+        <div class="${handwritingEnabled ? 'handwriting-mode' : ''}" style="padding:16px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
                 <div>
                     <span style="font-size:20px;font-weight:600;">${subjectInfo.icon} ${subjectInfo.name}模拟考试</span>
@@ -303,23 +695,24 @@ function renderExamInterface(subjectInfo, config) {
             
             <div id="exam-questions-container" style="max-height:calc(100vh - 250px);overflow-y:auto;padding-right:8px;">
                 ${currentExam.questions.map((q, index) => `
-                    <div class="card" id="question-${index}" style="margin-bottom:16px;">
+                    <div class="card question-card" id="question-${index}" style="margin-bottom:16px;">
                         <div style="display:flex;gap:12px;">
-                            <div style="background:#3377FF;color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;">
+                            <div class="question-number" style="background:#3377FF;color:white;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;">
                                 ${index + 1}
                             </div>
                             <div style="flex:1;">
-                                <div style="font-weight:600;margin-bottom:12px;line-height:1.5;">${q.question}</div>
+                                <div class="question-text" style="font-weight:600;margin-bottom:12px;line-height:1.6;">${q.question}</div>
                                 <div style="display:flex;flex-direction:column;gap:8px;">
                                     ${q.options.map((opt, optIdx) => `
-                                        <label 
-                                            onclick="selectAnswer(${index}, '${optIdx}')"
-                                            style="padding:10px 14px;background:#f8f9fa;border:2px solid #e0e0e0;border-radius:8px;cursor:pointer;transition:all 0.2s;"
+                                        <button 
+                                            onclick="selectAnswer(${index}, ${optIdx})"
+                                            class="option-btn"
                                             id="option-${index}-${optIdx}"
+                                            style="padding:12px 16px;background:#f8f9fa;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;text-align:left;transition:all 0.2s;font-size:14px;"
                                         >
                                             <span style="font-weight:600;margin-right:8px;">${String.fromCharCode(65 + optIdx)}.</span>
                                             ${opt}
-                                        </label>
+                                        </button>
                                     `).join('')}
                                 </div>
                             </div>
@@ -361,6 +754,7 @@ function selectAnswer(questionIndex, optionIndex) {
     if (selectedEl) {
         selectedEl.style.background = '#e8f0ff';
         selectedEl.style.borderColor = '#3377FF';
+        selectedEl.classList.add('selected');
     }
     
     // 记录答案
@@ -436,11 +830,13 @@ function submitExam() {
         subject: currentExam.subject,
         grade: currentExam.grade,
         difficulty: currentExam.difficulty,
+        mode: currentExam.mode,
         score,
         total: currentExam.questions.length,
         correct: correctCount,
         timeUsed,
-        results
+        results,
+        hasPaper: !!currentExam.uploadedPaper
     };
     
     examHistory.unshift(record);
@@ -455,7 +851,7 @@ function renderExamResult(record) {
     const container = document.getElementById('fullscreen-content');
     if (!container) return;
     
-    const subjectInfo = examConfig.subjects[record.subject];
+    const subjectInfo = examConfig.subjects[record.subject] || { name: '自定义', icon: '📄' };
     const percentage = Math.round((record.correct / record.total) * 100);
     const minutes = Math.floor(record.timeUsed / 60);
     const seconds = record.timeUsed % 60;
@@ -483,8 +879,15 @@ function renderExamResult(record) {
                 </div>
             </div>
             
-            <h4 style="margin:20px 0 12px;">📋 题目解析</h4>
-            <div style="max-height:calc(100vh - 350px);overflow-y:auto;padding-right:8px;">
+            ${record.hasPaper ? `
+                <div style="margin-top:16px;">
+                    <div style="font-weight:600;margin-bottom:8px;">📄 你的试卷</div>
+                    <img src="${currentExam.uploadedPaper}" style="width:100%;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);" />
+                </div>
+            ` : ''}
+            
+            <h4 style="margin:20px 0 12px;">📋 答题详情</h4>
+            <div style="max-height:calc(100vh - 400px);overflow-y:auto;padding-right:8px;">
                 ${record.results.map((r, index) => `
                     <div class="card" style="margin-bottom:12px;padding:14px;border-left:4px solid ${r.isCorrect ? '#43E97B' : '#FF6B6B'};">
                         <div style="display:flex;align-items:flex-start;gap:10px;">
@@ -512,13 +915,13 @@ function renderExamResult(record) {
             
             <div style="display:flex;gap:12px;margin-top:16px;">
                 <button 
-                    onclick="startNewExam()"
+                    onclick="renderExam(document.getElementById('fullscreen-content'))"
                     style="flex:1;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;"
                 >
-                    🔄 再考一次
+                    🔄 再来一次
                 </button>
                 <button 
-                    onclick="renderExam(document.getElementById('fullscreen-content'))"
+                    onclick="closeFullscreenPage()"
                     style="flex:1;padding:14px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;"
                 >
                     📝 返回首页
@@ -535,13 +938,13 @@ function renderExamHistory() {
     }
     
     return examHistory.slice(0, 10).map(record => {
-        const subjectInfo = examConfig.subjects[record.subject];
+        const subjectInfo = examConfig.subjects[record.subject] || { name: '自定义', icon: '📄' };
         const percentage = Math.round((record.correct / record.total) * 100);
         return `
             <div style="display:flex;align-items:center;padding:12px;background:white;border-radius:10px;margin-bottom:8px;">
                 <div style="font-size:24px;margin-right:12px;">${subjectInfo.icon}</div>
                 <div style="flex:1;">
-                    <div style="font-weight:600;font-size:14px;">${subjectInfo.name} - ${examConfig.difficulties[record.difficulty].name}</div>
+                    <div style="font-weight:600;font-size:14px;">${subjectInfo.name} ${record.mode === 'manual' ? '·上传试卷' : '·' + examConfig.difficulties[record.difficulty]?.name}</div>
                     <div style="font-size:12px;color:#999;">${record.date}</div>
                 </div>
                 <div style="text-align:right;">
@@ -577,11 +980,18 @@ function loadExamHistory() {
 
 // 挂载到window
 window.renderExam = renderExam;
+window.setExamMode = setExamMode;
+window.handlePaperUpload = handlePaperUpload;
+window.clearUploadedPaper = clearUploadedPaper;
+window.toggleHandwriting = toggleHandwriting;
 window.selectExamSubject = selectExamSubject;
 window.selectExamGrade = selectExamGrade;
 window.selectExamDifficulty = selectExamDifficulty;
 window.startNewExam = startNewExam;
 window.selectAnswer = selectAnswer;
+window.selectManualAnswer = selectManualAnswer;
+window.setManualAnswer = setManualAnswer;
+window.closeOptionSelector = closeOptionSelector;
 window.submitExam = submitExam;
 
 // ES6导出
@@ -592,4 +1002,4 @@ export {
     submitExam
 };
 
-console.log('[V231] 模拟考试模块加载完成');
+console.log('[V231] 模拟考试模块（增强版）加载完成');
