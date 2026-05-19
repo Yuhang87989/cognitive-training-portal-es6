@@ -204,3 +204,6 @@ window.toggleWeekTask = toggleWeekTask;
 };
 
 console.log('[ES6 Module] plan.js 模块加载完成');
+
+// ES6 Module导出
+export { renderPlan };

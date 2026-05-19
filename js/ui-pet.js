@@ -1,12 +1,17 @@
 // 虚拟宠物UI渲染模块
 
-import { showToast } from './utils.js';
+import { showToast } from './modules/utils.js';
+import './modules/pet.js';
 
 // 渲染宠物主页
-export async function renderPetPage(container) {
-    const { default: pet } = await import('./modules/pet.js');
+export function renderPetPage(container) {
+    // 确保pet模块已初始化
+    if (typeof window.petModule === 'undefined') {
+        setTimeout(() => renderPetPage(container), 100);
+        return;
+    }
     
-    // 初始化宠物模块
+    const pet = window.petModule;
     pet.init();
     
     const data = pet.getData();
@@ -132,10 +137,11 @@ export async function renderPetPage(container) {
 
 // 绑定宠物页面事件
 function bindPetEvents(container, pet, data) {
-    // 返回按钮
+    // 返回按钮 - 使用关闭全屏页面
     container.querySelector('#petBackBtn').addEventListener('click', () => {
-        // 返回我的页面
-        renderMyCenter(container);
+        if (typeof window.closeFullscreenPage === 'function') {
+            window.closeFullscreenPage();
+        }
     });
     
     // 喂食
@@ -197,7 +203,7 @@ function updatePetDisplay(container, pet) {
     container.querySelector('.pet-name').textContent = data.name;
     container.querySelector('.pet-mood').textContent = moodState.emoji + ' ' + moodState.name + ' · ' + moodState.desc;
     container.querySelector('.exp-fill').style.width = (data.exp / data.expToNextLevel) * 100 + '%';
-    container.querySelector('.stat-value').textContent = data.exp + ' / ' + data.expToNextLevel;
+    container.querySelectorAll('.stat-value')[0].textContent = data.exp + ' / ' + data.expToNextLevel;
     container.querySelector('.health-fill').style.width = data.health + '%';
 }
 
@@ -209,6 +215,9 @@ function animatePet(container) {
         emoji.style.transform = 'scale(1)';
     }, 300);
 }
+
+// Window导出
+window.renderPet = renderPetPage;
 
 export default {
     renderPetPage

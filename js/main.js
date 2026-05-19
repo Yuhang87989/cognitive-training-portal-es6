@@ -33,6 +33,10 @@ import './audio.js';
 import './modules/ui.js';
 import './modules/pet.js';
 import './ui-pet.js';
+import './modules/map.js';
+import './modules/mindmap.js';
+import './modules/deepseek.js';
+import './modules/plan.js';
 
 // 数据模块 - 这些是配置数据，需要预先加载
 import './data/topics.js';

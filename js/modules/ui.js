@@ -371,7 +371,8 @@ function openFullscreenPage(module) {
     switch(module) {
         case 'ai': if (typeof window.renderDeepseek === 'function') window.renderDeepseek(contentEl); break;
         case 'practice': if (typeof renderPractice === 'function') window.renderPractice(contentEl); break;
-        case 'map': if (typeof renderMap === 'function') window.renderMap(contentEl); break;
+        case 'map': 
+        case 'mindmap': if (typeof renderMap === 'function') window.renderMap(contentEl); break;
         case 'plan': if (typeof window.renderPlan === 'function') window.renderPlan(contentEl); break;
         case 'topics': if (typeof renderTopics === 'function') renderTopics(contentEl); break;
         case 'method': if (typeof renderMethod === 'function') window.renderMethod(contentEl); break;
@@ -408,8 +409,8 @@ function openFullscreenPage(module) {
             }
             break;
         case 'pet': 
-            if (typeof window.renderPetPage === 'function') {
-                window.renderPetPage(contentEl);
+            if (typeof window.renderPet === 'function') {
+                window.renderPet(contentEl);
             } else {
                 contentEl.innerHTML = '<div class="card" style="text-align:center;padding:40px;"><p>🐱 虚拟宠物加载中...</p></div>';
             }

@@ -274,3 +274,20 @@ export default {
     getMoodState,
     getState
 };
+
+// Window导出
+window.petModule = {
+    init: initPet,
+    getData: getPetData,
+    addExp,
+    addMood,
+    feed: feedPet,
+    play: playWithPet,
+    pet: petPet,
+    rename: renamePet,
+    changeSkin,
+    getCurrentSkin,
+    getAllSkins,
+    getMoodState,
+    getState
+};
