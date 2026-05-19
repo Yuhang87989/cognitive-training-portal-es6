@@ -617,11 +617,6 @@ window.openChangePasswordModal = openChangePasswordModal;
 window.openManageUserModal = openManageUserModal;
 
 // ============================================================
-// ES6 Module Export - V225 ES6改造
+// ES6 Module Export - V256修复
 // ============================================================
-    toggleUserMenu,
-    closeUserMenuOutside,
-    showUserSwitchModal,
-    showCreateUserModal,
-    quickLogin,
-    openManageUserModal
+// 所有函数已挂载到window，ES6模块可以直接import

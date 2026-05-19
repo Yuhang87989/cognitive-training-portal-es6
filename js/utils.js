@@ -421,9 +421,6 @@ window.loadModuleData = loadModuleData;
 // User - 用户管理
 // ============================================================
 // ============================================================
-// ES6 Module Export - V225 ES6改造
+// ES6 Module Export - V256修复
 // ============================================================
-    showToast,
-    cleanupModuleState,
-    loadScript,
-    loadModuleData
+// 所有函数已挂载到window，ES6模块可以直接import

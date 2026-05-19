@@ -754,13 +754,4 @@ if (document.readyState === 'loading') {
 // ============================================================
 // ES6 Module Export - V225 ES6改造
 // ============================================================
-    loadData,
-    saveData,
-    saveUserData,
-    getCurrentUserData,
-    migrateData,
-    saveImageFile,
-    getImageFile,
-    getImageFileAsDataUrl,
-    deleteImageFile,
-    clearAllImageFiles
+// 注意：所有函数已挂载到window，传统模式和ES6模式都可以使用
