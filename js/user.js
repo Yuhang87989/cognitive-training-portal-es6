@@ -97,9 +97,9 @@ function quickLogin(userId) {
     if (dropdown) dropdown.classList.remove('show');
     
     // 刷新主界面UI（如果主界面已加载）
-    if (typeof updateUI === 'function') updateUI();
-    if (typeof syncTodayStats === 'function') syncTodayStats();
-    if (typeof renderUserList === 'function') renderUserList();
+    if (typeof window.updateUI === 'function') window.updateUI();
+    if (typeof window.syncTodayStats === 'function') window.syncTodayStats();
+    if (typeof window.renderUserList === 'function') window.renderUserList();
 }
 
 function openEditProfileModal() {

@@ -45,9 +45,9 @@ function closeWelcomeModal() {
     }
 }
 
-function window.closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
+function closeDetail() { document.getElementById('detail-modal').classList.remove('show'); }
 
-function window.closeModal(modalId) {
+function closeModal(modalId) {
     if (!modalId) {
         // 如果没有指定 modalId，默认关闭 detail-modal
         const modal = document.getElementById('detail-modal');
@@ -368,22 +368,22 @@ function openFullscreenPage(module) {
         return;
     }
     
-    // V255: 直接调用渲染函数（所有模块已预先加载）
+    // V256: ES6模块已在main.js中import，所有渲染函数挂载在window上
     switch(module) {
         case 'ai': if (typeof window.renderDeepseek === 'function') window.renderDeepseek(contentEl); break;
-        case 'practice': if (typeof renderPractice === 'function') window.renderPractice(contentEl); break;
-        case 'map': if (typeof renderMap === 'function') window.renderMap(contentEl); break;
+        case 'practice': if (typeof window.renderPractice === 'function') window.renderPractice(contentEl); break;
+        case 'map': if (typeof window.renderMap === 'function') window.renderMap(contentEl); break;
         case 'plan': if (typeof window.renderPlan === 'function') window.renderPlan(contentEl); break;
-        case 'topics': if (typeof renderTopics === 'function') renderTopics(contentEl); break;
-        case 'method': if (typeof renderMethod === 'function') window.renderMethod(contentEl); break;
-        case 'thinking': if (typeof renderThinking === 'function') renderThinking(contentEl); break;
-        case 'podcast': if (typeof renderPodcast === 'function') window.renderPodcast(contentEl); break;
-        case 'video': if (typeof renderVideo === 'function') window.renderVideo(contentEl); break;
-        case 'games': if (typeof renderGames === 'function') renderGames(contentEl); break;
+        case 'topics': if (typeof window.renderTopics === 'function') window.renderTopics(contentEl); break;
+        case 'method': if (typeof window.renderMethod === 'function') window.renderMethod(contentEl); break;
+        case 'thinking': if (typeof window.renderThinking === 'function') window.renderThinking(contentEl); break;
+        case 'podcast': if (typeof window.renderPodcast === 'function') window.renderPodcast(contentEl); break;
+        case 'video': if (typeof window.renderVideo === 'function') window.renderVideo(contentEl); break;
+        case 'games': if (typeof window.renderGames === 'function') window.renderGames(contentEl); break;
         case 'deepseek': if (typeof window.renderDeepseek === 'function') window.renderDeepseek(contentEl); break;
-        case 'wrongbook': if (typeof renderWrongbook === 'function') renderWrongbook(contentEl); break;
+        case 'wrongbook': if (typeof window.renderWrongbook === 'function') window.renderWrongbook(contentEl); break;
         case 'exam': if (typeof window.renderExam === 'function') window.renderExam(contentEl); break;
-        case 'pomodoro': if (typeof renderPomodoro === 'function') renderPomodoro(contentEl); break;
+        case 'pomodoro': if (typeof window.renderPomodoro === 'function') window.renderPomodoro(contentEl); break;
         case 'my': if (typeof window.renderMyPage === 'function') window.renderMyPage(contentEl); break;
         case 'journal': 
             if (typeof window.renderJournalModule === 'function') {
@@ -1037,7 +1037,7 @@ function renderSlide() {
 }
 
 
-function window.selectThinkingOpt(el, selectedIdx, questionIdx) {
+function selectThinkingOpt(el, selectedIdx, questionIdx) {
     const parent = el.parentElement;
     parent.querySelectorAll('.thinking-opt').forEach(opt => {
         opt.style.background = 'white';
@@ -1539,6 +1539,7 @@ window.closeAboutModal = closeAboutModal;
 window.closeApiConfigModal = closeApiConfigModal;
 window.closeAvatarModal = closeAvatarModal;
 window.closeModal = closeModal;
+window.selectThinkingOpt = selectThinkingOpt;
 window.closeUpdateModal = closeUpdateModal;
 window.closeWelcomeModal = closeWelcomeModal;
 window.deleteUser = deleteUser;
