@@ -527,7 +527,7 @@ window.closeCreateUserModal = closeCreateUserModal;
 window.closeDeleteUserModal = closeDeleteUserModal;
 window.closeDifficultyModal = closeDifficultyModal;
 window.closeEditProfileModal = closeEditProfileModal;
-window.closeUserMenu = closeUserMenu; // 从ui.js导入
+// closeUserMenu 已在ui.js中挂载，无需重复挂载
 window.closeUserSwitchModal = closeUserSwitchModal;
 window.confirmDeleteUser = confirmDeleteUser;
 window.createNewUser = createNewUser;
