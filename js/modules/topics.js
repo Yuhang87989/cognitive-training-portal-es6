@@ -363,17 +363,6 @@ window.closeDetail = closeDetail;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderTopics,
-        selectTopicsGrade,
-        selectTopicsSubject,
-        loadTopicsList,
-        getTopicsList,
-        findTopic,
-        openTopicQuestion,
-        checkTopicAnswer,
-        analyzeTopicWithAI,
         uploadTopicPhoto,
         prevTopicsPage,
         nextTopicsPage,
@@ -389,3 +378,5 @@ if (typeof module !== 'undefined' && module.exports) {
     loadTopicsList,
     openTopicQuestion,
     checkTopicAnswer
+// ES6 Module兼容
+export {};

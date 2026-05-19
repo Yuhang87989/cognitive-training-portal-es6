@@ -135,19 +135,10 @@ window.deleteLocalVideo = deleteLocalVideo;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderVideo,
-        renderLocalVideoList,
-        filterVideoCourse,
-        playVideoFromList,
-        playLocalVideo,
-        deleteLocalVideo,
-        videoCourses: window.videoCourses
-    };
-}
 
     renderVideo,
     renderLocalVideoList,
     filterVideoCourse,
     playVideoFromList
+// ES6 Module兼容
+export {};

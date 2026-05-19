@@ -502,17 +502,6 @@ if (typeof CTM !== 'undefined') {
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        SelfDrive: window.SelfDrive,
-        renderSelfDrive,
-        calculateStreakDays,
-        hasCheckedInToday,
-        checkInToday,
-        renderGoalPage,
-        addGoal,
-        toggleGoal,
-        deleteGoal,
         renderHabitPage,
         addHabit,
         checkHabit,
@@ -529,4 +518,5 @@ window.renderGoalPage = renderGoalPage;
 window.renderHabitPage = renderHabitPage;
 window.renderAchievementPage = renderAchievementPage;
 window.renderDiaryPage = renderDiaryPage;
-window.renderMethodPage = renderMethodPage;
+window.renderMethodPage = renderMethodPage;// ES6 Module兼容
+export {};

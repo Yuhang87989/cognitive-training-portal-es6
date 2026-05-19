@@ -371,8 +371,9 @@ function openFullscreenPage(module) {
     switch(module) {
         case 'ai': if (typeof window.renderDeepseek === 'function') window.renderDeepseek(contentEl); break;
         case 'practice': if (typeof renderPractice === 'function') window.renderPractice(contentEl); break;
-        case 'map': 
-        case 'mindmap': if (typeof renderMap === 'function') window.renderMap(contentEl); break;
+        case 'map': if (typeof window.renderMap === 'function') window.renderMap(contentEl); break;
+        case 'mindmap': if (typeof window.renderMindMap === 'function') window.renderMindMap(contentEl); break;
+        case 'notepad': if (typeof window.renderNotepad === 'function') window.renderNotepad(contentEl); break;
         case 'plan': if (typeof window.renderPlan === 'function') window.renderPlan(contentEl); break;
         case 'topics': if (typeof renderTopics === 'function') renderTopics(contentEl); break;
         case 'method': if (typeof renderMethod === 'function') window.renderMethod(contentEl); break;

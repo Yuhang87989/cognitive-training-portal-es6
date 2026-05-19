@@ -738,17 +738,6 @@ window.stopPodcastAudio = stopPodcastAudio;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderPodcast,
-        renderPodcastListItems,
-        togglePodcastList,
-        onPodcastSelectChange,
-        playPodcastById,
-        podcastPlay,
-        podcastTogglePlay,
-        podcastPrev,
-        podcastNext,
         podcastCycleSpeed,
         askPodcastAI,
         togglePodcastVoice,
@@ -765,3 +754,5 @@ if (typeof module !== 'undefined' && module.exports) {
     podcastNext,
     podcastCycleSpeed,
     stopPodcastAudio
+// ES6 Module兼容
+export {};

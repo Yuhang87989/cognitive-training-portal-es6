@@ -843,17 +843,6 @@ window.photoToQuestion = photoToQuestion;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderThinking,
-        showThinkingType,
-        startThinkingQuiz,
-        selectThinkingOpt,
-        submitThinkingAnswers,
-        renderThinkingNotes,
-        handleThinkingNoteUpload,
-        deleteThinkingNote,
-        updateThinkingStats,
         rateThinkingAnswer,
         viewThinkingNote,
         analyzeThinkingWithAI,
@@ -866,3 +855,5 @@ if (typeof module !== 'undefined' && module.exports) {
     showThinkingType,
     startThinkingQuiz,
     submitThinkingAnswers
+// ES6 Module兼容
+export {};

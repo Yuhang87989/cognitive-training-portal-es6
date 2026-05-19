@@ -113,20 +113,6 @@ window.deleteNote = deleteNote;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderNotepad,
-        saveNote,
-        deleteNote,
-        loadNotes,
-        escapeHtml,
-        formatDate,
-        NOTEPAD_STORAGE_KEY,
-        NOTEPAD_NOTES_KEY
-    };
-}
 
-    renderNotepad,
-    saveNote,
-    deleteNote,
-    loadNotes
+// ES6 Module导出
+export { renderNotepad, saveNote, deleteNote };

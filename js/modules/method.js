@@ -1112,18 +1112,9 @@ window.showGameOver = showGameOver;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        startMethodQuiz,
-        rateMethodAnswer,
-        analyzeMethodWithAI,
-        conserveAnswer,
-        photoToQuestion,
-        showGameOver,
-        methodTrainingQuestions: window.methodTrainingQuestions
-    };
-}
 
     startMethodQuiz,
     rateMethodAnswer,
     analyzeMethodWithAI
+// ES6 Module兼容
+export {};

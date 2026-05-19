@@ -115,18 +115,9 @@ window.togglePomodoro = togglePomodoro;
 // ============================================================
 // ES6 Module 导出
 // ============================================================
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        renderPomodoro,
-        resetPomodoro,
-        setPomodoroTime,
-        togglePomodoro,
-        pomodoroTimer: window.pomodoroTimer,
-        pomodoroTime: window.pomodoroTime
-    };
-}
-
     renderPomodoro,
     resetPomodoro,
     setPomodoroTime,
     togglePomodoro
+// ES6 Module兼容
+export {};
