@@ -24,6 +24,8 @@ console.log('[V231] 脚本目录:', SCRIPT_DIR);
 
 // 导入核心模块 - 各模块会自行将关键函数挂载到window
 import './config.js';
+import './event-bus.js';
+import './store.js';
 import './ctm.js';
 import './db.js';
 import './storage.js';
