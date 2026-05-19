@@ -504,10 +504,24 @@ function openChangePasswordModal() {
 
 
 // ============================================================
+// 缺失的关闭按钮函数 - V247修复
+// ============================================================
+
+function closeAvatarModal() {
+    document.getElementById('avatar-modal').classList.remove('show');
+}
+
+function closeApiConfigModal() {
+    document.getElementById('api-config-modal').classList.remove('show');
+}
+
+// ============================================================
 // WeekPlans - 周计划数据
 // ============================================================
 
 // Window exports for onclick handlers
+window.closeApiConfigModal = closeApiConfigModal;
+window.closeAvatarModal = closeAvatarModal;
 window.closeChangePasswordModal = closeChangePasswordModal;
 window.closeCreateUserModal = closeCreateUserModal;
 window.closeDeleteUserModal = closeDeleteUserModal;

@@ -407,6 +407,13 @@ function openFullscreenPage(module) {
                 contentEl.innerHTML = '<div class="card" style="text-align:center;padding:40px;"><p>自驱力训练开发中...</p></div>';
             }
             break;
+        case 'pet': 
+            if (typeof window.renderPetPage === 'function') {
+                window.renderPetPage(contentEl);
+            } else {
+                contentEl.innerHTML = '<div class="card" style="text-align:center;padding:40px;"><p>🐱 虚拟宠物加载中...</p></div>';
+            }
+            break;
         case 'growth': 
             contentEl.innerHTML = `
                 <div style="padding:20px;">
