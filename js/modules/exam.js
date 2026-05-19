@@ -956,10 +956,23 @@ function renderExamHistory() {
     }).join('');
 }
 
-// 保存历史记录到本地存储
+// 保存历史记录到本地存储（双存储机制：独立键 + 用户数据）
 function saveExamHistory() {
     try {
-        localStorage.setItem('exam_history', JSON.stringify(examHistory.slice(0, 50))); // 最多保存50条
+        // 1. 保存到独立键（向后兼容）
+        localStorage.setItem('exam_history', JSON.stringify(examHistory.slice(0, 50)));
+        
+        // 2. 保存到用户数据（用于IndexedDB同步）
+        const user = window.getCurrentUserData ? window.getCurrentUserData() : {};
+        user.examHistory = examHistory.slice(0, 50);
+        if (window.saveUserData) {
+            window.saveUserData(user);
+        }
+        
+        // 3. 触发同步到IndexedDB
+        if (window.syncToLocalDB) {
+            setTimeout(window.syncToLocalDB, 100);
+        }
     } catch (e) {
         console.error('保存考试历史失败:', e);
     }
@@ -968,9 +981,22 @@ function saveExamHistory() {
 // 从本地存储加载历史记录
 function loadExamHistory() {
     try {
-        const saved = localStorage.getItem('exam_history');
+        // 先尝试从用户数据加载
+        let saved = null;
+        if (window.getCurrentUserData) {
+            const user = window.getCurrentUserData();
+            if (user && user.examHistory) {
+                saved = JSON.stringify(user.examHistory);
+            }
+        }
+        
+        // 用户数据没有，再从独立键加载
+        if (!saved) {
+            saved = localStorage.getItem('exam_history');
+        }
+        
         if (saved) {
-            examHistory = JSON.parse(saved);
+            examHistory = typeof saved === 'string' ? JSON.parse(saved) : saved;
         }
     } catch (e) {
         console.error('加载考试历史失败:', e);

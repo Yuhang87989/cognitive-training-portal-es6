@@ -1017,6 +1017,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Helvetica Neue'
         if (typeof window.initPortal === "function") {
             window.initPortal();
             console.log("[V229] 首页关键模块加载完成，已初始化");
+            
+            // V255: 从IndexedDB恢复数据到localStorage
+            if (typeof window.syncDBToLocalStorage === "function") {
+                setTimeout(function() {
+                    window.syncDBToLocalStorage();
+                    console.log("[V255] 已从本地数据库恢复数据");
+                }, 100);
+            }
+            
             // Register Service Worker
             if ("serviceWorker" in navigator) {
                 navigator.serviceWorker.register("./sw.js").catch(function(err) {});

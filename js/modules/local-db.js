@@ -252,17 +252,87 @@ window.syncDBToLocalStorage = function() {
     if (user) LocalDB.save('userInfo', user, 'currentUser');
     
     // 错题本同步
-    if (window.wrongBook && user.wrongNotes || []) {
+    if (window.wrongBook && user && user.wrongNotes) {
         LocalDB.save('wrongBook', user.wrongNotes || [], 'all');
+    }
+    
+    // 聊天记录同步
+    if (window.chatManager && user && user.chatHistory) {
+        LocalDB.save('chatHistory', { records: user.chatHistory }, 'all');
+    }
+    
+    // 训练记录同步
+    if (user && user.trainingRecords) {
+        LocalDB.save('trainingRecords', user.trainingRecords, 'all');
+    }
+    
+    // 模拟考试历史同步
+    if (user && user.examHistory) {
+        LocalDB.save('trainingRecords', user.examHistory, 'examHistory');
+    }
+    
+    // 学生日记同步
+    if (user && user.diaryEntries) {
+        LocalDB.save('trainingRecords', user.diaryEntries, 'diaryEntries');
     }
     
     console.log('数据已同步到本地数据库');
 };
 
-window.syncLocalStorageToDB = function() {
+window.syncDBToLocalStorage = function() {
     // 从IndexedDB恢复到localStorage
     LocalDB.get('userInfo', 'currentUser').then(function(user) {
-        if (user) localStorage.setItem('cognitive_user', JSON.stringify(user));
+        if (user) {
+            // 恢复基础用户信息
+            const currentUser = window.getCurrentUserData() || {};
+            const mergedUser = { ...currentUser, ...user };
+            localStorage.setItem('cognitive_user', JSON.stringify(mergedUser));
+        }
+    });
+    
+    // 恢复错题本
+    LocalDB.get('wrongBook', 'all').then(function(data) {
+        if (data) {
+            const user = window.getCurrentUserData() || {};
+            user.wrongNotes = data;
+            localStorage.setItem('cognitive_user', JSON.stringify(user));
+        }
+    });
+    
+    // 恢复聊天记录
+    LocalDB.get('chatHistory', 'all').then(function(data) {
+        if (data && data.records) {
+            const user = window.getCurrentUserData() || {};
+            user.chatHistory = data.records;
+            localStorage.setItem('cognitive_user', JSON.stringify(user));
+        }
+    });
+    
+    // 恢复训练记录
+    LocalDB.get('trainingRecords', 'all').then(function(data) {
+        if (data) {
+            const user = window.getCurrentUserData() || {};
+            user.trainingRecords = data;
+            localStorage.setItem('cognitive_user', JSON.stringify(user));
+        }
+    });
+    
+    // 恢复模拟考试历史
+    LocalDB.get('trainingRecords', 'examHistory').then(function(data) {
+        if (data) {
+            const user = window.getCurrentUserData() || {};
+            user.examHistory = data;
+            localStorage.setItem('cognitive_user', JSON.stringify(user));
+        }
+    });
+    
+    // 恢复学生日记
+    LocalDB.get('trainingRecords', 'diaryEntries').then(function(data) {
+        if (data) {
+            const user = window.getCurrentUserData() || {};
+            user.diaryEntries = data;
+            localStorage.setItem('cognitive_user', JSON.stringify(user));
+        }
     });
 };
 
@@ -395,7 +465,7 @@ window.restoreFromDB = function() {
     LocalDB.get('wrongBook', 'all').then(function(wrongNotes) {
         if (wrongNotes && wrongNotes.length > 0) {
             const user = window.getCurrentUserData();
-            if (user && (!user.wrongNotes || user.wrongNotes.length === 0) {
+            if (user && (!user.wrongNotes || user.wrongNotes.length === 0)) {
                 user.wrongNotes = wrongNotes;
                 window.saveUserData(user);
                 console.log('✅ 已从本地数据库恢复错题本数据:', wrongNotes.length + '道');

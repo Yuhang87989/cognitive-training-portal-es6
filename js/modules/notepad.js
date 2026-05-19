@@ -42,17 +42,48 @@ const CATEGORY_TAGS = ['学习', '生活', '心情', '目标', '其他'];
 
 // 加载笔记列表
 function loadNotes() {
+    // 先尝试从用户数据加载
+    if (window.getCurrentUserData) {
+        const user = window.getCurrentUserData();
+        if (user && user.diaryEntries) {
+            return user.diaryEntries;
+        }
+    }
+    
+    // 用户数据没有，再从独立键加载
     const notes = localStorage.getItem(NOTEPAD_NOTES_KEY);
     return notes ? JSON.parse(notes) : [];
 }
 
-// 保存笔记列表
+// 保存笔记列表（双存储机制）
 function saveNotes(notes) {
+    // 1. 保存到独立键（向后兼容）
     localStorage.setItem(NOTEPAD_NOTES_KEY, JSON.stringify(notes));
+    
+    // 2. 保存到用户数据（用于IndexedDB同步）
+    const user = window.getCurrentUserData ? window.getCurrentUserData() : {};
+    user.diaryEntries = notes;
+    if (window.saveUserData) {
+        window.saveUserData(user);
+    }
+    
+    // 3. 触发同步到IndexedDB
+    if (window.syncToLocalDB) {
+        setTimeout(window.syncToLocalDB, 100);
+    }
 }
 
 // 加载统计数据
 function loadStats() {
+    // 先尝试从用户数据加载
+    if (window.getCurrentUserData) {
+        const user = window.getCurrentUserData();
+        if (user && user.diaryStats) {
+            return user.diaryStats;
+        }
+    }
+    
+    // 用户数据没有，再从独立键加载
     const stats = localStorage.getItem(DIARY_STATS_KEY);
     return stats ? JSON.parse(stats) : {
         totalEntries: 0,
@@ -62,9 +93,17 @@ function loadStats() {
     };
 }
 
-// 保存统计数据
+// 保存统计数据（双存储机制）
 function saveStats(stats) {
+    // 1. 保存到独立键（向后兼容）
     localStorage.setItem(DIARY_STATS_KEY, JSON.stringify(stats));
+    
+    // 2. 保存到用户数据（用于IndexedDB同步）
+    const user = window.getCurrentUserData ? window.getCurrentUserData() : {};
+    user.diaryStats = stats;
+    if (window.saveUserData) {
+        window.saveUserData(user);
+    }
 }
 
 // 更新统计数据
