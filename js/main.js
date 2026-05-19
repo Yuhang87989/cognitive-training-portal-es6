@@ -50,6 +50,7 @@ import './modules/pomodoro.js';
 import './modules/my-page.js';
 import './modules/self-drive.js';
 import './modules/wrongbook.js';
+import './modules/exam.js';
 
 // 数据模块 - 这些是配置数据，需要预先加载
 import './data/topics.js';

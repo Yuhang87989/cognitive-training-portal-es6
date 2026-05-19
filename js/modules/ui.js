@@ -345,6 +345,7 @@ function openFullscreenPage(module) {
         'games': '🎮 训练游戏',
         'deepseek': '🤖 DeepSeek',
         'wrongbook': '📒 错题本',
+        'exam': '📝 模拟考试',
         'pomodoro': '🍅 番茄闹钟',
         'calculator': '🧮 计算器',
         'notepad': '📝 记事本',
@@ -381,6 +382,7 @@ function openFullscreenPage(module) {
         case 'games': if (typeof renderGames === 'function') renderGames(contentEl); break;
         case 'deepseek': if (typeof window.renderDeepseek === 'function') window.renderDeepseek(contentEl); break;
         case 'wrongbook': if (typeof renderWrongbook === 'function') renderWrongbook(contentEl); break;
+        case 'exam': if (typeof window.renderExam === 'function') window.renderExam(contentEl); break;
         case 'pomodoro': if (typeof renderPomodoro === 'function') renderPomodoro(contentEl); break;
         case 'my': if (typeof window.renderMyPage === 'function') window.renderMyPage(contentEl); break;
         case 'journal': 
